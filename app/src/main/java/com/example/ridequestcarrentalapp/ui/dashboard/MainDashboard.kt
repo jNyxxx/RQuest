@@ -2,6 +2,7 @@ package com.example.ridequestcarrentalapp.ui.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -279,6 +280,42 @@ fun MainDashboard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun QuickStatsSection(
+    totalCars: Int,
+    availableCars: Int,
+    featuredCount: Int
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatItem(label = "Total Cars", value = totalCars.toString())
+        StatItem(label = "Available", value = availableCars.toString())
+        StatItem(label = "Featured", value = featuredCount.toString())
+    }
+}
+
+@Composable
+private fun StatItem(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = value,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = Color.Gray
+        )
     }
 }
 

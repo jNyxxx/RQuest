@@ -382,80 +382,80 @@ fun AdvancedFiltersSection(
     }
 }
 
-@Composable
-fun QuickStatsSection(
-    totalCars: Int,
-    availableCars: Int,
-    featuredCount: Int
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        QuickStatCard(
-            title = "Total Cars",
-            value = totalCars.toString(),
-            icon = Icons.Default.DirectionsCar,
-            color = Orange
-        )
-        QuickStatCard(
-            title = "Available",
-            value = availableCars.toString(),
-            icon = Icons.Default.CheckCircle,
-            color = Color(0xFF4CAF50)
-        )
-        QuickStatCard(
-            title = "Featured",
-            value = featuredCount.toString(),
-            icon = Icons.Default.Star,
-            color = Color(0xFFFF9800)
-        )
-    }
-}
-
-@Composable
-private fun QuickStatCard(
-    title: String,
-    value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: Color
-) {
-    Card(
-        modifier = Modifier.width(100.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = color,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = value,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = color
-            )
-            Text(
-                text = title,
-                fontSize = 10.sp,
-                color = Color.Gray,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
+//@Composable
+//fun QuickStatsSection(
+//    totalCars: Int,
+//    availableCars: Int,
+//    featuredCount: Int
+//) {
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp),
+//        horizontalArrangement = Arrangement.SpaceEvenly
+//    ) {
+//        QuickStatCard(
+//            title = "Total Cars",
+//            value = totalCars.toString(),
+//            icon = Icons.Default.DirectionsCar,
+//            color = Orange
+//        )
+//        QuickStatCard(
+//            title = "Available",
+//            value = availableCars.toString(),
+//            icon = Icons.Default.CheckCircle,
+//            color = Color(0xFF4CAF50)
+//        )
+//        QuickStatCard(
+//            title = "Featured",
+//            value = featuredCount.toString(),
+//            icon = Icons.Default.Star,
+//            color = Color(0xFFFF9800)
+//        )
+//    }
+//}
+//
+//@Composable
+//private fun QuickStatCard(
+//    title: String,
+//    value: String,
+//    icon: androidx.compose.ui.graphics.vector.ImageVector,
+//    color: Color
+//) {
+//    Card(
+//        modifier = Modifier.width(100.dp),
+//        shape = RoundedCornerShape(12.dp),
+//        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+//    ) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(12.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Icon(
+//                imageVector = icon,
+//                contentDescription = title,
+//                tint = color,
+//                modifier = Modifier.size(24.dp)
+//            )
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Text(
+//                text = value,
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                color = color
+//            )
+//            Text(
+//                text = title,
+//                fontSize = 10.sp,
+//                color = Color.Gray,
+//                textAlign = TextAlign.Center
+//            )
+//        }
+//    }
+//}
 
 @Composable
 fun FeaturedCarsSection(

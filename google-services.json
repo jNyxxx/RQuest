@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "779219384672",
+    "project_id": "ridequest-129b7",
+    "storage_bucket": "ridequest-129b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779219384672:android:e4c6f036a292c67d1f0605",
+        "android_client_info": {
+          "package_name": "com.example.ridequestcarrentalapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDuNTnFUf-kzYblHbUXzLx70sFTF1lvP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

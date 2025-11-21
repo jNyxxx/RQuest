@@ -1,8 +1,6 @@
-package com.example.ridequestcarrentalapp.ui.login
+package com.example.ridequestcarrentalapp
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,10 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -24,18 +19,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ridequestcarrentalapp.R
 import com.example.ridequestcarrentalapp.ui.theme.Helvetica
 import com.example.ridequestcarrentalapp.ui.theme.Orange
 
 @Composable
-fun LoginScreenFirebase(
+fun AdminLoginScreen(
     isLoading: Boolean = false,
     errorMessage: String? = null,
     onLoginClick: (String, String) -> Unit,
-    onSignUpClick: () -> Unit,
-    onForgotPasswordClick: () -> Unit,
-    onAdminLoginClick: () -> Unit = {}
+    onBackClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -44,7 +36,7 @@ fun LoginScreenFirebase(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFF1a1a2e))
     ) {
         Column(
             modifier = Modifier
@@ -52,20 +44,40 @@ fun LoginScreenFirebase(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // Logo
+            // Back Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color.White.copy(alpha = 0.1f), CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Admin Icon
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Orange),
+                    .size(100.dp)
+                    .background(Orange, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.white_back_logo),
-                    contentDescription = "RideQuest Logo",
-                    contentScale = ContentScale.Fit,
+                Icon(
+                    Icons.Default.AdminPanelSettings,
+                    contentDescription = "Admin",
+                    tint = Color.White,
                     modifier = Modifier.size(50.dp)
                 )
             }
@@ -73,30 +85,29 @@ fun LoginScreenFirebase(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Sign In",
+                text = "Admin Portal",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Helvetica,
-                color = Orange
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Welcome back! Sign in to continue.",
+                text = "Access for authorized personnel only",
                 fontSize = 14.sp,
-                fontFamily = Helvetica,
-                color = Color.Gray,
+                color = Color.White.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Error Message
             if (errorMessage != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.2f))
                 ) {
                     Text(
                         text = errorMessage,
@@ -108,12 +119,14 @@ fun LoginScreenFirebase(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Email Field
+            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Email address") },
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                placeholder = { Text("Admin Email", color = Color.White.copy(alpha = 0.5f)) },
+                leadingIcon = {
+                    Icon(Icons.Default.Email, contentDescription = null, tint = Orange)
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -121,23 +134,28 @@ fun LoginScreenFirebase(
                 enabled = !isLoading,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Orange,
-                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.3f)
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
                 )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password Field
+            // Password
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = { Text("Password") },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                placeholder = { Text("Password", color = Color.White.copy(alpha = 0.5f)) },
+                leadingIcon = {
+                    Icon(Icons.Default.Lock, contentDescription = null, tint = Orange)
+                },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.7f)
                         )
                     }
                 },
@@ -149,26 +167,15 @@ fun LoginScreenFirebase(
                 enabled = !isLoading,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Orange,
-                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.3f)
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
                 )
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Forgot Password
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                Text(
-                    text = "Forgot Password?",
-                    color = Orange,
-                    fontSize = 14.sp,
-                    fontFamily = Helvetica,
-                    modifier = Modifier.clickable { onForgotPasswordClick() }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Sign In Button
+            // Login Button
             Button(
                 onClick = { onLoginClick(email.trim(), password) },
                 modifier = Modifier
@@ -181,40 +188,17 @@ fun LoginScreenFirebase(
                 if (isLoading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
-                    Text("Sign In", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Icon(Icons.Default.Login, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Access Admin Panel", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Admin Login Link
-            Text(
-                text = "Admin? Login here",
-                color = Color.Gray,
-                fontSize = 14.sp,
-                fontFamily = Helvetica,
-                modifier = Modifier
-                    .clickable { onAdminLoginClick() }
-                    .padding(8.dp)
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sign Up Link
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 32.dp)
-            ) {
-                Text("Don't have an account? ", color = Color.Gray, fontSize = 14.sp)
-                Text(
-                    text = "Sign Up",
-                    color = Orange,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { onSignUpClick() }
-                )
+                }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
-    }
-}
