@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add New Vehicle"
+            android:textColor="@color/rq_orange"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText android:id="@+id/etMake" android:hint="Make (e.g. Toyota)" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:paddingHorizontal="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/etModel" android:hint="Model (e.g. Vios)" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:paddingHorizontal="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/etType" android:hint="Type (e.g. Sedan)" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:paddingHorizontal="12dp" android:layout_marginBottom="12dp"/>
+
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp">
+            <EditText android:id="@+id/etYear" android:hint="Year" android:inputType="number" android:layout_weight="1" android:layout_width="0dp" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:paddingHorizontal="12dp" android:layout_marginEnd="8dp"/>
+            <EditText android:id="@+id/etPrice" android:hint="Rate/Day" android:inputType="numberDecimal" android:layout_weight="1" android:layout_width="0dp" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:paddingHorizontal="12dp"/>
+        </LinearLayout>
+
+        <EditText android:id="@+id/etPlate" android:hint="Plate Number" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:paddingHorizontal="12dp" android:layout_marginBottom="12dp"/>
+
+        <TextView android:text="Select Image Asset:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:textColor="#555"/>
+        <Spinner android:id="@+id/spImage" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_input_field" android:layout_marginBottom="12dp"/>
+
+        <Button android:id="@+id/btnPreview" android:text="Preview Image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:backgroundTint="#999" android:layout_marginBottom="12dp"/>
+        <ImageView android:id="@+id/ivPreview" android:layout_width="match_parent" android:layout_height="150dp" android:scaleType="centerCrop" android:background="#EEE" android:layout_marginBottom="24dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddCar"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Add Vehicle"
+            android:background="@drawable/bg_button_orange"
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
+
+        <Button android:id="@+id/btnBack" android:text="Cancel" android:textColor="#555" android:background="@android:color/transparent" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>

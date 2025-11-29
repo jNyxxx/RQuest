@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="4dp"/>
+    <solid android:color="#F26E24"/> <!-- Orange for active -->
+    <size android:width="24dp" android:height="6dp"/>
+</shape>

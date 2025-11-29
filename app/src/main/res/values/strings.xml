@@ -1,0 +1,37 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">RideQuest</string>
+
+    <!-- Common -->
+    <string name="back_button">Back</string>
+    <string name="more_options">More options</string>
+    <string name="car_image">Car image</string>
+
+    <!-- Car Detail Screen -->
+    <string name="car_details">Car Details</string>
+    <string name="tesla_model_s">Tesla Model S</string>
+    <string name="premium_car">Premium Car</string>
+    <string name="price_sample">$18,000</string>
+    <string name="per_day">per day</string>
+    <string name="car_features">Car features</string>
+
+    <!-- Car Features -->
+    <string name="capacity">Capacity</string>
+    <string name="capacity_icon">Capacity icon</string>
+    <string name="five_seats">5 Seats</string>
+
+    <string name="engine">Engine</string>
+    <string name="engine_icon">Engine icon</string>
+    <string name="hp_670">670 HP</string>
+
+    <string name="max_speed">Max Speed</string>
+    <string name="max_speed_icon">Max speed icon</string>
+    <string name="speed_250">250km/h</string>
+
+    <string name="book_now">Book Now</string>
+
+    <!-- Booking Screen -->
+    <string name="step_indicator">Step indicator</string>
+    <string name="calendar_icon">Calendar icon</string>
+    <string name="time_icon">Time icon</string>
+</resources>
