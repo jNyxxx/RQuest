@@ -1,25 +1,57 @@
 package com.example.ridequest;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class EditProfileActivity extends AppCompatActivity {
-    @Override protected void onCreate(Bundle savedInstanceState) {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+
         CarRentalData db = new CarRentalData(this);
         int uid = getSharedPreferences("UserSession", MODE_PRIVATE).getInt("UID", 1);
 
-        EditText f = findViewById(R.id.etFirst), l = findViewById(R.id.etLast), e = findViewById(R.id.etEmail), p = findViewById(R.id.etPhone);
-        CarRentalData.Customer c = db.getCustomer(uid);
-        if(c!=null) { f.setText(c.firstName); l.setText(c.lastName); e.setText(c.email); p.setText(c.phone); }
+        EditText etFirst = findViewById(R.id.etFirst);
+        EditText etLast = findViewById(R.id.etLast);
+        EditText etEmail = findViewById(R.id.etEmail);
+        EditText etPhone = findViewById(R.id.etPhone);
+        TextView tvName = findViewById(R.id.tvEditNameDisplay);
 
-        findViewById(R.id.btnSave).setOnClickListener(v -> {
-            if(db.updateCustomer(uid, f.getText().toString(), l.getText().toString(), e.getText().toString(), p.getText().toString())) {
-                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show(); finish();
+        // Load existing data
+        CarRentalData.Customer c = db.getCustomer(uid);
+        if(c != null) {
+            etFirst.setText(c.firstName);
+            etLast.setText(c.lastName);
+            etEmail.setText(c.email);
+            etPhone.setText(c.phone);
+            tvName.setText(c.firstName + " " + c.lastName);
+        }
+
+        // Save Button
+        Button btnSave = findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(v -> {
+            String f = etFirst.getText().toString();
+            String l = etLast.getText().toString();
+            String e = etEmail.getText().toString();
+            String p = etPhone.getText().toString();
+
+            if (db.updateCustomer(uid, f, l, e, p)) {
+                Toast.makeText(this, "Profile Updated!", Toast.LENGTH_SHORT).show();
+                finish(); // Go back to Profile Screen
+            } else {
+                Toast.makeText(this, "Update Failed", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Back Button
+        ImageView btnBack = findViewById(R.id.btnBackEdit);
+        btnBack.setOnClickListener(v -> finish());
     }
 }

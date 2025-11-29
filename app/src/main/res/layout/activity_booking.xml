@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:padding="20dp">
 
     <!-- Header -->
-    <ImageView
+    <FrameLayout
         android:id="@+id/btnBack"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/bg_input_field"
+        android:background="@drawable/bg_input_field"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="center"
-        android:rotation="180"
-        android:src="@android:drawable/ic_menu_revert"
-        app:layout_constraintBottom_toBottomOf="@id/btnBack"
-        app:layout_constraintEnd_toEndOf="@id/btnBack"
-        app:layout_constraintStart_toStartOf="@id/btnBack"
-        app:layout_constraintTop_toTopOf="@id/btnBack"
-        app:tint="#333" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/back_button"
+            android:rotation="180"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="#333" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvHeader"
@@ -52,7 +51,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Timeline (Visual) -->
+            <!-- Timeline -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,17 +62,19 @@
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@android:drawable/radiobutton_off_background"
-                    app:tint="@color/black" />
+                    android:contentDescription="@string/step_indicator"
+                    android:src="@android:drawable/radiobutton_on_background"
+                    app:tint="@color/rq_orange" />
 
                 <View
                     android:layout_width="80dp"
                     android:layout_height="2dp"
-                    android:background="#333" />
+                    android:background="#CCC" />
 
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
+                    android:contentDescription="@string/step_indicator"
                     android:src="@android:drawable/radiobutton_off_background"
                     app:tint="#CCC" />
 
@@ -85,6 +86,7 @@
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
+                    android:contentDescription="@string/step_indicator"
                     android:src="@android:drawable/radiobutton_off_background"
                     app:tint="#CCC" />
             </LinearLayout>
@@ -100,7 +102,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="40dp"
-                    android:text="Dates"
+                    android:text="@string/dates"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -108,14 +110,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="40dp"
-                    android:text="Payment"
+                    android:text="@string/payment"
                     android:textColor="#999"
                     android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Confirm"
+                    android:text="@string/confirm"
                     android:textColor="#999"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -133,6 +135,7 @@
                     android:id="@+id/ivBookingCar"
                     android:layout_width="80dp"
                     android:layout_height="50dp"
+                    android:contentDescription="@string/car_image"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_launcher_foreground" />
 
@@ -148,7 +151,8 @@
                         android:layout_height="wrap_content"
                         android:text="Tesla Model S"
                         android:textColor="#333"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        tools:ignore="HardcodedText" />
 
                     <TextView
                         android:id="@+id/tvBookingPrice"
@@ -156,7 +160,8 @@
                         android:layout_height="wrap_content"
                         android:text="$18,000 per day"
                         android:textColor="#757575"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        tools:ignore="HardcodedText" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -165,11 +170,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp"
-                android:text="Select Rental Dates"
+                android:text="Select Rental Dates &amp; Times"
                 android:textColor="#555"
                 android:textStyle="bold" />
 
-            <!-- Date Pickers -->
+            <!-- Pickup Date -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -181,6 +186,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:contentDescription="@string/calendar_icon"
                     android:src="@android:drawable/ic_menu_my_calendar"
                     app:tint="#333" />
 
@@ -199,14 +205,16 @@
                     android:background="@null"
                     android:gravity="center_vertical|end"
                     android:hint="Select Date"
-                    android:inputType="date"
-                    android:textSize="14sp" />
+                    android:inputType="none"
+                    android:textSize="14sp"
+                    tools:ignore="Autofill,LabelFor" />
             </LinearLayout>
 
+            <!-- Pickup Time -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/bg_input_field"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="12dp">
@@ -214,6 +222,39 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:contentDescription="@string/time_icon"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="#333" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Pickup Time"
+                    android:textColor="#999"
+                    android:textSize="12sp" />
+
+                <Spinner
+                    android:id="@+id/spPickupTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:gravity="end" />
+            </LinearLayout>
+
+            <!-- Return Date -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/calendar_icon"
                     android:src="@android:drawable/ic_menu_my_calendar"
                     app:tint="#333" />
 
@@ -232,8 +273,41 @@
                     android:background="@null"
                     android:gravity="center_vertical|end"
                     android:hint="Select Date"
-                    android:inputType="date"
-                    android:textSize="14sp" />
+                    android:inputType="none"
+                    android:textSize="14sp"
+                    tools:ignore="Autofill,LabelFor" />
+            </LinearLayout>
+
+            <!-- Return Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/time_icon"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="#333" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Return Time"
+                    android:textColor="#999"
+                    android:textSize="12sp" />
+
+                <Spinner
+                    android:id="@+id/spReturnTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:gravity="end" />
             </LinearLayout>
 
             <TextView
@@ -248,8 +322,9 @@
                 android:id="@+id/spPickupLoc"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:layout_marginBottom="24dp"
                 android:background="@drawable/bg_input_field"
-                android:layout_marginBottom="24dp"/>
+                android:paddingHorizontal="12dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -263,8 +338,9 @@
                 android:id="@+id/spReturnLoc"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:layout_marginBottom="32dp"
                 android:background="@drawable/bg_input_field"
-                android:layout_marginBottom="32dp"/>
+                android:paddingHorizontal="12dp" />
 
         </LinearLayout>
     </ScrollView>

@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-}
+    id("org.jetbrains.kotlin.android")}
 
 android {
     namespace = "com.example.ridequest"
@@ -9,7 +8,12 @@ android {
 
     defaultConfig {
         applicationId = "com.example.ridequest"
+
+        // --- FIX ---
+        // Set minSdk to a reasonable level to support more devices.
+        // API 24 (Android 7.0) is a common and good starting point.
         minSdk = 34
+
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -44,9 +48,16 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation(libs.constraintlayout)
+
+
+    // --- Recommended Addition ---
+    // This dependency is often used with activities and fragments.
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
+

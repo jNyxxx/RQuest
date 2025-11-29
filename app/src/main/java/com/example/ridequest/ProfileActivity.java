@@ -3,6 +3,8 @@ package com.example.ridequest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,23 +22,33 @@ public class ProfileActivity extends AppCompatActivity {
 
         load();
 
-        findViewById(R.id.btnEditProfile).setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+        // Edit Profile Click
+        LinearLayout btnEdit = findViewById(R.id.btnEditProfile);
+        btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
 
-        findViewById(R.id.btnLogout).setOnClickListener(v -> {
+        // Logout Click
+        TextView btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            // Clear session
             SharedPreferences.Editor editor = getSharedPreferences("UserSession", MODE_PRIVATE).edit();
             editor.clear();
             editor.apply();
 
+            // Go to Landing
             Intent intent = new Intent(this, LandingActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
+
+        // Back Button
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        load();
+        load(); // Refresh in case edit changed name
     }
 
     private void load() {
