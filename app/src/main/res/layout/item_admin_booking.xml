@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvBookingId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Booking #123"
+                android:textColor="#333"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pending"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:background="@drawable/bg_status_pending"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <!-- Customer Info -->
+        <TextView
+            android:id="@+id/tvCustomer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Customer: John Doe"
+            android:textColor="#666"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp"
+            tools:ignore="HardcodedText" />
+
+        <!-- Car Info -->
+        <TextView
+            android:id="@+id/tvCar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Car: Toyota Wigo"
+            android:textColor="#666"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp"
+            tools:ignore="HardcodedText" />
+
+        <!-- Dates -->
+        <TextView
+            android:id="@+id/tvDates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="11/30/2025 → 12/1/2025"
+            android:textColor="#999"
+            android:textSize="12sp"
+            android:layout_marginBottom="8dp"
+            tools:ignore="HardcodedText" />
+
+        <!-- Total -->
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$850.00"
+            android:textColor="@color/rq_orange"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            tools:ignore="HardcodedText" />
+
+        <!-- Action Buttons (Only show for Pending) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Cancel"
+                android:textColor="@color/white"
+                android:background="@drawable/bg_button_cancel"
+                android:textAllCaps="false"
+                android:paddingHorizontal="16dp"
+                android:layout_marginEnd="8dp"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/btnApprove"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Approve"
+                android:textColor="@color/white"
+                android:background="@drawable/bg_button_approve"
+                android:textAllCaps="false"
+                android:paddingHorizontal="16dp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

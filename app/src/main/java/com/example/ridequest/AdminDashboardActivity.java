@@ -2,9 +2,10 @@ package com.example.ridequest;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,10 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class AdminDashboardActivity extends AppCompatActivity {
+
+    private static final String TAG = "AdminDashboard";
     private CarRentalData db;
-    private RecyclerView rv;
+    private RecyclerView recyclerView;
     private FloatingActionButton fab;
     private boolean showingVehicles = true;
+
+    private TextView btnVehicles, btnBookings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,16 +28,29 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_dashboard);
 
         db = new CarRentalData(this);
-        rv = findViewById(R.id.rvAdmin);
+        recyclerView = findViewById(R.id.rvAdmin);
         fab = findViewById(R.id.fabAdd);
         ImageView btnProfile = findViewById(R.id.btnAdminProfile);
 
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        btnVehicles = findViewById(R.id.btnViewVehicles);
+        btnBookings = findViewById(R.id.btnViewBookings);
 
-        findViewById(R.id.btnViewVehicles).setOnClickListener(v -> loadVehicles());
-        findViewById(R.id.btnViewBookings).setOnClickListener(v -> loadBookings());
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // LOGOUT LOGIC
+        // Tab Selection
+        btnVehicles.setOnClickListener(v -> {
+            showingVehicles = true;
+            updateTabStyles();
+            loadVehicles();
+        });
+
+        btnBookings.setOnClickListener(v -> {
+            showingVehicles = false;
+            updateTabStyles();
+            loadBookings();
+        });
+
+        // Logout Logic
         if (btnProfile != null) {
             btnProfile.setOnClickListener(v -> {
                 PopupMenu popup = new PopupMenu(AdminDashboardActivity.this, btnProfile);
@@ -52,6 +70,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
             });
         }
 
+        // FAB for adding vehicles
         fab.setOnClickListener(v -> {
             if (showingVehicles) {
                 startActivity(new Intent(AdminDashboardActivity.this, AddVehicleActivity.class));
@@ -59,6 +78,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 Toast.makeText(this, "Switch to Vehicles tab to add cars", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Start with vehicles view
+        updateTabStyles();
+        loadVehicles();
     }
 
     @Override
@@ -68,19 +91,196 @@ public class AdminDashboardActivity extends AppCompatActivity {
         else loadBookings();
     }
 
+    /**
+     * Update tab button styles
+     */
+    private void updateTabStyles() {
+        if(showingVehicles) {
+            btnVehicles.setBackgroundResource(R.drawable.bg_button_orange);
+            btnVehicles.setTextColor(getResources().getColor(R.color.white));
+
+            btnBookings.setBackgroundResource(R.drawable.bg_input_field);
+            btnBookings.setTextColor(getResources().getColor(R.color.black));
+
+            fab.show();
+        } else {
+            btnBookings.setBackgroundResource(R.drawable.bg_button_orange);
+            btnBookings.setTextColor(getResources().getColor(R.color.white));
+
+            btnVehicles.setBackgroundResource(R.drawable.bg_input_field);
+            btnVehicles.setTextColor(getResources().getColor(R.color.black));
+
+            fab.hide();
+        }
+    }
+
+    /**
+     * Load vehicles list
+     */
     private void loadVehicles() {
-        showingVehicles = true;
+        Log.d(TAG, "Loading vehicles...");
         fab.show();
-        rv.setAdapter(new VehicleAdapter(this, db.getAllVehicles(), true, id -> {
+
+        recyclerView.setAdapter(new VehicleAdapter(this, db.getAllVehicles(), true, id -> {
             db.deleteVehicle(id);
             loadVehicles();
             Toast.makeText(this, "Vehicle Deleted", Toast.LENGTH_SHORT).show();
         }));
     }
 
+    /**
+     * Load bookings list with admin actions
+     */
     private void loadBookings() {
-        showingVehicles = false;
+        Log.d(TAG, "Loading bookings...");
         fab.hide();
-        rv.setAdapter(new BookingAdapter(db.getAllBookings()));
+
+        AdminBookingAdapter adapter = new AdminBookingAdapter(
+                this,
+                db.getAllBookingsForAdmin(),
+                new AdminBookingAdapter.BookingActionListener() {
+                    @Override
+                    public void onApprove(CarRentalData.AdminBookingItem booking) {
+                        approveBooking(booking);
+                    }
+
+                    @Override
+                    public void onCancel(CarRentalData.AdminBookingItem booking) {
+                        cancelBooking(booking);
+                    }
+
+                    @Override
+                    public void onViewDetails(CarRentalData.AdminBookingItem booking) {
+                        viewBookingDetails(booking);
+                    }
+                }
+        );
+
+        recyclerView.setAdapter(adapter);
+    }
+
+    /**
+     * Approve a booking
+     */
+    private void approveBooking(CarRentalData.AdminBookingItem booking) {
+        Log.d(TAG, "Approving booking: " + booking.id);
+
+        if(db.approveBooking(booking.id)) {
+            // Generate receipt
+            String receipt = generateReceipt(booking);
+
+            Toast.makeText(this, "Booking Approved!\n\n" + receipt, Toast.LENGTH_LONG).show();
+
+            // Optionally: Send confirmation email to customer
+            sendApprovalEmailToCustomer(booking, receipt);
+
+            loadBookings(); // Refresh list
+        } else {
+            Toast.makeText(this, "Failed to approve booking", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Cancel a booking
+     */
+    private void cancelBooking(CarRentalData.AdminBookingItem booking) {
+        Log.d(TAG, "Cancelling booking: " + booking.id);
+
+        if(db.cancelBooking(booking.id)) {
+            Toast.makeText(this, "Booking Cancelled", Toast.LENGTH_SHORT).show();
+
+            // Optionally: Send cancellation email to customer
+            sendCancellationEmailToCustomer(booking);
+
+            loadBookings(); // Refresh list
+        } else {
+            Toast.makeText(this, "Failed to cancel booking", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * View booking details
+     */
+    private void viewBookingDetails(CarRentalData.AdminBookingItem booking) {
+        Intent intent = new Intent(this, BookingDetailsActivity.class);
+        intent.putExtra("BOOKING_ID", booking.id);
+        startActivity(intent);
+    }
+
+    /**
+     * Generate unique receipt
+     */
+    private String generateReceipt(CarRentalData.AdminBookingItem booking) {
+        return "━━━━━━━━━━━━━━━━━━━━\n" +
+                "   RIDEQUEST RECEIPT\n" +
+                "━━━━━━━━━━━━━━━━━━━━\n\n" +
+                "Receipt #: " + booking.bookingReference + "\n" +
+                "Date: " + new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm", java.util.Locale.US).format(new java.util.Date()) + "\n\n" +
+                "Customer: " + booking.customerName + "\n" +
+                "Vehicle: " + booking.carName + "\n\n" +
+                "Pickup: " + booking.pickupDate + " " + booking.pickupTime + "\n" +
+                "Return: " + booking.returnDate + " " + booking.returnTime + "\n\n" +
+                "TOTAL: $" + String.format("%.2f", booking.totalCost) + "\n" +
+                "Payment: " + booking.paymentMethod + "\n\n" +
+                "Status: CONFIRMED\n" +
+                "━━━━━━━━━━━━━━━━━━━━\n" +
+                "Thank you for choosing\n" +
+                "RideQuest!";
+    }
+
+    /**
+     * Send approval email to customer
+     */
+    private void sendApprovalEmailToCustomer(CarRentalData.AdminBookingItem booking, String receipt) {
+        String subject = "✅ Booking Confirmed - " + booking.bookingReference;
+
+        String body = "Dear " + booking.customerName + ",\n\n" +
+                "Great news! Your booking has been APPROVED.\n\n" +
+                receipt + "\n\n" +
+                "Pickup Address: " + booking.pickupAddress + "\n" +
+                "Return Address: " + booking.returnAddress + "\n\n" +
+                "Please arrive on time and bring a valid ID.\n\n" +
+                "Safe travels!\n" +
+                "RideQuest Team";
+
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{booking.customerEmail});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send confirmation via..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Log.e(TAG, "No email app found");
+        }
+    }
+
+    /**
+     * Send cancellation email to customer
+     */
+    private void sendCancellationEmailToCustomer(CarRentalData.AdminBookingItem booking) {
+        String subject = "❌ Booking Cancelled - " + booking.bookingReference;
+
+        String body = "Dear " + booking.customerName + ",\n\n" +
+                "Unfortunately, we had to cancel your booking.\n\n" +
+                "Booking ID: " + booking.bookingReference + "\n" +
+                "Vehicle: " + booking.carName + "\n" +
+                "Total: $" + String.format("%.2f", booking.totalCost) + "\n\n" +
+                "Reason: Payment not verified\n\n" +
+                "If you believe this is an error, please contact us.\n\n" +
+                "RideQuest Team";
+
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{booking.customerEmail});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send cancellation via..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Log.e(TAG, "No email app found");
+        }
     }
 }

@@ -40,6 +40,7 @@
         <!-- Admin -->
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".AddVehicleActivity" />
+        <activity android:name=".BookingDetailsActivity" />
 
         <!-- NOTE: CarDetailActivity is declared ONCE above, NOT duplicated here! -->
 

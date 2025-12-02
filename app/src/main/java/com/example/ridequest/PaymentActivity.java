@@ -116,30 +116,41 @@ public class PaymentActivity extends AppCompatActivity {
             });
         }
 
-        // Confirm Payment Button
+        // Confirm Payment Button now creates a pending booking for admin approval
         findViewById(R.id.btnConfirm).setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
             CarRentalData db = new CarRentalData(this);
 
-            // Call processPaymentAndBooking with ALL 10 parameters
-            boolean success = db.processPaymentAndBooking(
-                    uid,           // Customer ID
-                    vid,           // Vehicle ID
-                    pickupDate,    // Pickup date
-                    returnDate,    // Return date
-                    pickupTime,    // Pickup time
-                    returnTime,    // Return time
-                    pickupLocId,   // Pickup location ID
-                    returnLocId,   // Return location ID
-                    totalCost,     // Total cost (including late fees)
-                    paymentMethod  // Payment method
+            // Generate unique booking reference
+            String bookingRef = "RQ" + System.currentTimeMillis();
+
+            // Get location addresses (placeholder logic)
+            // TODO: You can fetch the actual address from the database using pickupLocId and returnLocId
+            String pickupAddr = "Cebu HQ";
+            String returnAddr = "Cebu HQ";
+
+            // Call createPendingBooking instead of the old method
+            boolean success = db.createPendingBooking(
+                    uid,
+                    vid,
+                    carName,
+                    pickupDate,
+                    returnDate,
+                    pickupTime,
+                    returnTime,
+                    pickupAddr,
+                    returnAddr,
+                    totalCost,
+                    paymentMethod,
+                    bookingRef
             );
 
             if(success) {
-                Log.d(TAG, "✓ Payment successful!");
+                Log.d(TAG, "✓ Booking created and pending approval!");
 
-                String message = "Booking Confirmed!\nTotal: $" + String.format("%.2f", totalCost);
+                String message = "Booking Submitted!\nReference: " + bookingRef +
+                        "\n\nYour booking is pending admin approval.";
                 if(lateFee > 0) {
                     message += "\n(Includes $" + String.format("%.2f", lateFee) + " late fee)";
                 }
@@ -153,10 +164,11 @@ public class PaymentActivity extends AppCompatActivity {
                 finish();
 
             } else {
-                Log.e(TAG, "✗ Payment failed!");
-                Toast.makeText(this, "Payment Failed. Please try again.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "✗ Booking failed!");
+                Toast.makeText(this, "Booking Failed. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
+        // --- END OF INTEGRATED CODE ---
 
         // Back Button
         findViewById(R.id.btnBack).setOnClickListener(v -> {

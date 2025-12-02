@@ -119,10 +119,12 @@ public class CarRentalData {
     public static class LocationItem {
         public int id;
         public String name;
+        public String address;
 
-        public LocationItem(int id, String name) {
+        public LocationItem(int id, String name, String address) {
             this.id = id;
             this.name = name;
+            this.address = address;
         }
     }
 
@@ -130,10 +132,10 @@ public class CarRentalData {
         List<LocationItem> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         try {
-            Cursor c = db.rawQuery("SELECT location_id, location_name FROM Location", null);
+            Cursor c = db.rawQuery("SELECT location_id, location_name, address FROM Location", null);
             if (c.moveToFirst()) {
                 do {
-                    list.add(new LocationItem(c.getInt(0), c.getString(1)));
+                    list.add(new LocationItem(c.getInt(0), c.getString(1), c.getString(2)));
                 } while (c.moveToNext());
             }
             c.close();
@@ -142,6 +144,23 @@ public class CarRentalData {
         }
         db.close();
         return list;
+    }
+
+    public String getLocationAddress(int locationId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String address = "Unknown Location";
+        try {
+            Cursor c = db.rawQuery("SELECT address FROM Location WHERE location_id=?",
+                    new String[]{String.valueOf(locationId)});
+            if(c.moveToFirst()) {
+                address = c.getString(0);
+            }
+            c.close();
+        } catch(Exception e) {
+            Log.e(TAG, "Error fetching location address: " + e.getMessage(), e);
+        }
+        db.close();
+        return address;
     }
 
     // --- AUTH ---
@@ -224,26 +243,17 @@ public class CarRentalData {
         return rows > 0;
     }
 
-    // --- PAYMENT & BOOKING (UPDATED WITH NEW PARAMETERS) ---
-    public boolean processPaymentAndBooking(int uid, int vid,
-                                            String pickupDate, String returnDate,
-                                            String pickupTime, String returnTime,
-                                            int pickupLocId, int returnLocId,
-                                            double totalCost, String paymentMethod) {
+    // --- CREATE PENDING BOOKING ---
+    public boolean createPendingBooking(int uid, int vid, String carName,
+                                        String pickupDate, String returnDate,
+                                        String pickupTime, String returnTime,
+                                        String pickupAddress, String returnAddress,
+                                        double totalCost, String paymentMethod,
+                                        String bookingId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
-        Log.d(TAG, "Processing booking:");
-        Log.d(TAG, "  Customer ID: " + uid);
-        Log.d(TAG, "  Vehicle ID: " + vid);
-        Log.d(TAG, "  Pickup: " + pickupDate + " " + pickupTime);
-        Log.d(TAG, "  Return: " + returnDate + " " + returnTime);
-        Log.d(TAG, "  Locations: " + pickupLocId + " -> " + returnLocId);
-        Log.d(TAG, "  Total Cost: $" + totalCost);
-        Log.d(TAG, "  Payment: " + paymentMethod);
-
         try {
-            // Insert Reservation with all fields
             ContentValues r = new ContentValues();
             r.put("customer_num", uid);
             r.put("vehicle_id", vid);
@@ -251,46 +261,22 @@ public class CarRentalData {
             r.put("return_date", returnDate);
             r.put("pickup_time", pickupTime);
             r.put("return_time", returnTime);
-            r.put("pickup_loc_id", pickupLocId);
-            r.put("return_loc_id", returnLocId);
-            r.put("status", "Confirmed");
+            r.put("status", "Pending");
             r.put("total_cost", totalCost);
+            r.put("booking_reference", bookingId);
+            r.put("pickup_address", pickupAddress);
+            r.put("return_address", returnAddress);
+            r.put("payment_method", paymentMethod);
 
             long bid = db.insert("Reservation", null, r);
             if(bid == -1) throw new Exception("Failed to insert reservation");
-            Log.d(TAG, "✓ Reservation created: ID " + bid);
-
-            // Insert Rental
-            ContentValues ren = new ContentValues();
-            ren.put("reservation_id", bid);
-            ren.put("total_amount", totalCost);
-            long rid = db.insert("Rental", null, ren);
-            if(rid == -1) throw new Exception("Failed to insert rental");
-            Log.d(TAG, "✓ Rental created: ID " + rid);
-
-            // Insert Payment
-            ContentValues p = new ContentValues();
-            p.put("rental_id", rid);
-            p.put("payment_date", "NOW");
-            p.put("amount", totalCost);
-            p.put("payment_mthd", paymentMethod);
-            long pid = db.insert("Payment", null, p);
-            if(pid == -1) throw new Exception("Failed to insert payment");
-            Log.d(TAG, "✓ Payment created: ID " + pid);
-
-            // Update Vehicle status
-            ContentValues v = new ContentValues();
-            v.put("status", "Rented");
-            int updated = db.update("Vehicle", v, "vehicle_id=?", new String[]{String.valueOf(vid)});
-            if(updated == 0) throw new Exception("Failed to update vehicle status");
-            Log.d(TAG, "✓ Vehicle status updated to Rented");
 
             db.setTransactionSuccessful();
-            Log.d(TAG, "✓✓✓ Booking completed successfully!");
+            Log.d(TAG, "✓ Pending booking created: " + bookingId);
             return true;
 
         } catch(Exception ex) {
-            Log.e(TAG, "✗✗✗ Booking failed: " + ex.getMessage(), ex);
+            Log.e(TAG, "✗ Pending booking failed: " + ex.getMessage(), ex);
             return false;
         } finally {
             db.endTransaction();
@@ -298,19 +284,132 @@ public class CarRentalData {
         }
     }
 
-    // --- BOOKINGS ---
+    // --- APPROVE BOOKING (ADMIN ACTION) ---
+    public boolean approveBooking(int bookingId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("status", "Confirmed");
+        int rows = db.update("Reservation", v, "booking_id=?", new String[]{String.valueOf(bookingId)});
+        db.close();
+
+        Log.d(TAG, rows > 0 ? "✓ Booking approved: " + bookingId : "✗ Approval failed");
+        return rows > 0;
+    }
+
+    // --- CANCEL BOOKING (ADMIN ACTION) ---
+    public boolean cancelBooking(int bookingId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("status", "Cancelled");
+        int rows = db.update("Reservation", v, "booking_id=?", new String[]{String.valueOf(bookingId)});
+        db.close();
+
+        Log.d(TAG, rows > 0 ? "✓ Booking cancelled: " + bookingId : "✗ Cancellation failed");
+        return rows > 0;
+    }
+
+    // --- ADMIN BOOKING ITEM ---
+    public static class AdminBookingItem {
+        public int id;
+        public String bookingReference;
+        public String customerName;
+        public String customerEmail;
+        public String carName;
+        public String pickupDate;
+        public String pickupTime;
+        public String pickupAddress;
+        public String returnDate;
+        public String returnTime;
+        public String returnAddress;
+        public String status;
+        public String paymentMethod;
+        public double totalCost;
+
+        public AdminBookingItem(int id, String ref, String custName, String custEmail,
+                                String car, String pDate, String pTime, String pAddr,
+                                String rDate, String rTime, String rAddr,
+                                String stat, String payment, double cost) {
+            this.id = id;
+            this.bookingReference = ref;
+            this.customerName = custName;
+            this.customerEmail = custEmail;
+            this.carName = car;
+            this.pickupDate = pDate;
+            this.pickupTime = pTime;
+            this.pickupAddress = pAddr;
+            this.returnDate = rDate;
+            this.returnTime = rTime;
+            this.returnAddress = rAddr;
+            this.status = stat;
+            this.paymentMethod = payment;
+            this.totalCost = cost;
+        }
+    }
+
+    // --- GET ALL BOOKINGS FOR ADMIN ---
+    public List<AdminBookingItem> getAllBookingsForAdmin() {
+        List<AdminBookingItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT r.booking_id, r.booking_reference, " +
+                "c.first_name || ' ' || c.last_name as customer_name, c.email, " +
+                "mk.make_name || ' ' || vm.model_name as car_name, " +
+                "r.pickup_date, r.pickup_time, r.pickup_address, " +
+                "r.return_date, r.return_time, r.return_address, " +
+                "r.status, r.payment_method, r.total_cost " +
+                "FROM Reservation r " +
+                "JOIN Customer c ON r.customer_num = c.customer_id " +
+                "JOIN Vehicle v ON r.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY r.booking_id DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if(c.moveToFirst()) {
+                do {
+                    list.add(new AdminBookingItem(
+                            c.getInt(0),      // booking_id
+                            c.getString(1),   // booking_reference
+                            c.getString(2),   // customer_name
+                            c.getString(3),   // email
+                            c.getString(4),   // car_name
+                            c.getString(5),   // pickup_date
+                            c.getString(6),   // pickup_time
+                            c.getString(7),   // pickup_address
+                            c.getString(8),   // return_date
+                            c.getString(9),   // return_time
+                            c.getString(10),  // return_address
+                            c.getString(11),  // status
+                            c.getString(12),  // payment_method
+                            c.getDouble(13)   // total_cost
+                    ));
+                } while(c.moveToNext());
+            }
+            c.close();
+        } catch(Exception e) {
+            Log.e(TAG, "Error fetching admin bookings: " + e.getMessage(), e);
+        }
+        db.close();
+        return list;
+    }
+
+    // --- BOOKING ITEM (Simple version for non-admin) ---
     public static class BookingItem {
         public int id;
-        public String customerName, carName, dates, status;
+        public String customerName;
+        public String carName;
+        public String dates;
+        public String status;
         public double total;
 
-        public BookingItem(int id, String c, String v, String d, String s, double t){
+        public BookingItem(int id, String custName, String car, String dates, String status, double total) {
             this.id = id;
-            customerName = c;
-            carName = v;
-            dates = d;
-            status = s;
-            total = t;
+            this.customerName = custName;
+            this.carName = car;
+            this.dates = dates;
+            this.status = status;
+            this.total = total;
         }
     }
 

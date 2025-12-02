@@ -1,128 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA"
+    android:background="#FFFFFF"
     android:padding="20dp">
 
-    <!-- 1. Header Row -->
-    <ImageView
-        android:id="@+id/ivLogoHeader"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/ic_launcher_foreground"
-        app:tint="@color/rq_orange"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/ivProfile"/>
-
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="RideQuest"
-        android:textColor="@color/rq_orange"
-        android:textStyle="bold"
-        android:textSize="22sp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/ivLogoHeader"
-        app:layout_constraintTop_toTopOf="@id/ivLogoHeader"
-        app:layout_constraintBottom_toBottomOf="@id/ivLogoHeader"/>
-
-    <!-- Profile Pic (Rightmost) -->
-    <ImageView
-        android:id="@+id/ivProfile"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/ic_launcher_foreground"
-        android:background="@drawable/bg_input_field"
-        android:padding="2dp"
-        android:clipToOutline="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <!-- Notification Bell (Left of Profile) -->
-    <FrameLayout
-        android:id="@+id/notification_bell_layout"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_input_field"
-        app:layout_constraintEnd_toStartOf="@id/ivProfile"
-        app:layout_constraintTop_toTopOf="@id/ivProfile">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@android:drawable/ic_popup_reminder"
-            android:layout_gravity="center"
-            app:tint="#555"/>
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_launcher_foreground"
+            app:tint="@color/rq_orange" />
 
-        <!-- Notification Badge -->
         <TextView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:text="2"
-            android:textSize="10sp"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:background="@drawable/bg_button_orange"
-            android:layout_gravity="top|end"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"/>
-    </FrameLayout>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/app_name"
+            android:textColor="@color/rq_orange"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <!-- ******************** ADDED THIS SECTION ******************** -->
-    <!-- This is the missing TextView that your Java code is looking for. -->
+        <ImageView
+            android:id="@+id/ivProfile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_input_field"
+            android:contentDescription="@string/profile_avatar"
+            android:padding="6dp"
+            android:src="@android:drawable/ic_menu_myplaces"
+            app:tint="#333" />
+    </LinearLayout>
+
+    <!-- Welcome Text -->
     <TextView
-        android:id="@+id/tvUserName"
+        android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Welcome, User!"
-        android:textColor="@android:color/black"
+        android:textColor="#333"
         android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivProfile" />
-    <!-- ********************************************************** -->
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader" />
 
-
-    <!-- 2. Search Row -->
+    <!-- Search Bar -->
     <LinearLayout
         android:id="@+id/layoutSearch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="50dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvUserName"> <!-- Updated constraint -->
+        android:background="@drawable/bg_input_field"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvWelcome">
 
-        <!-- Search Bar -->
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/search_icon"
+            android:src="@android:drawable/ic_menu_search"
+            app:tint="#999" />
+
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Search your dream car..."
-            android:textSize="14sp"
-            android:paddingHorizontal="16dp"
-            android:drawableStart="@android:drawable/ic_menu_search"
-            android:drawablePadding="12dp"
-            android:drawableTint="#9E9E9E"/>
-
-        <!-- Filter Button -->
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="12dp"
-            android:src="@android:drawable/ic_menu_preferences"
-            android:background="@drawable/bg_input_field"
-            app:tint="#555"/>
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="Search your dream car..."
+            android:inputType="text"
+            android:textSize="14sp"
+            tools:ignore="Autofill" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/filter_icon"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            app:tint="#999" />
     </LinearLayout>
 
-    <!-- 3. Category Chips -->
+    <!-- Filter Chips -->
     <HorizontalScrollView
-        android:id="@+id/svChips"
+        android:id="@+id/layoutFilters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -134,61 +110,65 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <TextView
+                android:id="@+id/btnFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_button_orange"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
                 android:text="All vehicles"
                 android:textColor="@color/white"
-                android:background="@drawable/bg_button_orange"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/btnFilterSedan"
                 android:layout_width="wrap_content"
-                android:layout_height="35dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="center"
                 android:paddingHorizontal="20dp"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                android:layout_marginEnd="8dp"/>
+                android:text="Sedan"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/btnFilterHatchback"
                 android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
+                android:layout_height="36dp"
                 android:background="@drawable/bg_input_field"
-                android:layout_marginEnd="8dp">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_launcher_foreground" app:tint="#555"/>
-                <TextView android:text="Sedan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:textSize="12sp" android:textColor="#555"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="20dp"
+                android:text="Hatchback"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/btnFilterSUV"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
                 android:background="@drawable/bg_input_field"
-                android:layout_marginEnd="8dp">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_launcher_foreground" app:tint="#555"/>
-                <TextView android:text="Hatchback" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:textSize="12sp" android:textColor="#555"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:background="@drawable/bg_input_field">
-                <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_launcher_foreground" app:tint="#555"/>
-                <TextView android:text="SUV" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:textSize="12sp" android:textColor="#555"/>
-            </LinearLayout>
+                android:paddingHorizontal="20dp"
+                android:text="SUV"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- 4. Car Grid -->
+    <!-- Vehicle Grid -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/svChips" />
+        app:layout_constraintTop_toBottomOf="@id/layoutFilters"
+        tools:listitem="@layout/item_vehicle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
