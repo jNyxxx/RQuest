@@ -50,7 +50,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
             loadBookings();
         });
 
-        // Logout Logic
+        // Logout Logic - UPDATED to go directly to Login
         if (btnProfile != null) {
             btnProfile.setOnClickListener(v -> {
                 PopupMenu popup = new PopupMenu(AdminDashboardActivity.this, btnProfile);
@@ -58,7 +58,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
                 popup.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == 1) {
-                        Intent intent = new Intent(AdminDashboardActivity.this, LandingActivity.class);
+                        // Go directly to LoginActivity instead of LandingActivity
+                        Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
@@ -115,11 +116,32 @@ public class AdminDashboardActivity extends AppCompatActivity {
         Log.d(TAG, "Loading vehicles...");
         fab.show();
 
-        recyclerView.setAdapter(new VehicleAdapter(this, db.getAllVehicles(), true, id -> {
-            db.deleteVehicle(id);
-            loadVehicles();
-            Toast.makeText(this, "Vehicle Deleted", Toast.LENGTH_SHORT).show();
-        }));
+        // UPDATED: Added onEdit callback for editing vehicles
+        recyclerView.setAdapter(new VehicleAdapter(this, db.getAllVehicles(), true,
+                new VehicleAdapter.OnDeleteListener() {
+                    @Override
+                    public void onDelete(int id) {
+                        db.deleteVehicle(id);
+                        loadVehicles();
+                        Toast.makeText(AdminDashboardActivity.this, "Vehicle Deleted", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new VehicleAdapter.OnEditListener() {
+                    @Override
+                    public void onEdit(CarRentalData.VehicleItem vehicle) {
+                        // Open EditVehicleActivity with vehicle data
+                        Intent intent = new Intent(AdminDashboardActivity.this, EditVehicleActivity.class);
+                        intent.putExtra("VEHICLE_ID", vehicle.id);
+                        intent.putExtra("MAKE_MODEL", vehicle.title);
+                        intent.putExtra("TYPE", vehicle.type);
+                        intent.putExtra("PRICE", vehicle.price);
+                        intent.putExtra("IMAGE_RES", vehicle.imageRes);
+                        intent.putExtra("TRANSMISSION", vehicle.transmission);
+                        intent.putExtra("SEATS", vehicle.seats);
+                        startActivity(intent);
+                    }
+                }
+        ));
     }
 
     private void loadBookings() {
@@ -166,7 +188,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private void cancelBooking(CarRentalData.AdminBookingItem booking) {
         Log.d(TAG, "Cancelling booking: " + booking.id);
 
-        // Admin cancellation (no fee applied)
         if(db.cancelBooking(booking.id, true)) {
             Toast.makeText(this, "Booking Cancelled", Toast.LENGTH_SHORT).show();
             sendCancellationEmailToCustomer(booking);

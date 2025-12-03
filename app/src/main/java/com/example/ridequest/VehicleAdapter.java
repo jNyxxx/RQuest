@@ -18,14 +18,33 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     private Context context;
     private boolean isAdmin;
     private OnDeleteListener deleteListener;
+    private OnEditListener editListener;
 
-    public interface OnDeleteListener { void onDelete(int id); }
-
-    public VehicleAdapter(Context ctx, List<CarRentalData.VehicleItem> list, boolean admin, OnDeleteListener listener) {
-        this.context = ctx; this.vehicles = list; this.isAdmin = admin; this.deleteListener = listener;
+    public interface OnDeleteListener {
+        void onDelete(int id);
     }
 
-    @NonNull @Override
+    public interface OnEditListener {
+        void onEdit(CarRentalData.VehicleItem vehicle);
+    }
+
+    // Constructor for admin view (with edit and delete)
+    public VehicleAdapter(Context ctx, List<CarRentalData.VehicleItem> list, boolean admin,
+                          OnDeleteListener delListener, OnEditListener editListener) {
+        this.context = ctx;
+        this.vehicles = list;
+        this.isAdmin = admin;
+        this.deleteListener = delListener;
+        this.editListener = editListener;
+    }
+
+    // Constructor for customer view (no edit/delete)
+    public VehicleAdapter(Context ctx, List<CarRentalData.VehicleItem> list, boolean admin, OnDeleteListener listener) {
+        this(ctx, list, admin, listener, null);
+    }
+
+    @NonNull
+    @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_vehicle, parent, false));
     }
@@ -65,13 +84,30 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         };
 
         if (isAdmin) {
+            // Admin view: Show Edit and Delete buttons
             if (holder.btnDetails != null) holder.btnDetails.setVisibility(View.GONE);
+
+            if (holder.btnEdit != null) {
+                holder.btnEdit.setVisibility(View.VISIBLE);
+                holder.btnEdit.setOnClickListener(x -> {
+                    if (editListener != null) {
+                        editListener.onEdit(v);
+                    }
+                });
+            }
+
             if (holder.btnDelete != null) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
-                holder.btnDelete.setOnClickListener(x -> deleteListener.onDelete(v.id));
+                holder.btnDelete.setOnClickListener(x -> {
+                    if (deleteListener != null) {
+                        deleteListener.onDelete(v.id);
+                    }
+                });
             }
         } else {
+            // Customer view: Show View Details button only
             if (holder.btnDelete != null) holder.btnDelete.setVisibility(View.GONE);
+            if (holder.btnEdit != null) holder.btnEdit.setVisibility(View.GONE);
 
             // Attach click to "View Details" button
             if (holder.btnDetails != null) {
@@ -83,12 +119,15 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         }
     }
 
-    @Override public int getItemCount() { return vehicles.size(); }
+    @Override
+    public int getItemCount() {
+        return vehicles.size();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, type, price;
         ImageView img;
-        Button btnDelete, btnDetails;
+        Button btnDelete, btnDetails, btnEdit;
 
         public ViewHolder(View v) {
             super(v);
@@ -99,6 +138,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             img = v.findViewById(R.id.ivCar);
             btnDelete = v.findViewById(R.id.btnDelete);
             btnDetails = v.findViewById(R.id.btnDetails);
+            btnEdit = v.findViewById(R.id.btnEdit);
         }
     }
 }

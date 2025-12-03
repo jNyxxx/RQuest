@@ -1,108 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical">
 
+        <!-- Car Image -->
         <ImageView
             android:id="@+id/ivCar"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_launcher_foreground"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_car_placeholder"
+            android:contentDescription="Vehicle Image"
+            tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/tvCarName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Toyota Wigo"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivCar"
-            app:layout_constraintEnd_toStartOf="@id/tvPrice"/>
-
-        <TextView
-            android:id="@+id/tvType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sedan"
-            android:textColor="#9E9E9E"
-            android:textSize="12sp"
-            app:layout_constraintTop_toBottomOf="@id/tvCarName"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$1800"
-            android:textColor="@color/rq_orange"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvCarName"/>
-
+        <!-- Car Details -->
         <LinearLayout
-            android:id="@+id/layoutSpecs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvType">
+            android:orientation="vertical"
+            android:padding="16dp">
 
+            <!-- Title and Status Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/tvCarName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Toyota Wigo"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Available"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <!-- Type -->
             <TextView
+                android:id="@+id/tvType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Manual"
-                android:textSize="10sp"
-                android:textColor="#757575"/>
-            <Space android:layout_width="16dp" android:layout_height="wrap_content"/>
+                android:text="Sedan"
+                android:textSize="14sp"
+                android:textColor="#666"
+                android:layout_marginBottom="8dp"
+                tools:ignore="HardcodedText" />
+
+            <!-- Price -->
             <TextView
+                android:id="@+id/tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Premium"
-                android:textSize="10sp"
-                android:textColor="#757575"/>
+                android:text="$850.00/day"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/rq_orange"
+                android:layout_marginBottom="12dp"
+                tools:ignore="HardcodedText" />
+
+            <!-- Admin Action Buttons and Customer Details Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <!-- Customer: View Details Button -->
+                <Button
+                    android:id="@+id/btnDetails"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text="View Details"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_orange"
+                    android:textAllCaps="false"
+                    android:visibility="visible"
+                    tools:ignore="HardcodedText" />
+
+                <!-- Admin: Edit Button -->
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Edit"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_blue"
+                    android:textAllCaps="false"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText" />
+
+                <!-- Admin: Delete Button -->
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Delete"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_cancel"
+                    android:textAllCaps="false"
+                    android:paddingHorizontal="16dp"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- THIS IS CRITICAL - DO NOT REMOVE -->
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnDetails"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_marginTop="16dp"
-            android:text="View Details"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:background="@drawable/bg_button_orange"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/layoutSpecs" />
+    </LinearLayout>
 
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:text="Delete"
-            android:backgroundTint="#D32F2F"
-            android:visibility="gone"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/btnDetails"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
