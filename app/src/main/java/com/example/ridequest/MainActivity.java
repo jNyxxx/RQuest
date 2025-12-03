@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume - Reloading vehicles");
-        loadVehicles();
+        loadVehicles(); // IMPORTANT: This will refresh the vehicle list when returning to this activity
     }
 
     private void loadVehicles() {
@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            // FIXED: Reload vehicles from database every time
             allVehicles = db.getAllVehicles();
             Log.d(TAG, "Loaded " + allVehicles.size() + " vehicles from database");
 
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "Filtered: " + filteredVehicles.size() + " vehicles (Search: '" + currentSearchQuery + "', Category: '" + currentFilter + "')");
 
-        // Update RecyclerView
+        // Update RecyclerView with customer view (no edit/delete buttons)
         adapter = new VehicleAdapter(this, filteredVehicles, false, null);
         recyclerView.setAdapter(adapter);
 

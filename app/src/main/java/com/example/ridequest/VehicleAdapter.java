@@ -58,14 +58,30 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         if (holder.type != null) holder.type.setText(v.type);
         if (holder.price != null) holder.price.setText("$" + v.price);
 
-        // Load Image Safely
+        // Load Image Safely (Base64 or Drawable)
         if (holder.img != null) {
-            int resId = 0;
-            if(v.imageRes != null) {
-                resId = context.getResources().getIdentifier(v.imageRes, "drawable", context.getPackageName());
+            if(v.imageRes != null && !v.imageRes.isEmpty()) {
+                try {
+                    // Try to decode as Base64
+                    byte[] decodedBytes = android.util.Base64.decode(v.imageRes, android.util.Base64.DEFAULT);
+                    android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    if (bitmap != null) {
+                        holder.img.setImageBitmap(bitmap);
+                    } else {
+                        // Try as drawable resource (old format compatibility)
+                        int resId = context.getResources().getIdentifier(v.imageRes, "drawable", context.getPackageName());
+                        if(resId != 0) holder.img.setImageResource(resId);
+                        else holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
+                    }
+                } catch (Exception e) {
+                    // If Base64 decode fails, try as drawable resource
+                    int resId = context.getResources().getIdentifier(v.imageRes, "drawable", context.getPackageName());
+                    if(resId != 0) holder.img.setImageResource(resId);
+                    else holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
+                }
+            } else {
+                holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
             }
-            if(resId != 0) holder.img.setImageResource(resId);
-            else holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
         }
 
         // CLICK LISTENER Logic for "View Details"
@@ -76,6 +92,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 i.putExtra("PRICE", v.price);
                 i.putExtra("NAME", v.title);
                 i.putExtra("IMG_RES", v.imageRes);
+                i.putExtra("TRANSMISSION", v.transmission);
+                i.putExtra("SEATS", v.seats);
                 context.startActivity(i);
             } catch (Exception e) {
                 e.printStackTrace();

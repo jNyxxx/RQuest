@@ -1,17 +1,30 @@
 package com.example.ridequest;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class EditVehicleActivity extends AppCompatActivity {
 
     private int vehicleId;
+    private ImageView ivPreview;
+    private String selectedImageBase64 = null;
+    private ActivityResultLauncher<Intent> galleryLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +38,7 @@ public class EditVehicleActivity extends AppCompatActivity {
         String makeModel = getIntent().getStringExtra("MAKE_MODEL");
         String type = getIntent().getStringExtra("TYPE");
         double price = getIntent().getDoubleExtra("PRICE", 0.0);
-        String imageRes = getIntent().getStringExtra("IMAGE_RES");
+        String imageData = getIntent().getStringExtra("IMAGE_RES");
         String transmission = getIntent().getStringExtra("TRANSMISSION");
         int seats = getIntent().getIntExtra("SEATS", 5);
 
@@ -39,29 +52,38 @@ public class EditVehicleActivity extends AppCompatActivity {
         EditText etModel = findViewById(R.id.etModel);
         EditText etType = findViewById(R.id.etType);
         EditText etPrice = findViewById(R.id.etPrice);
-        Spinner spImage = findViewById(R.id.spImage);
+        EditText etSeats = findViewById(R.id.etSeats);
         Spinner spTransmission = findViewById(R.id.spTransmission);
-        Spinner spSeats = findViewById(R.id.spSeats);
-        ImageView ivPreview = findViewById(R.id.ivPreview);
+        ivPreview = findViewById(R.id.ivPreview);
         Button btnUpdate = findViewById(R.id.btnUpdateCar);
-        Button btnPreview = findViewById(R.id.btnPreview);
+        Button btnSelectImage = findViewById(R.id.btnSelectImage);
 
         // Populate fields with existing data
         etMake.setText(make);
         etModel.setText(model);
         etType.setText(type);
         etPrice.setText(String.valueOf(price));
+        etSeats.setText(String.valueOf(seats));
 
-        // Setup image spinner
-        String[] images = {"car_wigo", "car_tesla", "car_explorer"};
-        ArrayAdapter<String> imageAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, images);
-        spImage.setAdapter(imageAdapter);
-
-        // Select current image
-        for (int i = 0; i < images.length; i++) {
-            if (images[i].equals(imageRes)) {
-                spImage.setSelection(i);
-                break;
+        // Set current image (if it's base64, decode it; otherwise use placeholder)
+        if (imageData != null && !imageData.isEmpty()) {
+            selectedImageBase64 = imageData;
+            try {
+                // Try to decode as Base64
+                byte[] decodedBytes = Base64.decode(imageData, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                if (bitmap != null) {
+                    ivPreview.setImageBitmap(bitmap);
+                } else {
+                    // It might be a drawable resource name (old format)
+                    int resId = getResources().getIdentifier(imageData, "drawable", getPackageName());
+                    if (resId != 0) {
+                        ivPreview.setImageResource(resId);
+                    }
+                }
+            } catch (Exception e) {
+                // Fallback to placeholder
+                ivPreview.setImageResource(android.R.drawable.ic_menu_gallery);
             }
         }
 
@@ -80,24 +102,32 @@ public class EditVehicleActivity extends AppCompatActivity {
             }
         }
 
-        // Setup seats spinner
-        String[] seatOptions = {"2", "4", "5", "7", "8"};
-        ArrayAdapter<String> seatsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, seatOptions);
-        spSeats.setAdapter(seatsAdapter);
+        // Initialize gallery launcher
+        galleryLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        if (imageUri != null) {
+                            try {
+                                // Load image into ImageView
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                                ivPreview.setImageBitmap(bitmap);
 
-        // Select current seat count
-        spSeats.setSelection(getSeatsIndex(seats));
+                                // Convert to Base64
+                                selectedImageBase64 = bitmapToBase64(bitmap);
+                                Toast.makeText(this, "Image selected successfully!", Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+        );
 
-        // Preview button
-        btnPreview.setOnClickListener(v -> {
-            try {
-                String selected = spImage.getSelectedItem().toString();
-                int resId = getResources().getIdentifier(selected, "drawable", getPackageName());
-                if (resId != 0) ivPreview.setImageResource(resId);
-            } catch (Exception e) {
-                Toast.makeText(this, "Image preview failed", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Select Image Button
+        btnSelectImage.setOnClickListener(v -> openGallery());
 
         // Update button
         btnUpdate.setOnClickListener(v -> {
@@ -106,23 +136,38 @@ public class EditVehicleActivity extends AppCompatActivity {
                 String newModel = etModel.getText().toString().trim();
                 String newType = etType.getText().toString().trim();
                 String priceStr = etPrice.getText().toString().trim();
-                String img = spImage.getSelectedItem().toString();
+                String seatsStr = etSeats.getText().toString().trim();
                 String trans = spTransmission.getSelectedItem().toString();
-                int seatCount = Integer.parseInt(spSeats.getSelectedItem().toString());
 
-                if (newMake.isEmpty() || newModel.isEmpty() || newType.isEmpty() || priceStr.isEmpty()) {
+                if (newMake.isEmpty() || newModel.isEmpty() || newType.isEmpty() ||
+                        priceStr.isEmpty() || seatsStr.isEmpty()) {
                     Toast.makeText(this, "Please fill ALL fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                double newPrice = Double.parseDouble(priceStr);
+                // Validate image
+                if (selectedImageBase64 == null || selectedImageBase64.isEmpty()) {
+                    Toast.makeText(this, "Please select a vehicle image", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                if (db.updateVehicle(vehicleId, newMake, newModel, newType, newPrice, img, trans, seatCount)) {
+                double newPrice = Double.parseDouble(priceStr);
+                int seatCount = Integer.parseInt(seatsStr);
+
+                // Validate seat count
+                if (seatCount < 1 || seatCount > 50) {
+                    Toast.makeText(this, "Seat capacity must be between 1 and 50", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (db.updateVehicle(vehicleId, newMake, newModel, newType, newPrice, selectedImageBase64, trans, seatCount)) {
                     Toast.makeText(this, "Vehicle Updated!", Toast.LENGTH_LONG).show();
                     finish();
                 } else {
                     Toast.makeText(this, "Failed to Update", Toast.LENGTH_SHORT).show();
                 }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Please enter valid numbers for Price and Seats", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -132,14 +177,18 @@ public class EditVehicleActivity extends AppCompatActivity {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
-    private int getSeatsIndex(int seats) {
-        switch (seats) {
-            case 2: return 0;
-            case 4: return 1;
-            case 5: return 2;
-            case 7: return 3;
-            case 8: return 4;
-            default: return 2; // Default to 5 seats
-        }
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        galleryLauncher.launch(intent);
+    }
+
+    private String bitmapToBase64(Bitmap bitmap) {
+        // Resize bitmap to reduce size
+        Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, 600, true);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        resized.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 }

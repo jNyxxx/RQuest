@@ -26,7 +26,8 @@
             android:layout_height="50dp"
             android:background="@drawable/bg_input_field"
             android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"/>
 
         <EditText
             android:id="@+id/etModel"
@@ -35,7 +36,8 @@
             android:layout_height="50dp"
             android:background="@drawable/bg_input_field"
             android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"/>
 
         <EditText
             android:id="@+id/etType"
@@ -44,7 +46,8 @@
             android:layout_height="50dp"
             android:background="@drawable/bg_input_field"
             android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="text"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -81,9 +84,10 @@
             android:layout_height="50dp"
             android:background="@drawable/bg_input_field"
             android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:inputType="textCapCharacters"/>
 
-        <!-- NEW: Transmission Spinner -->
+        <!-- Transmission Spinner -->
         <TextView
             android:text="Transmission:"
             android:layout_width="wrap_content"
@@ -99,7 +103,7 @@
             android:background="@drawable/bg_input_field"
             android:layout_marginBottom="12dp"/>
 
-        <!-- NEW: Seats Spinner -->
+        <!-- CHANGED: Seats is now EditText instead of Spinner -->
         <TextView
             android:text="Seating Capacity:"
             android:layout_width="wrap_content"
@@ -108,11 +112,14 @@
             android:textColor="#555"
             android:textStyle="bold"/>
 
-        <Spinner
-            android:id="@+id/spSeats"
+        <EditText
+            android:id="@+id/etSeats"
+            android:hint="Number of seats (e.g. 5)"
+            android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="12dp"
             android:layout_marginBottom="12dp"/>
 
         <TextView
@@ -123,25 +130,19 @@
             android:textColor="#555"
             android:textStyle="bold"/>
 
-        <Spinner
-            android:id="@+id/spImage"
+        <Button
+            android:id="@+id/btnSelectImage"
+            android:text="Select Image from Gallery"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:layout_marginBottom="12dp"/>
-
-        <Button
-            android:id="@+id/btnPreview"
-            android:text="Preview Image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#999"
+            android:background="@drawable/bg_button_orange"
+            android:textColor="@color/white"
             android:layout_marginBottom="12dp"/>
 
         <ImageView
             android:id="@+id/ivPreview"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="200dp"
             android:scaleType="centerCrop"
             android:background="#EEE"
             android:layout_marginBottom="24dp"

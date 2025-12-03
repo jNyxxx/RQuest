@@ -3,7 +3,6 @@ package com.example.ridequest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -17,11 +16,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import android.widget.ArrayAdapter;
 
 public class BookingActivity extends AppCompatActivity {
 
     private double dailyRate;
-    private List<CarRentalData.LocationItem> locations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +41,10 @@ public class BookingActivity extends AppCompatActivity {
         EditText etPickup = findViewById(R.id.etPickupDate);
         EditText etReturn = findViewById(R.id.etReturnDate);
 
-        Spinner spPickup = findViewById(R.id.spPickupLoc);
-        Spinner spReturn = findViewById(R.id.spReturnLoc);
+        // CHANGED: Now using EditText instead of Spinner for addresses
+        EditText etPickupAddress = findViewById(R.id.etPickupAddress);
+        EditText etReturnAddress = findViewById(R.id.etReturnAddress);
+
         Spinner spTimeP = findViewById(R.id.spPickupTime);
         Spinner spTimeR = findViewById(R.id.spReturnTime);
 
@@ -52,22 +53,24 @@ public class BookingActivity extends AppCompatActivity {
         if(tvPrice != null) tvPrice.setText("$" + dailyRate + " per day");
 
         if(ivCar != null && imgRes != null) {
-            int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
-            if(resId != 0) ivCar.setImageResource(resId);
+            try {
+                // Try to decode as Base64
+                byte[] decodedBytes = android.util.Base64.decode(imgRes, android.util.Base64.DEFAULT);
+                android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                if (bitmap != null) {
+                    ivCar.setImageBitmap(bitmap);
+                } else {
+                    // Try as drawable resource
+                    int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
+                    if(resId != 0) ivCar.setImageResource(resId);
+                }
+            } catch (Exception e) {
+                // Try as drawable resource
+                int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
+                if(resId != 0) ivCar.setImageResource(resId);
+                else ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
+            }
         }
-
-        // Load Locations from Database
-        CarRentalData db = new CarRentalData(this);
-        locations = db.getAllLocations();
-
-        List<String> locationNames = new ArrayList<>();
-        for(CarRentalData.LocationItem loc : locations) {
-            locationNames.add(loc.name);
-        }
-
-        ArrayAdapter<String> locAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, locationNames);
-        spPickup.setAdapter(locAdapter);
-        spReturn.setAdapter(locAdapter);
 
         // Setup Time Spinners (24-hour format for easier calculation)
         List<String> times = new ArrayList<>();
@@ -97,8 +100,25 @@ public class BookingActivity extends AppCompatActivity {
             String pickupTime = spTimeP.getSelectedItem().toString();
             String returnTime = spTimeR.getSelectedItem().toString();
 
+            // CHANGED: Get addresses from EditText
+            String pickupAddress = etPickupAddress.getText().toString().trim();
+            String returnAddress = etReturnAddress.getText().toString().trim();
+
+            // Validate all fields
             if (pickupDate.isEmpty() || returnDate.isEmpty()) {
                 Toast.makeText(this, "Please select both dates", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (pickupAddress.isEmpty()) {
+                Toast.makeText(this, "Please enter pickup address", Toast.LENGTH_SHORT).show();
+                etPickupAddress.requestFocus();
+                return;
+            }
+
+            if (returnAddress.isEmpty()) {
+                Toast.makeText(this, "Please enter return address", Toast.LENGTH_SHORT).show();
+                etReturnAddress.requestFocus();
                 return;
             }
 
@@ -108,10 +128,6 @@ public class BookingActivity extends AppCompatActivity {
             if (calc == null) {
                 return; // Error already shown in calculateRentalCost
             }
-
-            // Get selected location IDs
-            int pickupLocId = locations.get(spPickup.getSelectedItemPosition()).id;
-            int returnLocId = locations.get(spReturn.getSelectedItemPosition()).id;
 
             // Pass everything to PaymentActivity
             Intent i = new Intent(this, PaymentActivity.class);
@@ -123,8 +139,8 @@ public class BookingActivity extends AppCompatActivity {
             i.putExtra("RETURN_DATE", returnDate);
             i.putExtra("PICKUP_TIME", pickupTime);
             i.putExtra("RETURN_TIME", returnTime);
-            i.putExtra("PICKUP_LOC_ID", pickupLocId);
-            i.putExtra("RETURN_LOC_ID", returnLocId);
+            i.putExtra("PICKUP_ADDRESS", pickupAddress);  // CHANGED: Pass custom address
+            i.putExtra("RETURN_ADDRESS", returnAddress);  // CHANGED: Pass custom address
             i.putExtra("LATE_HOURS", calc.lateHours);
             i.putExtra("LATE_FEE", calc.lateFee);
             startActivity(i);

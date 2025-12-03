@@ -147,7 +147,7 @@
                 android:alignmentMode="alignMargins"
                 android:columnOrderPreserved="false">
 
-                <!-- Feature 1: Capacity -->
+                <!-- Feature 1: Seats (UPDATED) -->
                 <LinearLayout
                     android:orientation="vertical"
                     android:background="@drawable/bg_input_field"
@@ -174,6 +174,7 @@
                         android:textColor="#999"/>
 
                     <TextView
+                        android:id="@+id/tvSeats"
                         android:text="@string/five_seats"
                         android:textStyle="bold"
                         android:textColor="#333"
@@ -181,7 +182,7 @@
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
 
-                <!-- Feature 2: Engine -->
+                <!-- Feature 2: Transmission (UPDATED) -->
                 <LinearLayout
                     android:orientation="vertical"
                     android:background="@drawable/bg_input_field"
@@ -196,11 +197,11 @@
                         android:src="@android:drawable/ic_lock_idle_charging"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:contentDescription="@string/engine_icon"
+                        android:contentDescription="Transmission icon"
                         app:tint="#777"/>
 
                     <TextView
-                        android:text="@string/engine"
+                        android:text="Transmission"
                         android:textSize="12sp"
                         android:layout_marginTop="16dp"
                         android:layout_width="wrap_content"
@@ -208,14 +209,15 @@
                         android:textColor="#999"/>
 
                     <TextView
-                        android:text="@string/hp_670"
+                        android:id="@+id/tvTransmission"
+                        android:text="Manual"
                         android:textStyle="bold"
                         android:textColor="#333"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
 
-                <!-- Feature 3: Max Speed -->
+                <!-- Feature 3: Engine -->
                 <LinearLayout
                     android:orientation="vertical"
                     android:background="@drawable/bg_input_field"
@@ -233,7 +235,7 @@
                         app:tint="#777"/>
 
                     <TextView
-                        android:text="@string/max_speed"
+                        android:text="Type"
                         android:textSize="12sp"
                         android:layout_marginTop="16dp"
                         android:layout_width="wrap_content"
@@ -241,7 +243,7 @@
                         android:textColor="#999"/>
 
                     <TextView
-                        android:text="@string/speed_250"
+                        android:text="Premium"
                         android:textStyle="bold"
                         android:textColor="#333"
                         android:layout_width="wrap_content"

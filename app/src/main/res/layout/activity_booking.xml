@@ -310,37 +310,45 @@
                     android:gravity="end" />
             </LinearLayout>
 
+            <!-- CHANGED: Pickup Address - Now EditText instead of Spinner -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Pickup Location"
+                android:text="Pickup Address"
                 android:textColor="#333"
                 android:textStyle="bold" />
 
-            <Spinner
-                android:id="@+id/spPickupLoc"
+            <EditText
+                android:id="@+id/etPickupAddress"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="24dp"
                 android:background="@drawable/bg_input_field"
-                android:paddingHorizontal="12dp" />
+                android:hint="Enter pickup address (e.g., 123 Main St, Cebu City)"
+                android:inputType="textPostalAddress"
+                android:paddingHorizontal="16dp"
+                tools:ignore="Autofill" />
 
+            <!-- CHANGED: Return Address - Now EditText instead of Spinner -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Return Location"
+                android:text="Return Address"
                 android:textColor="#333"
                 android:textStyle="bold" />
 
-            <Spinner
-                android:id="@+id/spReturnLoc"
+            <EditText
+                android:id="@+id/etReturnAddress"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="32dp"
                 android:background="@drawable/bg_input_field"
-                android:paddingHorizontal="12dp" />
+                android:hint="Enter return address (e.g., 456 Park Ave, Cebu City)"
+                android:inputType="textPostalAddress"
+                android:paddingHorizontal="16dp"
+                tools:ignore="Autofill" />
 
         </LinearLayout>
     </ScrollView>
