@@ -91,9 +91,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         else loadBookings();
     }
 
-    /**
-     * Update tab button styles
-     */
     private void updateTabStyles() {
         if(showingVehicles) {
             btnVehicles.setBackgroundResource(R.drawable.bg_button_orange);
@@ -114,9 +111,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Load vehicles list
-     */
     private void loadVehicles() {
         Log.d(TAG, "Loading vehicles...");
         fab.show();
@@ -128,9 +122,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }));
     }
 
-    /**
-     * Load bookings list with admin actions
-     */
     private void loadBookings() {
         Log.d(TAG, "Loading bookings...");
         fab.hide();
@@ -159,57 +150,38 @@ public class AdminDashboardActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    /**
-     * Approve a booking
-     */
     private void approveBooking(CarRentalData.AdminBookingItem booking) {
         Log.d(TAG, "Approving booking: " + booking.id);
 
         if(db.approveBooking(booking.id)) {
-            // Generate receipt
             String receipt = generateReceipt(booking);
-
             Toast.makeText(this, "Booking Approved!\n\n" + receipt, Toast.LENGTH_LONG).show();
-
-            // Optionally: Send confirmation email to customer
             sendApprovalEmailToCustomer(booking, receipt);
-
-            loadBookings(); // Refresh list
+            loadBookings();
         } else {
             Toast.makeText(this, "Failed to approve booking", Toast.LENGTH_SHORT).show();
         }
     }
 
-    /**
-     * Cancel a booking
-     */
     private void cancelBooking(CarRentalData.AdminBookingItem booking) {
         Log.d(TAG, "Cancelling booking: " + booking.id);
 
-        if(db.cancelBooking(booking.id)) {
+        // Admin cancellation (no fee applied)
+        if(db.cancelBooking(booking.id, true)) {
             Toast.makeText(this, "Booking Cancelled", Toast.LENGTH_SHORT).show();
-
-            // Optionally: Send cancellation email to customer
             sendCancellationEmailToCustomer(booking);
-
-            loadBookings(); // Refresh list
+            loadBookings();
         } else {
             Toast.makeText(this, "Failed to cancel booking", Toast.LENGTH_SHORT).show();
         }
     }
 
-    /**
-     * View booking details
-     */
     private void viewBookingDetails(CarRentalData.AdminBookingItem booking) {
         Intent intent = new Intent(this, BookingDetailsActivity.class);
         intent.putExtra("BOOKING_ID", booking.id);
         startActivity(intent);
     }
 
-    /**
-     * Generate unique receipt
-     */
     private String generateReceipt(CarRentalData.AdminBookingItem booking) {
         return "━━━━━━━━━━━━━━━━━━━━\n" +
                 "   RIDEQUEST RECEIPT\n" +
@@ -228,9 +200,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 "RideQuest!";
     }
 
-    /**
-     * Send approval email to customer
-     */
     private void sendApprovalEmailToCustomer(CarRentalData.AdminBookingItem booking, String receipt) {
         String subject = "✅ Booking Confirmed - " + booking.bookingReference;
 
@@ -256,9 +225,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Send cancellation email to customer
-     */
     private void sendCancellationEmailToCustomer(CarRentalData.AdminBookingItem booking) {
         String subject = "❌ Booking Cancelled - " + booking.bookingReference;
 

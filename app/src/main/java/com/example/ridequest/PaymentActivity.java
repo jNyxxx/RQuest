@@ -2,8 +2,11 @@ package com.example.ridequest;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +16,8 @@ public class PaymentActivity extends AppCompatActivity {
 
     private static final String TAG = "PaymentActivity";
     private String paymentMethod = "Credit Card";
+    private EditText etPaymentId;
+    private EditText etCardholderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +52,7 @@ public class PaymentActivity extends AppCompatActivity {
         Log.d(TAG, "  User ID: " + uid);
         Log.d(TAG, "  Vehicle ID: " + vid);
         Log.d(TAG, "  Car Name: " + carName);
-        Log.d(TAG, "  Daily Rate: $" + dailyRate);
         Log.d(TAG, "  Total Cost: $" + totalCost);
-        Log.d(TAG, "  Pickup: " + pickupDate + " " + pickupTime);
-        Log.d(TAG, "  Return: " + returnDate + " " + returnTime);
-        Log.d(TAG, "  Late Hours: " + lateHours);
-        Log.d(TAG, "  Late Fee: $" + lateFee);
 
         // Validate required data
         if(vid == -1) {
@@ -72,7 +72,10 @@ public class PaymentActivity extends AppCompatActivity {
         TextView tvCarName = findViewById(R.id.tvCarName);
         TextView tvDates = findViewById(R.id.tvDates);
         TextView tvTotal = findViewById(R.id.tvTotal);
-        TextView tvLateFeeWarning = findViewById(R.id.tvLateFeeWarning); // Optional - add to XML
+        TextView tvLateFeeWarning = findViewById(R.id.tvLateFeeWarning);
+
+        etPaymentId = findViewById(R.id.etPaymentId);
+        etCardholderName = findViewById(R.id.etCardholderName);
 
         // Set UI Data
         if(tvTitle != null) tvTitle.setText("Payment Summary");
@@ -109,50 +112,83 @@ public class PaymentActivity extends AppCompatActivity {
             rg.setOnCheckedChangeListener((g, checkedId) -> {
                 if (checkedId == R.id.rbCard) {
                     paymentMethod = "Credit Card";
+                    if(etPaymentId != null) {
+                        etPaymentId.setHint("Card Number (last 4 digits)");
+                    }
                 } else if (checkedId == R.id.rbGcash) {
                     paymentMethod = "GCash";
+                    if(etPaymentId != null) {
+                        etPaymentId.setHint("GCash Mobile Number");
+                    }
                 }
                 Log.d(TAG, "Payment method selected: " + paymentMethod);
             });
         }
 
-        // Confirm Payment Button now creates a pending booking for admin approval
+        // Confirm Payment Button
         findViewById(R.id.btnConfirm).setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
+            // Validate payment details are filled
+            String paymentId = etPaymentId.getText().toString().trim();
+            String cardholderName = etCardholderName.getText().toString().trim();
+
+            if(paymentId.isEmpty()) {
+                Toast.makeText(this, "⚠️ Please enter payment ID/number", Toast.LENGTH_SHORT).show();
+                etPaymentId.requestFocus();
+                return;
+            }
+
+            if(cardholderName.isEmpty()) {
+                Toast.makeText(this, "⚠️ Please enter cardholder/account name", Toast.LENGTH_SHORT).show();
+                etCardholderName.requestFocus();
+                return;
+            }
+
+            // Validate payment ID format
+            if(paymentMethod.equals("Credit Card") && paymentId.length() != 4) {
+                Toast.makeText(this, "⚠️ Please enter last 4 digits of card number", Toast.LENGTH_SHORT).show();
+                etPaymentId.requestFocus();
+                return;
+            }
+
+            if(paymentMethod.equals("GCash") && paymentId.length() < 10) {
+                Toast.makeText(this, "⚠️ Please enter valid GCash mobile number", Toast.LENGTH_SHORT).show();
+                etPaymentId.requestFocus();
+                return;
+            }
+
+            // Proceed with booking
             CarRentalData db = new CarRentalData(this);
 
-            // Generate unique booking reference
-            String bookingRef = "RQ" + System.currentTimeMillis();
+            // Get location addresses
+            String pickupAddr = db.getLocationAddress(pickupLocId);
+            String returnAddr = db.getLocationAddress(returnLocId);
 
-            // Get location addresses (placeholder logic)
-            // TODO: You can fetch the actual address from the database using pickupLocId and returnLocId
-            String pickupAddr = "Cebu HQ";
-            String returnAddr = "Cebu HQ";
-
-            // Call createPendingBooking instead of the old method
+            // Create pending booking
             boolean success = db.createPendingBooking(
-                    uid,
-                    vid,
-                    carName,
-                    pickupDate,
-                    returnDate,
-                    pickupTime,
-                    returnTime,
-                    pickupAddr,
-                    returnAddr,
-                    totalCost,
-                    paymentMethod,
-                    bookingRef
+                    uid, vid, carName,
+                    pickupDate, returnDate,
+                    pickupTime, returnTime,
+                    pickupAddr, returnAddr,
+                    totalCost, paymentMethod,
+                    paymentId, pickupLocId, returnLocId
             );
 
             if(success) {
                 Log.d(TAG, "✓ Booking created and pending approval!");
 
-                String message = "Booking Submitted!\nReference: " + bookingRef +
-                        "\n\nYour booking is pending admin approval.";
+                String message = "✓ Booking Submitted Successfully!\n\n" +
+                        "Your booking is pending admin approval.\n\n" +
+                        "Payment Method: " + paymentMethod + "\n" +
+                        "Payment ID: " + paymentId + "\n\n" +
+                        "⚠️ IMPORTANT - Bring to Pickup:\n" +
+                        "• Valid driver's license\n" +
+                        "• Government-issued ID\n" +
+                        "• Proof of insurance";
+
                 if(lateFee > 0) {
-                    message += "\n(Includes $" + String.format("%.2f", lateFee) + " late fee)";
+                    message += "\n\n(Includes $" + String.format("%.2f", lateFee) + " late fee)";
                 }
 
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
@@ -165,10 +201,9 @@ public class PaymentActivity extends AppCompatActivity {
 
             } else {
                 Log.e(TAG, "✗ Booking failed!");
-                Toast.makeText(this, "Booking Failed. Please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "❌ Booking Failed\n\nThe car may no longer be available for your selected dates.", Toast.LENGTH_LONG).show();
             }
         });
-        // --- END OF INTEGRATED CODE ---
 
         // Back Button
         findViewById(R.id.btnBack).setOnClickListener(v -> {
