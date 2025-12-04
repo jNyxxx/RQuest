@@ -27,13 +27,13 @@ public class BookingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
 
-        // Get Data from Intent
+        // gets Data from Intent
         int vid = getIntent().getIntExtra("VID", -1);
         dailyRate = getIntent().getDoubleExtra("PRICE", 0.0);
         String name = getIntent().getStringExtra("NAME");
         String imgRes = getIntent().getStringExtra("IMG_RES");
 
-        // Initialize UI Elements
+        // UI Elements
         TextView tvName = findViewById(R.id.tvBookingCarName);
         TextView tvPrice = findViewById(R.id.tvBookingPrice);
         ImageView ivCar = findViewById(R.id.ivBookingCar);
@@ -41,7 +41,7 @@ public class BookingActivity extends AppCompatActivity {
         EditText etPickup = findViewById(R.id.etPickupDate);
         EditText etReturn = findViewById(R.id.etReturnDate);
 
-        // CHANGED: Now using EditText instead of Spinner for addresses
+
         EditText etPickupAddress = findViewById(R.id.etPickupAddress);
         EditText etReturnAddress = findViewById(R.id.etReturnAddress);
 
@@ -54,18 +54,15 @@ public class BookingActivity extends AppCompatActivity {
 
         if(ivCar != null && imgRes != null) {
             try {
-                // Try to decode as Base64
                 byte[] decodedBytes = android.util.Base64.decode(imgRes, android.util.Base64.DEFAULT);
                 android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                 if (bitmap != null) {
                     ivCar.setImageBitmap(bitmap);
                 } else {
-                    // Try as drawable resource
                     int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
                     if(resId != 0) ivCar.setImageResource(resId);
                 }
             } catch (Exception e) {
-                // Try as drawable resource
                 int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
                 if(resId != 0) ivCar.setImageResource(resId);
                 else ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
@@ -167,9 +164,7 @@ public class BookingActivity extends AppCompatActivity {
         dpd.show();
     }
 
-    /**
-     * Inner class to hold rental calculation results
-     */
+
     private static class RentalCalculation {
         double baseCost;
         double lateFee;
@@ -178,16 +173,10 @@ public class BookingActivity extends AppCompatActivity {
         int fullDays;
     }
 
-    /**
-     * Calculate rental cost with 24-hour rule enforcement
-     * Rules:
-     * 1. Return time must be SAME or BEFORE pickup time (24hr increments)
-     * 2. Late returns charged at 1/4 daily rate per hour
-     */
     private RentalCalculation calculateRentalCost(String pickupDateStr, String pickupTimeStr,
                                                   String returnDateStr, String returnTimeStr) {
         try {
-            // Parse dates and times
+            // dates and times
             SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy HH:mm", Locale.US);
             String pickupDateTime = pickupDateStr + " " + pickupTimeStr;
             String returnDateTime = returnDateStr + " " + returnTimeStr;
@@ -200,21 +189,21 @@ public class BookingActivity extends AppCompatActivity {
                 return null;
             }
 
-            // Check if return is before pickup
+            // checks if return is before pickup
             if(returnDT.before(pickupDT)) {
                 Toast.makeText(this, "Return date/time cannot be before pickup!", Toast.LENGTH_LONG).show();
                 return null;
             }
 
-            // Calculate total hours
+            // calculates total hours
             long diffInMillis = returnDT.getTime() - pickupDT.getTime();
             long totalHours = diffInMillis / (1000 * 60 * 60);
 
-            // Calculate full 24-hour periods
+            // calculate full 24-hour periods
             int fullDays = (int) (totalHours / 24);
             int remainingHours = (int) (totalHours % 24);
 
-            // Parse times to check 24-hour rule
+            // Pparse times to check 24-hour rule
             String[] pickupTimeParts = pickupTimeStr.split(":");
             String[] returnTimeParts = returnTimeStr.split(":");
 
@@ -238,42 +227,35 @@ public class BookingActivity extends AppCompatActivity {
 
             // Check 24-hour rule: Return time must be SAME or EARLIER than pickup time
             if(returnTotalMinutes > pickupTotalMinutes) {
-                // Return time is LATER than pickup time - this violates the 24hr rule
+                // if return time is LATER than pickup time - this violates the 24hr rule hence will charge the excess time by hour
                 calc.lateHours = (int) Math.ceil((returnTotalMinutes - pickupTotalMinutes) / 60.0);
 
                 // Calculate late fee: 1/4 of daily rate per hour
                 double hourlyRate = dailyRate / 4.0;
                 calc.lateFee = calc.lateHours * hourlyRate;
 
-                // Show warning to user
+                // shows warning to user
                 Toast.makeText(this,
-                        "⚠️ LATE RETURN DETECTED!\n" +
-                                "Late by: " + calc.lateHours + " hour(s)\n" +
-                                "Late fee: $" + String.format("%.2f", calc.lateFee) + " ($" + String.format("%.2f", hourlyRate) + "/hr)",
+                        "⚠️ LATE RETURN DETECTED! ⚠️",
                         Toast.LENGTH_LONG).show();
             }
 
-            // Calculate base cost
+            // calculate base cost
             calc.baseCost = (fullDays > 0 ? fullDays : 1) * dailyRate;
 
-            // Total cost = base cost + late fee
+            // total cost = base cost + late fee(per hour late)
             calc.totalCost = calc.baseCost + calc.lateFee;
 
-            // Show breakdown to user
+            // shows breakdown to user
             String message;
             if(calc.lateFee > 0) {
                 message = String.format(Locale.US,
-                        "Rental: %d day(s) × $%.2f = $%.2f\n" +
-                                "Late Fee: %d hr(s) × $%.2f = $%.2f\n" +
-                                "TOTAL: $%.2f",
-                        calc.fullDays, dailyRate, calc.baseCost,
-                        calc.lateHours, (dailyRate / 4.0), calc.lateFee,
-                        calc.totalCost);
+                        "Total: $%.2f (Late: $%.2f)",
+                        calc.totalCost, calc.lateFee);
             } else {
                 message = String.format(Locale.US,
-                        "✓ On-time return!\n" +
-                                "Rental: %d day(s) × $%.2f = $%.2f",
-                        calc.fullDays, dailyRate, calc.totalCost);
+                        "Total: $%.2f ✓ On time",
+                        calc.totalCost);
             }
 
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();

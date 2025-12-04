@@ -37,7 +37,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Tab Selection
         btnVehicles.setOnClickListener(v -> {
             showingVehicles = true;
             updateTabStyles();
@@ -50,7 +49,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
             loadBookings();
         });
 
-        // Logout Logic - UPDATED to go directly to Login
+        //  logout go directly to Login
         if (btnProfile != null) {
             btnProfile.setOnClickListener(v -> {
                 PopupMenu popup = new PopupMenu(AdminDashboardActivity.this, btnProfile);
@@ -116,7 +115,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         Log.d(TAG, "Loading vehicles...");
         fab.show();
 
-        // UPDATED: Added onEdit callback for editing vehicles
+        //  onEdit callback for editing vehicles
         recyclerView.setAdapter(new VehicleAdapter(this, db.getAllVehicles(), true,
                 new VehicleAdapter.OnDeleteListener() {
                     @Override

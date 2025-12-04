@@ -1,23 +1,31 @@
 package com.example.ridequest;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class PaymentActivity extends AppCompatActivity {
 
     private static final String TAG = "PaymentActivity";
-    private String paymentMethod = "Credit Card";
-    private EditText etPaymentId;
-    private EditText etCardholderName;
+    private ImageView ivReceipt;
+    private String receiptImageBase64 = null;
+    private ActivityResultLauncher<Intent> galleryLauncher;
+    private double downpaymentAmount;
+    private double totalCost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +34,10 @@ public class PaymentActivity extends AppCompatActivity {
 
         Log.d(TAG, "=== PaymentActivity Started ===");
 
-        // Get ALL data from BookingActivity
+        // getter of all data from BookingActivity
         int vid = getIntent().getIntExtra("VID", -1);
         double dailyRate = getIntent().getDoubleExtra("DAILY_RATE", 0.0);
-        double totalCost = getIntent().getDoubleExtra("TOTAL_COST", 0.0);
+        totalCost = getIntent().getDoubleExtra("TOTAL_COST", 0.0);
         String carName = getIntent().getStringExtra("NAME");
 
         String pickupDate = getIntent().getStringExtra("PICKUP_DATE");
@@ -37,163 +45,133 @@ public class PaymentActivity extends AppCompatActivity {
         String pickupTime = getIntent().getStringExtra("PICKUP_TIME");
         String returnTime = getIntent().getStringExtra("RETURN_TIME");
 
-        int pickupLocId = getIntent().getIntExtra("PICKUP_LOC_ID", 1);
-        int returnLocId = getIntent().getIntExtra("RETURN_LOC_ID", 1);
+        String pickupAddress = getIntent().getStringExtra("PICKUP_ADDRESS");
+        String returnAddress = getIntent().getStringExtra("RETURN_ADDRESS");
 
-        // Late fee information
         int lateHours = getIntent().getIntExtra("LATE_HOURS", 0);
         double lateFee = getIntent().getDoubleExtra("LATE_FEE", 0.0);
 
-        // Get User ID from session
         int uid = getSharedPreferences("UserSession", MODE_PRIVATE).getInt("UID", 1);
 
-        // Log all received data
-        Log.d(TAG, "Received booking data:");
-        Log.d(TAG, "  User ID: " + uid);
-        Log.d(TAG, "  Vehicle ID: " + vid);
-        Log.d(TAG, "  Car Name: " + carName);
-        Log.d(TAG, "  Total Cost: $" + totalCost);
+        // calculates 30% downpayment for the rent
+        downpaymentAmount = totalCost * 0.30;
+        double remainingBalance = totalCost - downpaymentAmount;
 
-        // Validate required data
-        if(vid == -1) {
-            Toast.makeText(this, "Error: Invalid vehicle ID", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+        Log.d(TAG, "Total Cost: $" + totalCost);
+        Log.d(TAG, "Downpayment (30%): $" + downpaymentAmount);
+        Log.d(TAG, "Remaining Balance: $" + remainingBalance);
 
-        if(pickupDate == null || returnDate == null || pickupTime == null || returnTime == null) {
+        // validates required data
+        if(vid == -1 || pickupDate == null || returnDate == null ||
+                pickupAddress == null || returnAddress == null) {
             Toast.makeText(this, "Error: Missing booking information", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Bind UI Elements
+        // UI Elements
         TextView tvTitle = findViewById(R.id.tvTitle);
         TextView tvCarName = findViewById(R.id.tvCarName);
         TextView tvDates = findViewById(R.id.tvDates);
-        TextView tvTotal = findViewById(R.id.tvTotal);
+        TextView tvTotalCost = findViewById(R.id.tvTotalCost);
+        TextView tvDownpayment = findViewById(R.id.tvDownpayment);
+        TextView tvBalance = findViewById(R.id.tvBalance);
         TextView tvLateFeeWarning = findViewById(R.id.tvLateFeeWarning);
+        ImageView ivQRCode = findViewById(R.id.ivQRCode);
+        ivReceipt = findViewById(R.id.ivReceipt);
+        Button btnUploadReceipt = findViewById(R.id.btnUploadReceipt);
+        Button btnConfirm = findViewById(R.id.btnConfirm);
 
-        etPaymentId = findViewById(R.id.etPaymentId);
-        etCardholderName = findViewById(R.id.etCardholderName);
-
-        // Set UI Data
         if(tvTitle != null) tvTitle.setText("Payment Summary");
         if(tvCarName != null) tvCarName.setText(carName != null ? carName : "Unknown Vehicle");
         if(tvDates != null) tvDates.setText(pickupDate + " " + pickupTime + " → " + returnDate + " " + returnTime);
 
-        // Show total with late fee breakdown if applicable
-        if(tvTotal != null) {
-            if(lateFee > 0) {
-                double baseCost = totalCost - lateFee;
-                String totalText = String.format(
-                        "Base: $%.2f\nLate Fee (%d hrs): $%.2f\nTotal: $%.2f",
-                        baseCost, lateHours, lateFee, totalCost
-                );
-                tvTotal.setText(totalText);
-            } else {
-                tvTotal.setText("Total: $" + String.format("%.2f", totalCost));
-            }
-        }
+        if(tvTotalCost != null) tvTotalCost.setText("Total: $" + String.format("%.2f", totalCost));
+        if(tvDownpayment != null) tvDownpayment.setText("Downpayment (30%): $" + String.format("%.2f", downpaymentAmount));
+        if(tvBalance != null) tvBalance.setText("Balance (pay at pickup): $" + String.format("%.2f", remainingBalance));
 
-        // Show late fee warning if applicable
+        // shows late fee warning if applicable
         if(tvLateFeeWarning != null) {
             if(lateFee > 0) {
                 tvLateFeeWarning.setVisibility(View.VISIBLE);
-                tvLateFeeWarning.setText("⚠️ Late return penalty: $" + String.format("%.2f", lateFee));
+                tvLateFeeWarning.setText("⚠️ Late return penalty included: $" + String.format("%.2f", lateFee));
             } else {
                 tvLateFeeWarning.setVisibility(View.GONE);
             }
         }
 
-        // Payment Method Selection
-        RadioGroup rg = findViewById(R.id.rgMethod);
-        if(rg != null) {
-            rg.setOnCheckedChangeListener((g, checkedId) -> {
-                if (checkedId == R.id.rbCard) {
-                    paymentMethod = "Credit Card";
-                    if(etPaymentId != null) {
-                        etPaymentId.setHint("Card Number (last 4 digits)");
-                    }
-                } else if (checkedId == R.id.rbGcash) {
-                    paymentMethod = "GCash";
-                    if(etPaymentId != null) {
-                        etPaymentId.setHint("GCash Mobile Number");
-                    }
-                }
-                Log.d(TAG, "Payment method selected: " + paymentMethod);
-            });
+        // QR Code
+        if(ivQRCode != null) {
+            ivQRCode.setImageResource(R.drawable.qr_code_payment);
         }
 
-        // Confirm Payment Button
-        findViewById(R.id.btnConfirm).setOnClickListener(v -> {
+        // gallery launcher for receipt upload
+        galleryLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        if (imageUri != null) {
+                            try {
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                                ivReceipt.setImageBitmap(bitmap);
+                                ivReceipt.setVisibility(View.VISIBLE);
+
+                                receiptImageBase64 = bitmapToBase64(bitmap);
+                                Toast.makeText(this, "✓ Receipt uploaded successfully!", Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "Failed to load receipt image", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+        );
+
+        // uploads receipt Button
+        btnUploadReceipt.setOnClickListener(v -> openGallery());
+
+        // confirms Payment Button
+        btnConfirm.setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
-            // Validate payment details are filled
-            String paymentId = etPaymentId.getText().toString().trim();
-            String cardholderName = etCardholderName.getText().toString().trim();
-
-            if(paymentId.isEmpty()) {
-                Toast.makeText(this, "⚠️ Please enter payment ID/number", Toast.LENGTH_SHORT).show();
-                etPaymentId.requestFocus();
-                return;
-            }
-
-            if(cardholderName.isEmpty()) {
-                Toast.makeText(this, "⚠️ Please enter cardholder/account name", Toast.LENGTH_SHORT).show();
-                etCardholderName.requestFocus();
-                return;
-            }
-
-            // Validate payment ID format
-            if(paymentMethod.equals("Credit Card") && paymentId.length() != 4) {
-                Toast.makeText(this, "⚠️ Please enter last 4 digits of card number", Toast.LENGTH_SHORT).show();
-                etPaymentId.requestFocus();
-                return;
-            }
-
-            if(paymentMethod.equals("GCash") && paymentId.length() < 10) {
-                Toast.makeText(this, "⚠️ Please enter valid GCash mobile number", Toast.LENGTH_SHORT).show();
-                etPaymentId.requestFocus();
+            // validate receipt upload
+            if(receiptImageBase64 == null || receiptImageBase64.isEmpty()) {
+                Toast.makeText(this, "⚠️ Please upload your payment receipt", Toast.LENGTH_LONG).show();
                 return;
             }
 
             // Proceed with booking
             CarRentalData db = new CarRentalData(this);
 
-            // Get location addresses
-            String pickupAddr = db.getLocationAddress(pickupLocId);
-            String returnAddr = db.getLocationAddress(returnLocId);
-
-            // Create pending booking
             boolean success = db.createPendingBooking(
                     uid, vid, carName,
                     pickupDate, returnDate,
                     pickupTime, returnTime,
-                    pickupAddr, returnAddr,
-                    totalCost, paymentMethod,
-                    paymentId, pickupLocId, returnLocId
+                    pickupAddress, returnAddress,
+                    totalCost, "QR Code Payment",
+                    receiptImageBase64,  // stores receipt as payment ID
+                    0, 0
             );
 
             if(success) {
                 Log.d(TAG, "✓ Booking created and pending approval!");
 
                 String message = "✓ Booking Submitted Successfully!\n\n" +
-                        "Your booking is pending admin approval.\n\n" +
-                        "Payment Method: " + paymentMethod + "\n" +
-                        "Payment ID: " + paymentId + "\n\n" +
+                        "Your booking is pending admin verification.\n\n" +
+                        "Downpayment Paid: $" + String.format("%.2f", downpaymentAmount) + "\n" +
+                        "Balance Due at Pickup: $" + String.format("%.2f", remainingBalance) + "\n\n" +
+                        "Pickup: " + pickupAddress + "\n" +
+                        "Return: " + returnAddress + "\n\n" +
                         "⚠️ IMPORTANT - Bring to Pickup:\n" +
                         "• Valid driver's license\n" +
                         "• Government-issued ID\n" +
-                        "• Proof of insurance";
-
-                if(lateFee > 0) {
-                    message += "\n\n(Includes $" + String.format("%.2f", lateFee) + " late fee)";
-                }
+                        "• Cash for remaining balance\n" +
+                        "• Proof of insurance (if applicable)";
 
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
-                // Return to main activity and clear back stack
+                // return to main activity
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -201,14 +179,25 @@ public class PaymentActivity extends AppCompatActivity {
 
             } else {
                 Log.e(TAG, "✗ Booking failed!");
-                Toast.makeText(this, "❌ Booking Failed\n\nThe car may no longer be available for your selected dates.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "❌ Booking Failed\n\nPlease try again.", Toast.LENGTH_LONG).show();
             }
         });
 
-        // Back Button
-        findViewById(R.id.btnBack).setOnClickListener(v -> {
-            Log.d(TAG, "Back button clicked");
-            finish();
-        });
+        // back Button
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        galleryLauncher.launch(intent);
+    }
+
+    private String bitmapToBase64(Bitmap bitmap) {
+        Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, 600, true);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        resized.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 }

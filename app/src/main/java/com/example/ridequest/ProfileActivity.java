@@ -26,15 +26,14 @@ public class ProfileActivity extends AppCompatActivity {
         LinearLayout btnEdit = findViewById(R.id.btnEditProfile);
         btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
 
-        // Logout Click - UPDATED to go directly to LoginActivity
+        // Logout Click
         TextView btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
-            // Clear session
             SharedPreferences.Editor editor = getSharedPreferences("UserSession", MODE_PRIVATE).edit();
             editor.clear();
             editor.apply();
 
-            // Go directly to LoginActivity (skip landing page)
+            // Go directly to LoginActivity
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

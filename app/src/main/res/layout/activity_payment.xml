@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/white"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="Payment Summary"
             android:textColor="@color/rq_orange"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
@@ -106,107 +107,126 @@
                     android:layout_marginBottom="16dp"/>
 
                 <TextView
-                    android:id="@+id/tvTotal"
+                    android:id="@+id/tvTotalCost"
                     android:text="Total: $500.00"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#333"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tvDownpayment"
+                    android:text="Downpayment (30%): $150.00"
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:textColor="@color/rq_orange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tvBalance"
+                    android:text="Balance (pay at pickup): $350.00"
+                    android:textSize="14sp"
+                    android:textColor="#666"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Select Payment Method Header -->
+        <!-- QR Code Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select Payment Method"
+            android:text="Scan QR Code to Pay Downpayment"
             android:textStyle="bold"
             android:textColor="#333"
             android:textSize="16sp"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Payment Method Radio Group -->
-        <RadioGroup
-            android:id="@+id/rgMethod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp">
-
-            <RadioButton
-                android:id="@+id/rbCard"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Credit Card"
-                android:background="@drawable/bg_input_field"
-                android:buttonTint="@color/rq_orange"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:checked="true"
-                android:layout_marginBottom="8dp"
-                tools:ignore="VisualLintButtonSize" />
-
-            <RadioButton
-                android:id="@+id/rbGcash"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="GCash"
-                android:background="@drawable/bg_input_field"
-                android:buttonTint="@color/rq_orange"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                tools:ignore="VisualLintButtonSize" />
-        </RadioGroup>
-
-        <!-- Payment Registration Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Payment Details"
+            android:text="Use GCash or any payment app to scan and pay"
+            android:textSize="12sp"
+            android:textColor="#999"
+            android:layout_marginBottom="16dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/ivQRCode"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="fitCenter"
+                android:padding="20dp"
+                android:src="@drawable/qr_code_payment"
+                android:contentDescription="QR Code for Payment"
+                tools:ignore="HardcodedText" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Upload Receipt Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Payment Receipt"
             android:textStyle="bold"
             android:textColor="#333"
             android:textSize="16sp"
             android:layout_marginBottom="12dp"/>
 
-        <EditText
-            android:id="@+id/etPaymentId"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Card Number (last 4 digits) / GCash Number"
-            android:inputType="text"
-            android:paddingHorizontal="16dp"
-            tools:ignore="Autofill" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="After payment, upload a screenshot or photo of your receipt"
+            android:textSize="12sp"
+            android:textColor="#999"
+            android:layout_marginBottom="16dp"/>
 
-        <EditText
-            android:id="@+id/etCardholderName"
+        <Button
+            android:id="@+id/btnUploadReceipt"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_input_field"
-            android:hint="Cardholder / Account Name"
-            android:inputType="textPersonName"
-            android:paddingHorizontal="16dp"
-            tools:ignore="Autofill" />
+            android:text="📸 Upload Receipt"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_button_orange"
+            android:textAllCaps="false"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Receipt Preview -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/ivReceipt"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:contentDescription="Receipt Preview"
+                tools:visibility="visible"
+                tools:src="@drawable/ic_launcher_foreground"/>
+        </androidx.cardview.widget.CardView>
 
         <!-- Important Notice -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⚠️ Payment information is required before finalizing your booking."
-            android:textColor="#666"
-            android:textSize="12sp"
-            android:background="#FFF3E0"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Pickup Requirements Notice -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="📋 Required at Pickup:\n• Valid driver's license\n• Government-issued ID\n• Proof of insurance (if applicable)"
+            android:text="⚠️ IMPORTANT:\n• Pay the downpayment amount shown above\n• Upload clear photo of payment receipt\n• Bring remaining balance in cash at pickup\n• Admin will verify payment before confirming"
             android:textColor="#666"
             android:textSize="12sp"
             android:background="#E3F2FD"
@@ -214,16 +234,17 @@
             android:layout_marginBottom="24dp"/>
 
         <!-- Confirm Button -->
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
             android:id="@+id/btnConfirm"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Confirm Payment"
-            android:textAllCaps="false"
-            android:background="@drawable/bg_button_orange"
+            android:layout_height="56dp"
+            android:text="Confirm Booking"
             android:textColor="@color/white"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:background="@drawable/bg_button_orange"
+            android:textAllCaps="false"/>
 
     </LinearLayout>
+
 </ScrollView>

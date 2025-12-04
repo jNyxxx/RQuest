@@ -22,11 +22,10 @@ public class CarRentalData {
         dbHelper = new DatabaseHelper(context);
     }
 
-    // ===================== BUSINESS RULE: Security & Account Rules =====================
+    // ===================== Security & Account Rules =====================
 
-    /**
-     * Validate password meets minimum security standards (8+ characters)
-     */
+     //vValidates password meets minimum security standards (8+ characters)
+
     public static boolean isPasswordValid(String password) {
         if (password == null || password.length() < 8) {
             return false;
@@ -40,9 +39,9 @@ public class CarRentalData {
         return hasLetter && hasDigit;
     }
 
-    /**
-     * Validate customer is at least 18 years old
-     */
+
+     // validates customer is at least 18 years old
+
     public static boolean isAgeValid(String dateOfBirth) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
@@ -66,9 +65,6 @@ public class CarRentalData {
 
     // ===================== AUTHENTICATION METHODS =====================
 
-    /**
-     * Login customer - returns customer_id if successful, -1 if failed
-     */
     public int loginCustomer(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = null;
@@ -86,7 +82,7 @@ public class CarRentalData {
             } else {
                 Log.e(TAG, "✗ Login failed - no matching email/password");
 
-                // Debug: Check if email exists
+                // checks if email exists
                 Cursor cDebug = db.rawQuery("SELECT customer_id, email FROM Customer WHERE email=?",
                         new String[]{email});
                 if (cDebug.moveToFirst()) {
@@ -106,16 +102,11 @@ public class CarRentalData {
         return id;
     }
 
-    /**
-     * Check admin credentials
-     */
+      // hard coded admin credentials
     public boolean checkAdmin(String email, String password) {
         return email.equals("admin") && password.equals("admin123");
     }
 
-    /**
-     * Register new customer with full validation
-     */
     public boolean registerCustomer(String firstName, String lastName, String email,
                                     String password, String phone, String dateOfBirth,
                                     String driversLicense, String address) {
@@ -151,7 +142,7 @@ public class CarRentalData {
             }
             c.close();
 
-            // Insert new customer
+            // inserts new customer
             ContentValues v = new ContentValues();
             v.put("first_name", firstName);
             v.put("last_name", lastName);
@@ -168,7 +159,7 @@ public class CarRentalData {
             if (res != -1) {
                 Log.d(TAG, "✓ Registration successful! Customer ID: " + res);
 
-                // Verify insertion
+                // verify insertion
                 Cursor cVerify = db.rawQuery("SELECT customer_id, email FROM Customer WHERE customer_id=?",
                         new String[]{String.valueOf(res)});
                 if (cVerify.moveToFirst()) {
@@ -190,9 +181,6 @@ public class CarRentalData {
         }
     }
 
-    /**
-     * Debug method - List all customers in database
-     */
     public void debugListAllCustomers() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT customer_id, email, first_name, last_name FROM Customer", null);
@@ -210,7 +198,7 @@ public class CarRentalData {
         db.close();
     }
 
-    // ===================== BUSINESS RULE: Car Availability & Management =====================
+    // ===================== Car Availability & Management =====================
 
     public boolean isCarAvailable(int vehicleId, String pickupDate, String returnDate) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -242,7 +230,7 @@ public class CarRentalData {
         return available;
     }
 
-    // ===================== BUSINESS RULE: Booking & Reservation =====================
+    // ===================== Booking & Reservation =====================
 
     private String generateBookingId() {
         return "RQ" + System.currentTimeMillis();
@@ -305,7 +293,7 @@ public class CarRentalData {
         }
     }
 
-    // ===================== BUSINESS RULE: 24-Hour Cancellation Policy =====================
+    // ===================== 24-Hour Cancellation Policy =====================
 
     public boolean cancelBooking(int bookingId, boolean isAdminCancellation) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -365,7 +353,7 @@ public class CarRentalData {
         }
     }
 
-    // ===================== BUSINESS RULE: Admin Approval =====================
+    // ===================== Admin Approval =====================
 
     public boolean approveBooking(int bookingId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -402,7 +390,7 @@ public class CarRentalData {
         }
     }
 
-    // ===================== BUSINESS RULE: Return Inspection =====================
+    // ===================== Return Inspection =====================
 
     public boolean createReturnInspection(int rentalId, int vehicleId, int inspectorId,
                                           int mileage, String fuelLevel, String condition,
@@ -493,9 +481,6 @@ public class CarRentalData {
 
     // ===================== Vehicle Management =====================
 
-    /**
-     * UPDATED: Add new car with transmission and seating capacity
-     */
     public boolean addNewCarComplete(String make, String model, String type, int year,
                                      double price, String plate, String imageRes,
                                      String transmission, int seats) {
@@ -554,16 +539,13 @@ public class CarRentalData {
         }
     }
 
-    /**
-     * NEW: Update existing vehicle
-     */
     public boolean updateVehicle(int vehicleId, String make, String model, String type,
                                  double price, String imageRes, String transmission, int seats) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
         try {
-            // Get current model_id
+            // gets current model_id
             Cursor cVehicle = db.rawQuery("SELECT model_id FROM Vehicle WHERE vehicle_id=?",
                     new String[]{String.valueOf(vehicleId)});
 
@@ -575,7 +557,7 @@ public class CarRentalData {
             long modelId = cVehicle.getLong(0);
             cVehicle.close();
 
-            // Update or create Make
+            // update or create Make
             long makeId = -1;
             Cursor cMake = db.rawQuery("SELECT make_id FROM Make WHERE make_name=?",
                     new String[]{make});
@@ -588,7 +570,7 @@ public class CarRentalData {
             }
             cMake.close();
 
-            // Update or create Type
+            // updates or create Type
             long typeId = -1;
             Cursor cType = db.rawQuery("SELECT type_id FROM Type WHERE type_name=?",
                     new String[]{type});
@@ -601,7 +583,7 @@ public class CarRentalData {
             }
             cType.close();
 
-            // Update VehicleModel
+            // updates VehicleModel
             ContentValues vModel = new ContentValues();
             vModel.put("make_id", makeId);
             vModel.put("type_id", typeId);
@@ -611,7 +593,7 @@ public class CarRentalData {
             db.update("VehicleModel", vModel, "model_id=?",
                     new String[]{String.valueOf(modelId)});
 
-            // Update Vehicle
+            // updates Vehicle
             ContentValues vVehicle = new ContentValues();
             vVehicle.put("image_res_name", imageRes);
             vVehicle.put("transmission", transmission);
@@ -639,9 +621,6 @@ public class CarRentalData {
         db.close();
     }
 
-    /**
-     * UPDATED: Get all vehicles with transmission and seating capacity
-     */
     public List<VehicleItem> getAllVehicles() {
         List<VehicleItem> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -746,11 +725,58 @@ public class CarRentalData {
         return list;
     }
 
+    // ===================== Booking Details Methods =====================
+
+    public BookingDetailItem getBookingDetails(int bookingId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        BookingDetailItem booking = null;
+
+        String query = "SELECT r.booking_id, r.booking_reference, r.status, " +
+                "c.first_name || ' ' || c.last_name as customer_name, c.email, c.phone, " +
+                "mk.make_name || ' ' || vm.model_name as car_name, v.image_res_name, " +
+                "r.pickup_date, r.pickup_time, r.return_date, r.return_time, " +
+                "r.pickup_address, r.return_address, " +
+                "r.total_cost, r.payment_method, r.payment_id " +
+                "FROM Reservation r " +
+                "JOIN Customer c ON r.customer_num = c.customer_id " +
+                "JOIN Vehicle v ON r.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "WHERE r.booking_id = ?";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{String.valueOf(bookingId)});
+            if (c.moveToFirst()) {
+                booking = new BookingDetailItem(
+                        c.getInt(0),      // booking_id
+                        c.getString(1),   // booking_reference
+                        c.getString(2),   // status
+                        c.getString(3),   // customer_name
+                        c.getString(4),   // customer_email
+                        c.getString(5),   // customer_phone
+                        c.getString(6),   // car_name
+                        c.getString(7),   // car_image
+                        c.getString(8),   // pickup_date
+                        c.getString(9),   // pickup_time
+                        c.getString(10),  // return_date
+                        c.getString(11),  // return_time
+                        c.getString(12),  // pickup_address
+                        c.getString(13),  // return_address
+                        c.getDouble(14),  // total_cost
+                        c.getString(15),  // payment_method
+                        c.getString(16)   // payment_receipt (payment_id)
+                );
+            }
+            c.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching booking details: " + e.getMessage(), e);
+        }
+        db.close();
+        return booking;
+    }
+
     // ===================== Inner Classes =====================
 
-    /**
-     * UPDATED: VehicleItem with transmission and seating capacity
-     */
     public static class VehicleItem {
         public int id;
         public String title, type, status, imageRes, transmission;
@@ -818,6 +844,42 @@ public class CarRentalData {
             this.dates = dates;
             this.status = status;
             this.total = total;
+        }
+    }
+
+    public static class BookingDetailItem {
+        public int id;
+        public String bookingReference, status;
+        public String customerName, customerEmail, customerPhone;
+        public String carName, carImage;
+        public String pickupDate, pickupTime, returnDate, returnTime;
+        public String pickupAddress, returnAddress;
+        public double totalCost;
+        public String paymentMethod, paymentReceipt;
+
+        public BookingDetailItem(int id, String ref, String status,
+                                 String custName, String custEmail, String custPhone,
+                                 String car, String carImg,
+                                 String pDate, String pTime, String rDate, String rTime,
+                                 String pAddr, String rAddr,
+                                 double cost, String payment, String receipt) {
+            this.id = id;
+            this.bookingReference = ref;
+            this.status = status;
+            this.customerName = custName;
+            this.customerEmail = custEmail;
+            this.customerPhone = custPhone;
+            this.carName = car;
+            this.carImage = carImg;
+            this.pickupDate = pDate;
+            this.pickupTime = pTime;
+            this.returnDate = rDate;
+            this.returnTime = rTime;
+            this.pickupAddress = pAddr;
+            this.returnAddress = rAddr;
+            this.totalCost = cost;
+            this.paymentMethod = payment;
+            this.paymentReceipt = receipt;
         }
     }
 }

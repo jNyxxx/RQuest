@@ -20,7 +20,7 @@ public class LoginActivity extends AppCompatActivity {
 
         db = new CarRentalData(this);
 
-        // DEBUG: List all customers on app start
+        // List all customers on app start
         Log.d(TAG, "=== LoginActivity Started ===");
         db.debugListAllCustomers();
 
@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // DEBUG: Refresh customer list when returning from signup
+        // Refresh customer list when returning from signup
         Log.d(TAG, "=== Returned to LoginActivity ===");
         db.debugListAllCustomers();
     }

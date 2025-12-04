@@ -32,7 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "type_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "type_name TEXT)");
 
-        // Customer Table - ENHANCED with business rules
+        // Customer Table
         db.execSQL("CREATE TABLE Customer (" +
                 "customer_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "first_name TEXT, " +
@@ -66,7 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(make_id) REFERENCES Make(make_id), " +
                 "FOREIGN KEY(type_id) REFERENCES Type(type_id))");
 
-        // Vehicle Table - ENHANCED
+        // Vehicle Table
         db.execSQL("CREATE TABLE Vehicle (" +
                 "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "model_id INTEGER, " +
@@ -95,7 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id))");
 
-        // Reservation Table - FULLY ENHANCED
+        // Reservation Table
         db.execSQL("CREATE TABLE Reservation (" +
                 "booking_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "customer_num INTEGER, " +
@@ -123,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(pickup_loc_id) REFERENCES Location(location_id), " +
                 "FOREIGN KEY(return_loc_id) REFERENCES Location(location_id))");
 
-        // Rental Table - ENHANCED
+        // Rental Table
         db.execSQL("CREATE TABLE Rental (" +
                 "rental_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "reservation_id INTEGER UNIQUE, " +
@@ -140,7 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "refueling_fee REAL DEFAULT 0, " +
                 "FOREIGN KEY(reservation_id) REFERENCES Reservation(booking_id))");
 
-        // Payment Table - ENHANCED
+        // Payment Table
         db.execSQL("CREATE TABLE Payment (" +
                 "payment_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "rental_id INTEGER, " +
@@ -150,7 +150,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "payment_status TEXT DEFAULT 'Pending', " +
                 "FOREIGN KEY(rental_id) REFERENCES Rental(rental_id))");
 
-        // NEW: Inspection Table
+        // Inspection Table
         db.execSQL("CREATE TABLE Inspection (" +
                 "inspection_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "rental_id INTEGER, " +
@@ -167,7 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(inspector_id) REFERENCES Employee(employee_id))");
 
-        // NEW: AccidentReport Table
+        // AccidentReport Table
         db.execSQL("CREATE TABLE AccidentReport (" +
                 "report_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "rental_id INTEGER, " +
@@ -184,7 +184,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(customer_id) REFERENCES Customer(customer_id))");
 
-        // NEW: Insurance Table
+        // Insurance Table
         db.execSQL("CREATE TABLE Insurance (" +
                 "insurance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "customer_id INTEGER, " +

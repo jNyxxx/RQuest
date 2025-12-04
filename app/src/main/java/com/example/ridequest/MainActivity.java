@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private List<CarRentalData.VehicleItem> allVehicles;
     private List<CarRentalData.VehicleItem> filteredVehicles;
 
-    private String currentFilter = "All"; // "All", "Sedan", "Hatchback", "SUV"
+    private String currentFilter = "All";
     private String currentSearchQuery = "";
 
     @Override
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView ivProfile = findViewById(R.id.ivProfile);
         EditText etSearch = findViewById(R.id.etSearch);
 
-        // Setup RecyclerView
+        // recyclerview
         if(recyclerView != null) {
             recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
             recyclerView.setHasFixedSize(true);
@@ -50,14 +50,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Error: RecyclerView not found", Toast.LENGTH_SHORT).show();
         }
 
-        // Setup Profile button
+        // profile button
         if(ivProfile != null) {
             ivProfile.setOnClickListener(v -> {
                 startActivity(new Intent(this, ProfileActivity.class));
             });
         }
 
-        // Setup Search functionality
+        // search functionality
         if(etSearch != null) {
             etSearch.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Setup Filter Buttons
+        // filter Buttons
         TextView btnAll = findViewById(R.id.btnFilterAll);
         TextView btnSedan = findViewById(R.id.btnFilterSedan);
         TextView btnHatchback = findViewById(R.id.btnFilterHatchback);
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Load vehicles
+        // loads all vehicles
         loadVehicles();
     }
 
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume - Reloading vehicles");
-        loadVehicles(); // IMPORTANT: This will refresh the vehicle list when returning to this activity
+        loadVehicles(); // IMPORTANT!! this method will refresh the vehicle list when returning to this activity
     }
 
     private void loadVehicles() {
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // FIXED: Reload vehicles from database every time
+            // reload vehicles from database every time
             allVehicles = db.getAllVehicles();
             Log.d(TAG, "Loaded " + allVehicles.size() + " vehicles from database");
 
@@ -147,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Filter vehicles based on search query and category filter
-     */
     private void filterVehicles() {
         if(allVehicles == null) {
             Log.w(TAG, "allVehicles is null, cannot filter");
@@ -162,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             boolean matchesSearch = true;
             boolean matchesCategory = true;
 
-            // Check search query
+            // search query
             if(!currentSearchQuery.isEmpty()) {
                 String query = currentSearchQuery.toLowerCase();
                 String title = vehicle.title != null ? vehicle.title.toLowerCase() : "";
@@ -171,13 +168,13 @@ public class MainActivity extends AppCompatActivity {
                 matchesSearch = title.contains(query) || type.contains(query);
             }
 
-            // Check category filter
+            // category filter
             if(!currentFilter.equals("All")) {
                 matchesCategory = vehicle.type != null &&
                         vehicle.type.equalsIgnoreCase(currentFilter);
             }
 
-            // Add vehicle if it matches both filters
+            // adds vehicle if it matches both filters
             if(matchesSearch && matchesCategory) {
                 filteredVehicles.add(vehicle);
             }
@@ -185,11 +182,11 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "Filtered: " + filteredVehicles.size() + " vehicles (Search: '" + currentSearchQuery + "', Category: '" + currentFilter + "')");
 
-        // Update RecyclerView with customer view (no edit/delete buttons)
+        // recyclerView with customer view
         adapter = new VehicleAdapter(this, filteredVehicles, false, null);
         recyclerView.setAdapter(adapter);
 
-        // Show message if no results
+        // message if no results
         if(filteredVehicles.isEmpty()) {
             if(!currentSearchQuery.isEmpty() || !currentFilter.equals("All")) {
                 Toast.makeText(this, "No vehicles found matching your search", Toast.LENGTH_SHORT).show();
@@ -197,22 +194,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Update visual styles of filter buttons
-     */
+    //  visual styles of filter buttons
     private void updateFilterButtonStyles() {
         TextView btnAll = findViewById(R.id.btnFilterAll);
         TextView btnSedan = findViewById(R.id.btnFilterSedan);
         TextView btnHatchback = findViewById(R.id.btnFilterHatchback);
         TextView btnSUV = findViewById(R.id.btnFilterSUV);
 
-        // Reset all to inactive style
+        // resets all to inactive style
         if(btnAll != null) setInactiveStyle(btnAll);
         if(btnSedan != null) setInactiveStyle(btnSedan);
         if(btnHatchback != null) setInactiveStyle(btnHatchback);
         if(btnSUV != null) setInactiveStyle(btnSUV);
 
-        // Set active style for selected filter
+        // style for selected filter
         switch(currentFilter) {
             case "All":
                 if(btnAll != null) setActiveStyle(btnAll);

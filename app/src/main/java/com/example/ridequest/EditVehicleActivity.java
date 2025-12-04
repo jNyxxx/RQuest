@@ -42,12 +42,12 @@ public class EditVehicleActivity extends AppCompatActivity {
         String transmission = getIntent().getStringExtra("TRANSMISSION");
         int seats = getIntent().getIntExtra("SEATS", 5);
 
-        // Parse make and model
+        // make and model
         String[] parts = makeModel != null ? makeModel.split(" ", 2) : new String[]{"", ""};
         String make = parts.length > 0 ? parts[0] : "";
         String model = parts.length > 1 ? parts[1] : "";
 
-        // Bind UI elements
+        // UI elements
         EditText etMake = findViewById(R.id.etMake);
         EditText etModel = findViewById(R.id.etModel);
         EditText etType = findViewById(R.id.etType);
@@ -65,24 +65,20 @@ public class EditVehicleActivity extends AppCompatActivity {
         etPrice.setText(String.valueOf(price));
         etSeats.setText(String.valueOf(seats));
 
-        // Set current image (if it's base64, decode it; otherwise use placeholder)
         if (imageData != null && !imageData.isEmpty()) {
             selectedImageBase64 = imageData;
             try {
-                // Try to decode as Base64
                 byte[] decodedBytes = Base64.decode(imageData, Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                 if (bitmap != null) {
                     ivPreview.setImageBitmap(bitmap);
                 } else {
-                    // It might be a drawable resource name (old format)
                     int resId = getResources().getIdentifier(imageData, "drawable", getPackageName());
                     if (resId != 0) {
                         ivPreview.setImageResource(resId);
                     }
                 }
             } catch (Exception e) {
-                // Fallback to placeholder
                 ivPreview.setImageResource(android.R.drawable.ic_menu_gallery);
             }
         }
@@ -110,11 +106,9 @@ public class EditVehicleActivity extends AppCompatActivity {
                         Uri imageUri = result.getData().getData();
                         if (imageUri != null) {
                             try {
-                                // Load image into ImageView
                                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                                 ivPreview.setImageBitmap(bitmap);
 
-                                // Convert to Base64
                                 selectedImageBase64 = bitmapToBase64(bitmap);
                                 Toast.makeText(this, "Image selected successfully!", Toast.LENGTH_SHORT).show();
                             } catch (IOException e) {
