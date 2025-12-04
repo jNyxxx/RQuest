@@ -1,142 +1,341 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="24dp">
+    android:background="#F8F9FA"
+    android:fillViewport="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:padding="24dp">
 
+        <!-- Header Section -->
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Edit Vehicle"
             android:textColor="@color/rq_orange"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
-
-        <EditText
-            android:id="@+id/etMake"
-            android:hint="Make (e.g. Toyota)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etModel"
-            android:hint="Model (e.g. Vios)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etType"
-            android:hint="Type (e.g. Sedan)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etPrice"
-            android:hint="Rate/Day"
-            android:inputType="numberDecimal"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- Transmission Spinner -->
-        <TextView
-            android:text="Transmission:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:textColor="#555"
-            android:textStyle="bold"/>
-
-        <Spinner
-            android:id="@+id/spTransmission"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- CHANGED: Seats is now EditText instead of Spinner -->
-        <TextView
-            android:text="Seating Capacity:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:textColor="#555"
-            android:textStyle="bold"/>
-
-        <EditText
-            android:id="@+id/etSeats"
-            android:hint="Number of seats (e.g. 5)"
-            android:inputType="number"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:contentDescription="Edit vehicle form"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:text="Select Image Asset:"
+            android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:textColor="#555"
-            android:textStyle="bold"/>
+            android:layout_marginTop="4dp"
+            android:text="Update vehicle information and specifications"
+            android:textColor="#666"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/btnSelectImage"
-            android:text="Select Image from Gallery"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_button_orange"
-            android:textColor="@color/white"
-            android:layout_marginBottom="12dp"/>
+        <!-- Vehicle Details Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardVehicleDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/ivPreview"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:background="#EEE"
-            android:layout_marginBottom="24dp"
-            android:contentDescription="Vehicle preview"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        <androidx.appcompat.widget.AppCompatButton
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicle Information"
+                    android:textColor="#333"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilMake"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/rq_orange"
+                    app:hintTextColor="@color/rq_orange"
+                    app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
+                    app:startIconTint="#666">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMake"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Make"
+                        android:inputType="textCapWords"
+                        android:maxLines="1"
+                        android:textSize="15sp"
+                        android:contentDescription="Vehicle manufacturer, for example Toyota, Honda, or Ford"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/rq_orange"
+                    app:hintTextColor="@color/rq_orange"
+                    app:startIconDrawable="@android:drawable/ic_menu_compass"
+                    app:startIconTint="#666">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Model"
+                        android:inputType="textCapWords"
+                        android:maxLines="1"
+                        android:textSize="15sp"
+                        android:contentDescription="Vehicle model, for example Vios, Civic, or Mustang"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/rq_orange"
+                    app:hintTextColor="@color/rq_orange"
+                    app:startIconDrawable="@android:drawable/ic_menu_view"
+                    app:startIconTint="#666">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Type"
+                        android:inputType="textCapWords"
+                        android:maxLines="1"
+                        android:textSize="15sp"
+                        android:contentDescription="Vehicle type, for example Sedan, SUV, Van, or Pickup"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/rq_orange"
+                    app:hintTextColor="@color/rq_orange"
+                    app:prefixText="₱ ">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Rate/Day"
+                        android:inputType="numberDecimal"
+                        android:maxLines="1"
+                        android:textSize="15sp"
+                        android:contentDescription="Daily rental rate in pesos"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Specifications Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSpecifications"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/cardVehicleDetails"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicle Specifications"
+                    android:textColor="#333"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Transmission Type"
+                    android:textColor="#666"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="8dp"
+                    app:strokeColor="#DDDDDD"
+                    app:strokeWidth="1dp"
+                    app:cardElevation="0dp">
+
+                    <Spinner
+                        android:id="@+id/spTransmission"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:paddingHorizontal="12dp"
+                        android:contentDescription="Select transmission type: Manual or Automatic"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilSeats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/rq_orange"
+                    app:hintTextColor="@color/rq_orange"
+                    app:helperText="Typical values: 2, 4, 5, 7, 8"
+                    app:helperTextTextColor="#999"
+                    app:startIconDrawable="@android:drawable/ic_menu_sort_by_size"
+                    app:startIconTint="#666">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSeats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Seating Capacity"
+                        android:inputType="number"
+                        android:maxLength="2"
+                        android:maxLines="1"
+                        android:textSize="15sp"
+                        android:contentDescription="Number of passenger seats"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Image Selection Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardImage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/cardSpecifications"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicle Photo"
+                    android:textColor="#333"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Update the vehicle image if needed"
+                    android:textColor="#666"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSelectImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="Select Image from Gallery"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/rq_orange"
+                    app:cornerRadius="8dp"
+                    app:icon="@android:drawable/ic_menu_gallery"
+                    app:iconTint="@color/white"
+                    android:contentDescription="Select vehicle image from gallery" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E0E0E0"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:id="@+id/ivPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:scaleType="centerCrop"
+                        android:background="#F5F5F5"
+                        android:contentDescription="Selected vehicle image preview"/>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action Buttons -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnUpdateCar"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
             android:text="Update Vehicle"
-            android:background="@drawable/bg_button_orange"
             android:textColor="@color/white"
-            android:textStyle="bold"/>
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            app:backgroundTint="@color/rq_orange"
+            app:cornerRadius="8dp"
+            android:contentDescription="Update vehicle information"
+            app:layout_constraintTop_toBottomOf="@id/cardImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBack"
-            android:text="Cancel"
-            android:textColor="#555"
-            android:background="@android:color/transparent"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:text="Cancel"
+            android:textColor="#666"
+            android:textSize="15sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:contentDescription="Cancel and return to previous screen"
+            app:layout_constraintTop_toBottomOf="@id/btnUpdateCar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

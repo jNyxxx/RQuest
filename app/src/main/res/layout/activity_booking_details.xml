@@ -61,9 +61,10 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:paddingBottom="24dp">
 
-            <!-- Booking Reference & Status Card -->
+            <!-- Booking Status Card with Enhanced Visual -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardStatus"
                 android:layout_width="0dp"
@@ -81,56 +82,46 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- Status Badge at Top -->
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:text="Pending"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:background="@drawable/bg_status_pending"
+                        android:textColor="@color/rq_orange"
+                        android:layout_gravity="end"
+                        android:layout_marginBottom="12dp"
+                        tools:ignore="HardcodedText" />
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                    <!-- Booking Reference -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Booking Reference"
+                        android:textColor="#999"
+                        android:textSize="11sp"
+                        tools:ignore="HardcodedText" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Booking Reference"
-                                android:textColor="#666"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                tools:ignore="HardcodedText" />
-
-                            <TextView
-                                android:id="@+id/tvBookingRef"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="RQ123456789"
-                                android:textColor="#333"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="4dp"
-                                tools:ignore="HardcodedText" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvStatus"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Pending"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:paddingHorizontal="16dp"
-                            android:paddingVertical="8dp"
-                            android:background="@drawable/bg_status_pending"
-                            android:textColor="@color/rq_orange"
-                            tools:ignore="HardcodedText" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvBookingRef"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RQ123456789"
+                        android:textColor="#333"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"
+                        android:letterSpacing="0.05"
+                        tools:ignore="HardcodedText" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Vehicle Information Card -->
+            <!-- Vehicle Card with Improved Layout -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardVehicle"
                 android:layout_width="0dp"
@@ -146,27 +137,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vehicle Information"
-                        android:textColor="#333"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"
-                        tools:ignore="HardcodedText" />
-
+                    <!-- Car Image - Full Width -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E0E0E0"
-                        app:strokeWidth="1dp">
+                        android:layout_height="200dp"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp">
 
                         <ImageView
                             android:id="@+id/ivCarImage"
@@ -178,21 +156,38 @@
                             tools:ignore="HardcodedText" />
                     </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:id="@+id/tvCarName"
-                        android:layout_width="wrap_content"
+                    <!-- Car Info Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Toyota Wigo"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        tools:ignore="HardcodedText" />
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vehicle"
+                            android:textColor="#999"
+                            android:textSize="11sp"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/tvCarName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Toyota Wigo"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"
+                            android:layout_marginTop="4dp"
+                            tools:ignore="HardcodedText" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Customer Information Card -->
+            <!-- Rental Period Card with Timeline Design -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardCustomer"
+                android:id="@+id/cardRental"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -212,6 +207,164 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="Rental Period"
+                        android:textColor="#333"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp"
+                        tools:ignore="HardcodedText" />
+
+                    <!-- Pickup Section with Icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <!-- Timeline Dot -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="top"
+                            android:layout_marginEnd="12dp">
+
+                            <View
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_marginTop="4dp"
+                                android:background="@drawable/bg_button_orange" />
+
+                            <View
+                                android:layout_width="2dp"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="4dp"
+                                android:background="#DDD" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="@drawable/bg_input_field"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pickup"
+                                android:textColor="@color/rq_orange"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:id="@+id/tvPickupDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="12/4/2025 • 10:00 AM"
+                                android:textColor="#333"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:id="@+id/tvPickupAddress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="123 Main St, Cebu City"
+                                android:textColor="#666"
+                                android:textSize="13sp"
+                                android:layout_marginTop="6dp"
+                                android:maxLines="2"
+                                android:ellipsize="end"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Return Section with Icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Timeline Dot -->
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_input_field" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="@drawable/bg_input_field"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Return"
+                                android:textColor="#999"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:id="@+id/tvReturnDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="12/5/2025 • 10:00 AM"
+                                android:textColor="#333"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:id="@+id/tvReturnAddress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="456 Park Ave, Manila"
+                                android:textColor="#666"
+                                android:textSize="13sp"
+                                android:layout_marginTop="6dp"
+                                android:maxLines="2"
+                                android:ellipsize="end"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Customer Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCustomer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/cardRental"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="Customer Information"
                         android:textColor="#333"
                         android:textSize="16sp"
@@ -219,6 +372,7 @@
                         android:layout_marginBottom="16dp"
                         tools:ignore="HardcodedText" />
 
+                    <!-- Info Grid -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -304,9 +458,9 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Rental Details Card -->
+            <!-- Payment Card with Better Visual Hierarchy -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardRental"
+                android:id="@+id/cardPayment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -326,265 +480,27 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rental Details"
+                        android:text="Payment Summary"
                         android:textColor="#333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp"
                         tools:ignore="HardcodedText" />
 
-                    <!-- Pickup Section -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pickup Date &amp; Time"
-                        android:textColor="#666"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp"
-                        tools:ignore="HardcodedText" />
-
+                    <!-- Cost Breakdown -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="12dp"
-                            android:layout_marginEnd="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Date"
-                                android:textColor="#999"
-                                android:textSize="11sp"
-                                tools:ignore="HardcodedText" />
-
-                            <TextView
-                                android:id="@+id/tvPickupDate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="12/4/2025"
-                                android:textColor="#333"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="4dp"
-                                tools:ignore="HardcodedText" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="12dp"
-                            android:layout_marginStart="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Time"
-                                android:textColor="#999"
-                                android:textSize="11sp"
-                                tools:ignore="HardcodedText" />
-
-                            <TextView
-                                android:id="@+id/tvPickupTime"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="10:00 AM"
-                                android:textColor="#333"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="4dp"
-                                tools:ignore="HardcodedText" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_input_field"
-                        android:padding="12dp"
-                        android:layout_marginBottom="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Pickup Address"
-                            android:textColor="#999"
-                            android:textSize="11sp"
-                            tools:ignore="HardcodedText" />
-
-                        <TextView
-                            android:id="@+id/tvPickupAddress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="123 Main St, Cebu City"
-                            android:textColor="#333"
-                            android:textSize="14sp"
-                            android:layout_marginTop="4dp"
-                            tools:ignore="HardcodedText" />
-                    </LinearLayout>
-
-                    <!-- Return Section -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Return Date &amp; Time"
-                        android:textColor="#666"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp"
-                        tools:ignore="HardcodedText" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="12dp"
-                            android:layout_marginEnd="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Date"
-                                android:textColor="#999"
-                                android:textSize="11sp"
-                                tools:ignore="HardcodedText" />
-
-                            <TextView
-                                android:id="@+id/tvReturnDate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="12/5/2025"
-                                android:textColor="#333"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="4dp"
-                                tools:ignore="HardcodedText" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:background="@drawable/bg_input_field"
-                            android:padding="12dp"
-                            android:layout_marginStart="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Time"
-                                android:textColor="#999"
-                                android:textSize="11sp"
-                                tools:ignore="HardcodedText" />
-
-                            <TextView
-                                android:id="@+id/tvReturnTime"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="10:00 AM"
-                                android:textColor="#333"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:layout_marginTop="4dp"
-                                tools:ignore="HardcodedText" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_input_field"
-                        android:padding="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Return Address"
-                            android:textColor="#999"
-                            android:textSize="11sp"
-                            tools:ignore="HardcodedText" />
-
-                        <TextView
-                            android:id="@+id/tvReturnAddress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="456 Park Ave, Manila"
-                            android:textColor="#333"
-                            android:textSize="14sp"
-                            android:layout_marginTop="4dp"
-                            tools:ignore="HardcodedText" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Payment Information Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardPayment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white"
-                app:layout_constraintTop_toBottomOf="@id/cardRental"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Payment Information"
-                        android:textColor="#333"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp"
-                        tools:ignore="HardcodedText" />
-
-                    <!-- Total Cost -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:text="Total Cost"
+                            android:text="Total Rental Cost"
                             android:textColor="#666"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             tools:ignore="HardcodedText" />
 
                         <TextView
@@ -593,16 +509,16 @@
                             android:layout_height="wrap_content"
                             android:text="$1000.00"
                             android:textColor="#333"
-                            android:textSize="16sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
-                    <!-- Downpayment Highlight -->
+                    <!-- Downpayment Highlight Box -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginVertical="8dp"
+                        android:layout_marginBottom="8dp"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="0dp"
                         app:cardBackgroundColor="#FFF3E0">
@@ -611,17 +527,32 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
-                            <TextView
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:text="Downpayment (30%)"
-                                android:textColor="@color/rq_orange"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                tools:ignore="HardcodedText" />
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Downpayment Paid"
+                                    android:textColor="@color/rq_orange"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="30% of total"
+                                    android:textColor="#999"
+                                    android:textSize="10sp"
+                                    android:layout_marginTop="2dp"
+                                    tools:ignore="HardcodedText" />
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/tvDownpayment"
@@ -629,27 +560,27 @@
                                 android:layout_height="wrap_content"
                                 android:text="$300.00"
                                 android:textColor="@color/rq_orange"
-                                android:textSize="16sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 tools:ignore="HardcodedText" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Balance -->
+                    <!-- Balance Due -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="16dp"
+                        android:paddingVertical="8dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:text="Balance (pay at pickup)"
+                            android:text="Balance Due at Pickup"
                             android:textColor="#666"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             tools:ignore="HardcodedText" />
 
                         <TextView
@@ -657,8 +588,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="$700.00"
-                            android:textColor="#666"
-                            android:textSize="14sp"
+                            android:textColor="#333"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
@@ -676,7 +608,7 @@
                         android:orientation="vertical"
                         android:background="@drawable/bg_input_field"
                         android:padding="12dp"
-                        android:layout_marginBottom="12dp">
+                        android:layout_marginBottom="16dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -698,7 +630,7 @@
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
-                    <!-- Payment Receipt -->
+                    <!-- Payment Receipt Section -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -711,7 +643,7 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="220dp"
+                        android:layout_height="240dp"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="0dp"
                         app:strokeColor="#E0E0E0"
