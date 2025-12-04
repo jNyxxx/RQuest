@@ -1,271 +1,493 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:padding="20dp">
+    android:background="#F8F9FA">
 
-    <!-- Top Navigation -->
-    <FrameLayout
-        android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/bg_input_field"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:rotation="180"
-            android:layout_gravity="center"
-            android:contentDescription="@string/back_button"
-            app:tint="#333"/>
-    </FrameLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/car_details"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="#333"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnBack"
-        app:layout_constraintBottom_toBottomOf="@id/btnBack"/>
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <FrameLayout
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/bg_input_field"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@android:drawable/ic_menu_more"
-            android:layout_gravity="center"
-            android:contentDescription="@string/more_options"
-            app:tint="#333"/>
-    </FrameLayout>
-
-    <!-- Large Car Image -->
-    <ImageView
-        android:id="@+id/ivDetailCar"
-        android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:layout_marginTop="20dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="@string/car_image"
-        android:src="@drawable/ic_launcher_foreground"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"/>
-
-    <!-- Content Panel -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/ivDetailCar"
-        app:layout_constraintBottom_toTopOf="@id/btnBookNow">
-
-        <LinearLayout
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/rq_orange"
+            app:contentInsetStart="8dp">
 
-            <!-- Title & Price Row -->
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:baselineAligned="false">
+                android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/tvDetailTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tesla_model_s"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        tools:ignore="VisualLintLongText" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/premium_car"
-                        android:textColor="#999"
-                        android:textSize="14sp"/>
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:rotation="180"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:contentDescription="@string/back_button"
+                    app:tint="@color/white" />
 
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="end">
-                    <TextView
-                        android:id="@+id/tvDetailPrice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/price_sample"
-                        android:textColor="@color/rq_orange"
-                        android:textSize="20sp"
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/per_day"
-                        android:textColor="#999"
-                        android:textSize="12sp"/>
-                </LinearLayout>
-            </LinearLayout>
+                    android:layout_centerInParent="true"
+                    android:text="@string/car_details"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/car_features"
-                android:textStyle="bold"
-                android:textColor="#333"
-                android:textSize="16sp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp"/>
+                <ImageView
+                    android:id="@+id/btnMore"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:src="@android:drawable/ic_menu_more"
+                    android:contentDescription="@string/more_options"
+                    app:tint="@color/white" />
+            </RelativeLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
-            <!-- Features Grid -->
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:rowCount="2"
-                android:alignmentMode="alignMargins"
-                android:columnOrderPreserved="false">
-
-                <!-- Feature 1: Seats (UPDATED) -->
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:padding="12dp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp">
-
-                    <ImageView
-                        android:src="@android:drawable/ic_menu_myplaces"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:contentDescription="@string/capacity_icon"
-                        app:tint="#777"/>
-
-                    <TextView
-                        android:text="@string/capacity"
-                        android:textSize="12sp"
-                        android:layout_marginTop="16dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#999"/>
-
-                    <TextView
-                        android:id="@+id/tvSeats"
-                        android:text="@string/five_seats"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <!-- Feature 2: Transmission (UPDATED) -->
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:padding="12dp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp">
-
-                    <ImageView
-                        android:src="@android:drawable/ic_lock_idle_charging"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:contentDescription="Transmission icon"
-                        app:tint="#777"/>
-
-                    <TextView
-                        android:text="Transmission"
-                        android:textSize="12sp"
-                        android:layout_marginTop="16dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#999"/>
-
-                    <TextView
-                        android:id="@+id/tvTransmission"
-                        android:text="Manual"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <!-- Feature 3: Engine -->
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:padding="12dp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginBottom="8dp">
-
-                    <ImageView
-                        android:src="@android:drawable/ic_menu_compass"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:contentDescription="@string/max_speed_icon"
-                        app:tint="#777"/>
-
-                    <TextView
-                        android:text="Type"
-                        android:textSize="12sp"
-                        android:layout_marginTop="16dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#999"/>
-
-                    <TextView
-                        android:text="Premium"
-                        android:textStyle="bold"
-                        android:textColor="#333"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-            </GridLayout>
-
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- Bottom Button -->
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnBookNow"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="@string/book_now"
-        android:textAllCaps="false"
-        android:background="@drawable/bg_button_orange"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp">
+
+            <!-- Car Image Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCarImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:id="@+id/ivDetailCar"
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/car_image"
+                    android:src="@drawable/ic_launcher_foreground" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Car Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCarInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/cardCarImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Title & Category -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvDetailTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/tesla_model_s"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#333" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/premium_car"
+                                android:textColor="#999"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="end">
+
+                            <TextView
+                                android:id="@+id/tvDetailPrice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/price_sample"
+                                android:textColor="@color/rq_orange"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/per_day"
+                                android:textColor="#999"
+                                android:textSize="12sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Price per day notice -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#FFF3E0">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@android:drawable/ic_dialog_info"
+                                android:contentDescription="Info icon"
+                                app:tint="@color/rq_orange" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:text="30% downpayment required, remaining balance due at pickup"
+                                android:textColor="#666"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Features Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardFeatures"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/cardCarInfo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/car_features"
+                        android:textStyle="bold"
+                        android:textColor="#333"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Features Grid -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <!-- Feature 1: Seats -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="@drawable/bg_input_field"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@android:drawable/ic_menu_myplaces"
+                                android:contentDescription="@string/capacity_icon"
+                                app:tint="#777" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/capacity"
+                                android:textSize="11sp"
+                                android:layout_marginTop="12dp"
+                                android:textColor="#999" />
+
+                            <TextView
+                                android:id="@+id/tvSeats"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/five_seats"
+                                android:textStyle="bold"
+                                android:textColor="#333"
+                                android:textSize="14sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <!-- Feature 2: Transmission -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="@drawable/bg_input_field"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@android:drawable/ic_lock_idle_charging"
+                                android:contentDescription="Transmission icon"
+                                app:tint="#777" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Transmission"
+                                android:textSize="11sp"
+                                android:layout_marginTop="12dp"
+                                android:textColor="#999" />
+
+                            <TextView
+                                android:id="@+id/tvTransmission"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Manual"
+                                android:textStyle="bold"
+                                android:textColor="#333"
+                                android:textSize="14sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <!-- Feature 3: Type -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:background="@drawable/bg_input_field"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@android:drawable/ic_menu_compass"
+                                android:contentDescription="Type icon"
+                                app:tint="#777" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Type"
+                                android:textSize="11sp"
+                                android:layout_marginTop="12dp"
+                                android:textColor="#999" />
+
+                            <TextView
+                                android:id="@+id/tvType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Premium"
+                                android:textStyle="bold"
+                                android:textColor="#333"
+                                android:textSize="14sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Additional Specifications Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSpecifications"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white"
+                app:layout_constraintTop_toBottomOf="@id/cardFeatures"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Specifications"
+                        android:textStyle="bold"
+                        android:textColor="#333"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Spec Item 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_input_field"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fuel Type"
+                            android:textColor="#999"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvFuelType"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gasoline"
+                            android:textColor="#333"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <!-- Spec Item 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_input_field"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Color"
+                            android:textColor="#999"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvColor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pearl White"
+                            android:textColor="#333"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <!-- Spec Item 3 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_input_field"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Year Model"
+                            android:textColor="#999"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvYear"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2024"
+                            android:textColor="#333"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Book Now Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBookNow"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:text="@string/book_now"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                app:backgroundTint="@color/rq_orange"
+                app:cornerRadius="8dp"
+                app:icon="@android:drawable/ic_media_next"
+                app:iconGravity="end"
+                android:contentDescription="Book this vehicle"
+                app:layout_constraintTop_toBottomOf="@id/cardSpecifications"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

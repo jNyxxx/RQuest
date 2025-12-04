@@ -12,7 +12,7 @@ android {
         // --- FIX ---
         // Set minSdk to a reasonable level to support more devices.
         // API 24 (Android 7.0) is a common and good starting point.
-        minSdk = 34
+        minSdk = 24
 
         targetSdk = 34
         versionCode = 1

@@ -3,24 +3,31 @@ package com.example.ridequest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import java.util.List;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminDashboard";
     private CarRentalData db;
     private RecyclerView recyclerView;
-    private FloatingActionButton fab;
+    private ExtendedFloatingActionButton fab;
+    private LinearLayout layoutEmpty, layoutStats;
+    private TextView tvSectionTitle, tvItemCount, tvTotalVehicles, tvActiveBookings, tvAdminSubtitle;
     private boolean showingVehicles = true;
 
-    private TextView btnVehicles, btnBookings;
+    private MaterialButton btnVehicles, btnBookings;
+    private MaterialCardView cardAdminProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +35,25 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_dashboard);
 
         db = new CarRentalData(this);
+
+        // Initialize views
         recyclerView = findViewById(R.id.rvAdmin);
         fab = findViewById(R.id.fabAdd);
-        ImageView btnProfile = findViewById(R.id.btnAdminProfile);
+        layoutEmpty = findViewById(R.id.layoutEmpty);
+        layoutStats = findViewById(R.id.layoutStats);
+        tvSectionTitle = findViewById(R.id.tvSectionTitle);
+        tvItemCount = findViewById(R.id.tvItemCount);
+        tvTotalVehicles = findViewById(R.id.tvTotalVehicles);
+        tvActiveBookings = findViewById(R.id.tvActiveBookings);
+        tvAdminSubtitle = findViewById(R.id.tvAdminSubtitle);
+        cardAdminProfile = findViewById(R.id.cardAdminProfile);
 
         btnVehicles = findViewById(R.id.btnViewVehicles);
         btnBookings = findViewById(R.id.btnViewBookings);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Tab switching
         btnVehicles.setOnClickListener(v -> {
             showingVehicles = true;
             updateTabStyles();
@@ -49,20 +66,31 @@ public class AdminDashboardActivity extends AppCompatActivity {
             loadBookings();
         });
 
-        //  logout go directly to Login
-        if (btnProfile != null) {
-            btnProfile.setOnClickListener(v -> {
-                PopupMenu popup = new PopupMenu(AdminDashboardActivity.this, btnProfile);
-                popup.getMenu().add(0, 1, 0, "Log Out");
+        // Profile menu - logout
+        if (cardAdminProfile != null) {
+            cardAdminProfile.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(AdminDashboardActivity.this, cardAdminProfile);
+                popup.getMenu().add(0, 1, 0, "Profile");
+                popup.getMenu().add(0, 2, 0, "Settings");
+                popup.getMenu().add(0, 3, 0, "Log Out");
 
                 popup.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == 1) {
-                        // Go directly to LoginActivity instead of LandingActivity
-                        Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                        return true;
+                    switch (item.getItemId()) {
+                        case 1:
+                            // TODO: Open profile
+                            Toast.makeText(this, "Profile coming soon", Toast.LENGTH_SHORT).show();
+                            return true;
+                        case 2:
+                            // TODO: Open settings
+                            Toast.makeText(this, "Settings coming soon", Toast.LENGTH_SHORT).show();
+                            return true;
+                        case 3:
+                            // Logout - Go directly to LoginActivity
+                            Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                            return true;
                     }
                     return false;
                 });
@@ -79,9 +107,22 @@ public class AdminDashboardActivity extends AppCompatActivity {
             }
         });
 
+        // FAB scroll behavior
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 && fab.isExtended()) {
+                    fab.shrink();
+                } else if (dy < 0 && !fab.isExtended()) {
+                    fab.extend();
+                }
+            }
+        });
+
         // Start with vehicles view
         updateTabStyles();
         loadVehicles();
+        updateStats();
     }
 
     @Override
@@ -89,96 +130,156 @@ public class AdminDashboardActivity extends AppCompatActivity {
         super.onResume();
         if (showingVehicles) loadVehicles();
         else loadBookings();
+        updateStats();
     }
 
     private void updateTabStyles() {
-        if(showingVehicles) {
-            btnVehicles.setBackgroundResource(R.drawable.bg_button_orange);
-            btnVehicles.setTextColor(getResources().getColor(R.color.white));
+        if (showingVehicles) {
+            // Vehicles tab active
+            btnVehicles.setBackgroundColor(getResources().getColor(R.color.rq_orange, null));
+            btnVehicles.setTextColor(getResources().getColor(R.color.white, null));
+            btnVehicles.setStrokeWidth(0);
 
-            btnBookings.setBackgroundResource(R.drawable.bg_input_field);
-            btnBookings.setTextColor(getResources().getColor(R.color.black));
+            btnBookings.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
+            btnBookings.setTextColor(getResources().getColor(R.color.rq_orange, null));
+            btnBookings.setStrokeWidth(4);
+            btnBookings.setStrokeColor(getColorStateList(R.color.rq_orange));
 
-            fab.show();
+            tvSectionTitle.setText("All Vehicles");
+            tvAdminSubtitle.setText("Manage your fleet");
+            fab.setText("Add Vehicle");
+            fab.setVisibility(View.VISIBLE);
         } else {
-            btnBookings.setBackgroundResource(R.drawable.bg_button_orange);
-            btnBookings.setTextColor(getResources().getColor(R.color.white));
+            // Bookings tab active
+            btnBookings.setBackgroundColor(getResources().getColor(R.color.rq_orange, null));
+            btnBookings.setTextColor(getResources().getColor(R.color.white, null));
+            btnBookings.setStrokeWidth(0);
 
-            btnVehicles.setBackgroundResource(R.drawable.bg_input_field);
-            btnVehicles.setTextColor(getResources().getColor(R.color.black));
+            btnVehicles.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
+            btnVehicles.setTextColor(getResources().getColor(R.color.rq_orange, null));
+            btnVehicles.setStrokeWidth(4);
+            btnVehicles.setStrokeColor(getColorStateList(R.color.rq_orange));
 
-            fab.hide();
+            tvSectionTitle.setText("All Bookings");
+            tvAdminSubtitle.setText("Manage reservations");
+            fab.setVisibility(View.GONE);
         }
+    }
+
+    private void updateStats() {
+        // Get counts from database
+        List<CarRentalData.VehicleItem> vehicles = db.getAllVehicles();
+        List<CarRentalData.AdminBookingItem> bookings = db.getAllBookingsForAdmin();
+
+        int vehicleCount = vehicles.size();
+        int bookingCount = bookings.size();
+
+        tvTotalVehicles.setText(String.valueOf(vehicleCount));
+        tvActiveBookings.setText(String.valueOf(bookingCount));
+
+        // Show stats section
+        layoutStats.setVisibility(View.VISIBLE);
     }
 
     private void loadVehicles() {
         Log.d(TAG, "Loading vehicles...");
-        fab.show();
 
-        //  onEdit callback for editing vehicles
-        recyclerView.setAdapter(new VehicleAdapter(this, db.getAllVehicles(), true,
-                new VehicleAdapter.OnDeleteListener() {
-                    @Override
-                    public void onDelete(int id) {
-                        db.deleteVehicle(id);
-                        loadVehicles();
-                        Toast.makeText(AdminDashboardActivity.this, "Vehicle Deleted", Toast.LENGTH_SHORT).show();
+        List<CarRentalData.VehicleItem> vehicles = db.getAllVehicles();
+
+        if (vehicles.isEmpty()) {
+            showEmptyState("No vehicles yet", "Tap the + button to add your first vehicle");
+        } else {
+            hideEmptyState();
+            tvItemCount.setText(vehicles.size() + " items");
+
+            recyclerView.setAdapter(new VehicleAdapter(this, vehicles, true,
+                    new VehicleAdapter.OnDeleteListener() {
+                        @Override
+                        public void onDelete(int id) {
+                            db.deleteVehicle(id);
+                            loadVehicles();
+                            updateStats();
+                            Toast.makeText(AdminDashboardActivity.this, "Vehicle Deleted ✓", Toast.LENGTH_SHORT).show();
+                        }
+                    },
+                    new VehicleAdapter.OnEditListener() {
+                        @Override
+                        public void onEdit(CarRentalData.VehicleItem vehicle) {
+                            Intent intent = new Intent(AdminDashboardActivity.this, EditVehicleActivity.class);
+                            intent.putExtra("VEHICLE_ID", vehicle.id);
+                            intent.putExtra("MAKE_MODEL", vehicle.title);
+                            intent.putExtra("TYPE", vehicle.type);
+                            intent.putExtra("PRICE", vehicle.price);
+                            intent.putExtra("IMAGE_RES", vehicle.imageRes);
+                            intent.putExtra("TRANSMISSION", vehicle.transmission);
+                            intent.putExtra("SEATS", vehicle.seats);
+                            startActivity(intent);
+                        }
                     }
-                },
-                new VehicleAdapter.OnEditListener() {
-                    @Override
-                    public void onEdit(CarRentalData.VehicleItem vehicle) {
-                        // Open EditVehicleActivity with vehicle data
-                        Intent intent = new Intent(AdminDashboardActivity.this, EditVehicleActivity.class);
-                        intent.putExtra("VEHICLE_ID", vehicle.id);
-                        intent.putExtra("MAKE_MODEL", vehicle.title);
-                        intent.putExtra("TYPE", vehicle.type);
-                        intent.putExtra("PRICE", vehicle.price);
-                        intent.putExtra("IMAGE_RES", vehicle.imageRes);
-                        intent.putExtra("TRANSMISSION", vehicle.transmission);
-                        intent.putExtra("SEATS", vehicle.seats);
-                        startActivity(intent);
-                    }
-                }
-        ));
+            ));
+        }
     }
 
     private void loadBookings() {
         Log.d(TAG, "Loading bookings...");
-        fab.hide();
 
-        AdminBookingAdapter adapter = new AdminBookingAdapter(
-                this,
-                db.getAllBookingsForAdmin(),
-                new AdminBookingAdapter.BookingActionListener() {
-                    @Override
-                    public void onApprove(CarRentalData.AdminBookingItem booking) {
-                        approveBooking(booking);
+        List<CarRentalData.AdminBookingItem> bookings = db.getAllBookingsForAdmin();
+
+        if (bookings.isEmpty()) {
+            showEmptyState("No bookings yet", "Bookings will appear here when customers make reservations");
+        } else {
+            hideEmptyState();
+            tvItemCount.setText(bookings.size() + " items");
+
+            AdminBookingAdapter adapter = new AdminBookingAdapter(
+                    this,
+                    bookings,
+                    new AdminBookingAdapter.BookingActionListener() {
+                        @Override
+                        public void onApprove(CarRentalData.AdminBookingItem booking) {
+                            approveBooking(booking);
+                        }
+
+                        @Override
+                        public void onCancel(CarRentalData.AdminBookingItem booking) {
+                            cancelBooking(booking);
+                        }
+
+                        @Override
+                        public void onViewDetails(CarRentalData.AdminBookingItem booking) {
+                            viewBookingDetails(booking);
+                        }
                     }
+            );
+            recyclerView.setAdapter(adapter);
+        }
+    }
 
-                    @Override
-                    public void onCancel(CarRentalData.AdminBookingItem booking) {
-                        cancelBooking(booking);
-                    }
+    private void showEmptyState(String title, String message) {
+        recyclerView.setVisibility(View.GONE);
+        layoutEmpty.setVisibility(View.VISIBLE);
 
-                    @Override
-                    public void onViewDetails(CarRentalData.AdminBookingItem booking) {
-                        viewBookingDetails(booking);
-                    }
-                }
-        );
+        TextView tvEmptyTitle = layoutEmpty.findViewById(R.id.tvEmptyTitle);
+        TextView tvEmptyMessage = layoutEmpty.findViewById(R.id.tvEmptyMessage);
 
-        recyclerView.setAdapter(adapter);
+        if (tvEmptyTitle != null) tvEmptyTitle.setText(title);
+        if (tvEmptyMessage != null) tvEmptyMessage.setText(message);
+    }
+
+    private void hideEmptyState() {
+        recyclerView.setVisibility(View.VISIBLE);
+        layoutEmpty.setVisibility(View.GONE);
     }
 
     private void approveBooking(CarRentalData.AdminBookingItem booking) {
         Log.d(TAG, "Approving booking: " + booking.id);
 
-        if(db.approveBooking(booking.id)) {
+        if (db.approveBooking(booking.id)) {
             String receipt = generateReceipt(booking);
-            Toast.makeText(this, "Booking Approved!\n\n" + receipt, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Booking Approved! ✓", Toast.LENGTH_LONG).show();
             sendApprovalEmailToCustomer(booking, receipt);
             loadBookings();
+            updateStats();
         } else {
             Toast.makeText(this, "Failed to approve booking", Toast.LENGTH_SHORT).show();
         }
@@ -187,10 +288,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private void cancelBooking(CarRentalData.AdminBookingItem booking) {
         Log.d(TAG, "Cancelling booking: " + booking.id);
 
-        if(db.cancelBooking(booking.id, true)) {
-            Toast.makeText(this, "Booking Cancelled", Toast.LENGTH_SHORT).show();
+        if (db.cancelBooking(booking.id, true)) {
+            Toast.makeText(this, "Booking Cancelled ✓", Toast.LENGTH_SHORT).show();
             sendCancellationEmailToCustomer(booking);
             loadBookings();
+            updateStats();
         } else {
             Toast.makeText(this, "Failed to cancel booking", Toast.LENGTH_SHORT).show();
         }
