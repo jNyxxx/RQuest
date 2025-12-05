@@ -20,7 +20,7 @@
             android:layout_height="72dp"
             android:layout_marginTop="8dp"
             android:contentDescription="App Logo"
-            android:src="@drawable/white_back_logo"
+            android:src="@drawable/ic_launcher_foreground"
             android:elevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

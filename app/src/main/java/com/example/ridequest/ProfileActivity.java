@@ -40,6 +40,12 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
 
+        TextView btnMyBookings = findViewById(R.id.btnMyBookings);
+        btnMyBookings.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MyBookingsActivity.class);
+            startActivity(intent);
+        });
+
         // Back Button
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
