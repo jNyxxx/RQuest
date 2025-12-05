@@ -50,6 +50,16 @@
             android:inputType="text"/>
 
         <EditText
+            android:id="@+id/etColor"
+            android:hint="Color (e.g. Red)"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="12dp"
+            android:layout_marginBottom="12dp"
+            android:inputType="text"/>
+
+        <EditText
             android:id="@+id/etPrice"
             android:hint="Rate/Day"
             android:inputType="numberDecimal"
@@ -59,7 +69,6 @@
             android:paddingHorizontal="12dp"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Transmission Spinner -->
         <TextView
             android:text="Transmission:"
             android:layout_width="wrap_content"
@@ -75,7 +84,36 @@
             android:background="@drawable/bg_input_field"
             android:layout_marginBottom="12dp"/>
 
-        <!-- CHANGED: Seats is now EditText instead of Spinner -->
+        <TextView
+            android:text="Category:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textColor="#555"
+            android:textStyle="bold"/>
+
+        <Spinner
+            android:id="@+id/spCategory"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_input_field"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:text="Fuel Type:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textColor="#555"
+            android:textStyle="bold"/>
+
+        <Spinner
+            android:id="@+id/spFuel"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_input_field"
+            android:layout_marginBottom="12dp"/>
+
         <TextView
             android:text="Seating Capacity:"
             android:layout_width="wrap_content"

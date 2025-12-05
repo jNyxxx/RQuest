@@ -674,41 +674,6 @@ public class CarRentalData {
         return res != -1;
     }
 
-    // ===================== Location Methods =====================
-
-    public List<LocationItem> getAllLocations() {
-        List<LocationItem> list = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        try {
-            Cursor c = db.rawQuery("SELECT location_id, location_name, address FROM Location", null);
-            if (c.moveToFirst()) {
-                do {
-                    list.add(new LocationItem(c.getInt(0), c.getString(1), c.getString(2)));
-                } while (c.moveToNext());
-            }
-            c.close();
-        } catch (Exception e) {
-            Log.e(TAG, "Error fetching locations: " + e.getMessage(), e);
-        }
-        return list;
-    }
-
-    public String getLocationAddress(int locationId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String address = "Unknown Location";
-        try {
-            Cursor c = db.rawQuery("SELECT address FROM Location WHERE location_id=?",
-                    new String[]{String.valueOf(locationId)});
-            if(c.moveToFirst()) {
-                address = c.getString(0);
-            }
-            c.close();
-        } catch(Exception e) {
-            Log.e(TAG, "Error fetching location address: " + e.getMessage(), e);
-        }
-        return address;
-    }
-
     // ===================== Customer Methods =====================
 
     public Customer getCustomer(int id) {
@@ -739,15 +704,15 @@ public class CarRentalData {
 
     public boolean addNewCarComplete(String make, String model, String type, int year,
                                      double price, String plate, String imageRes,
-                                     String transmission, int seats) {
+                                     String transmission, int seats,
+                                     String color, String category, String fuelType) { // NEW ARGS
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long makeId = -1, typeId = -1, modelId = -1;
 
         db.beginTransaction();
         try {
-            // Check/Insert Make
-            Cursor cMake = db.rawQuery("SELECT make_id FROM Make WHERE make_name=?",
-                    new String[]{make});
+            // Make Logic
+            Cursor cMake = db.rawQuery("SELECT make_id FROM Make WHERE make_name=?", new String[]{make});
             if (cMake.moveToFirst()) makeId = cMake.getInt(0);
             else {
                 ContentValues v = new ContentValues();
@@ -756,9 +721,8 @@ public class CarRentalData {
             }
             cMake.close();
 
-            // Check/Insert Type
-            Cursor cType = db.rawQuery("SELECT type_id FROM Type WHERE type_name=?",
-                    new String[]{type});
+            // Type Logic (Body Type like Sedan/Hatchback)
+            Cursor cType = db.rawQuery("SELECT type_id FROM Type WHERE type_name=?", new String[]{type});
             if (cType.moveToFirst()) typeId = cType.getInt(0);
             else {
                 ContentValues v = new ContentValues();
@@ -767,7 +731,7 @@ public class CarRentalData {
             }
             cType.close();
 
-            // Insert Vehicle Model
+            // Model Logic
             ContentValues vModel = new ContentValues();
             vModel.put("make_id", makeId);
             vModel.put("type_id", typeId);
@@ -776,35 +740,39 @@ public class CarRentalData {
             vModel.put("daily_rate", price);
             modelId = db.insert("VehicleModel", null, vModel);
 
-            // Insert Vehicle
+            // Vehicle Logic
             ContentValues vCar = new ContentValues();
             vCar.put("model_id", modelId);
-            // ⚠️ REMOVED: vCar.put("location_id", 1);
             vCar.put("plt_number", plate);
             vCar.put("status", "Available");
             vCar.put("image_res_name", imageRes);
             vCar.put("transmission", transmission);
             vCar.put("seating_capacity", seats);
+            // ⭐ NEW FIELDS
+            vCar.put("color", color);
+            vCar.put("category", category);
+            vCar.put("fuel_type", fuelType);
+
             db.insert("Vehicle", null, vCar);
 
             db.setTransactionSuccessful();
-            Log.d(TAG, "✓ Vehicle added successfully");
             return true;
         } catch (Exception e) {
-            Log.e(TAG, "Error adding vehicle: " + e.getMessage(), e);
+            Log.e(TAG, "Error adding vehicle", e);
             return false;
         } finally {
             db.endTransaction();
         }
     }
 
+    // updateVehicle
     public boolean updateVehicle(int vehicleId, String make, String model, String type,
-                                 double price, String imageRes, String transmission, int seats) {
+                                 double price, String imageRes, String transmission, int seats,
+                                 String color, String category, String fuelType) { // NEW PARAMETERS
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
         try {
-            // gets current model_id
             Cursor cVehicle = db.rawQuery("SELECT model_id FROM Vehicle WHERE vehicle_id=?",
                     new String[]{String.valueOf(vehicleId)});
 
@@ -816,7 +784,6 @@ public class CarRentalData {
             long modelId = cVehicle.getLong(0);
             cVehicle.close();
 
-            // update or create Make
             long makeId = -1;
             Cursor cMake = db.rawQuery("SELECT make_id FROM Make WHERE make_name=?",
                     new String[]{make});
@@ -829,7 +796,6 @@ public class CarRentalData {
             }
             cMake.close();
 
-            // updates or create Type
             long typeId = -1;
             Cursor cType = db.rawQuery("SELECT type_id FROM Type WHERE type_name=?",
                     new String[]{type});
@@ -842,7 +808,6 @@ public class CarRentalData {
             }
             cType.close();
 
-            // updates VehicleModel
             ContentValues vModel = new ContentValues();
             vModel.put("make_id", makeId);
             vModel.put("type_id", typeId);
@@ -852,17 +817,20 @@ public class CarRentalData {
             db.update("VehicleModel", vModel, "model_id=?",
                     new String[]{String.valueOf(modelId)});
 
-            // updates Vehicle
+
             ContentValues vVehicle = new ContentValues();
             vVehicle.put("image_res_name", imageRes);
             vVehicle.put("transmission", transmission);
             vVehicle.put("seating_capacity", seats);
+            vVehicle.put("color", color);
+            vVehicle.put("category", category);
+            vVehicle.put("fuel_type", fuelType);
 
             int rows = db.update("Vehicle", vVehicle, "vehicle_id=?",
                     new String[]{String.valueOf(vehicleId)});
 
             db.setTransactionSuccessful();
-            Log.d(TAG, "✓ Vehicle updated successfully");
+            Log.d(TAG, "✓ Vehicle updated successfully with new details");
             return rows > 0;
 
         } catch (Exception e) {
@@ -881,8 +849,10 @@ public class CarRentalData {
     public List<VehicleItem> getAllVehicles() {
         List<VehicleItem> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        // Updated Query to fetch new columns
         String query = "SELECT v.vehicle_id, mk.make_name, vm.model_name, t.type_name, " +
-                "vm.daily_rate, v.status, v.image_res_name, v.transmission, v.seating_capacity " +
+                "vm.daily_rate, v.status, v.image_res_name, v.transmission, v.seating_capacity, " +
+                "v.plt_number, v.color, v.category, v.fuel_type " + // Added cols
                 "FROM Vehicle v " +
                 "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
                 "JOIN Make mk ON vm.make_id = mk.make_id " +
@@ -892,25 +862,24 @@ public class CarRentalData {
             if (c.moveToFirst()) {
                 do {
                     String title = c.getString(1) + " " + c.getString(2);
-                    String transmission = c.getString(7);
-                    int seats = c.getInt(8);
-
                     list.add(new VehicleItem(
                             c.getInt(0),      // id
                             title,            // title
-                            c.getString(3),   // type
+                            c.getString(3),   // type (Body type like Hatchback)
                             c.getDouble(4),   // price
                             c.getString(5),   // status
                             c.getString(6),   // imageRes
-                            transmission,     // transmission
-                            seats             // seats
+                            c.getString(7),   // transmission
+                            c.getInt(8),      // seats
+                            c.getString(9),   // plate
+                            c.getString(10),  // color
+                            c.getString(11),  // category
+                            c.getString(12)   // fuelType
                     ));
                 } while (c.moveToNext());
             }
             c.close();
-        } catch (Exception e) {
-            Log.e(TAG, "Error: " + e.getMessage(), e);
-        }
+        } catch (Exception e) { Log.e(TAG, "Error: " + e.getMessage()); }
         return list;
     }
 
@@ -1254,17 +1223,14 @@ public class CarRentalData {
         public String title, type, status, imageRes, transmission;
         public double price;
         public int seats;
+        public String plate, color, category, fuelType;
 
         public VehicleItem(int id, String t, String ty, double p, String s,
-                           String img, String trans, int seats) {
-            this.id = id;
-            this.title = t;
-            this.type = ty;
-            this.price = p;
-            this.status = s;
-            this.imageRes = img;
-            this.transmission = trans != null ? trans : "Manual";
-            this.seats = seats > 0 ? seats : 5;
+                           String img, String trans, int seats,
+                           String plt, String col, String cat, String fuel) {
+            this.id = id; this.title = t; this.type = ty; this.price = p;
+            this.status = s; this.imageRes = img; this.transmission = trans; this.seats = seats;
+            this.plate = plt; this.color = col; this.category = cat; this.fuelType = fuel;
         }
     }
 

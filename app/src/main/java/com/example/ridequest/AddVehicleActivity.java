@@ -29,9 +29,10 @@ public class AddVehicleActivity extends AppCompatActivity {
     private String selectedImageBase64 = null;
     private ActivityResultLauncher<Intent> galleryLauncher;
 
-    private TextInputLayout tilMake, tilModel, tilType, tilYear, tilPrice, tilPlate, tilSeats;
-    private TextInputEditText etMake, etModel, etType, etYear, etPrice, etPlate, etSeats;
-    private Spinner spTransmission;
+    // Added tilColor for consistency if you add it to XML, otherwise we handle error on EditText
+    private TextInputLayout tilMake, tilModel, tilType, tilYear, tilPrice, tilPlate, tilSeats, tilColor;
+    private TextInputEditText etMake, etModel, etType, etYear, etPrice, etPlate, etSeats, etColor;
+    private Spinner spTransmission, spCategory, spFuel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class AddVehicleActivity extends AppCompatActivity {
 
         CarRentalData db = new CarRentalData(this);
 
-        // Initialize views
+        // Initialize Layouts (TextInputLayouts)
         tilMake = findViewById(R.id.tilMake);
         tilModel = findViewById(R.id.tilModel);
         tilType = findViewById(R.id.tilType);
@@ -48,7 +49,11 @@ public class AddVehicleActivity extends AppCompatActivity {
         tilPrice = findViewById(R.id.tilPrice);
         tilPlate = findViewById(R.id.tilPlate);
         tilSeats = findViewById(R.id.tilSeats);
+        // Ensure you add TextInputLayout with id "tilColor" in your XML surrounding etColor for best effect
+        // If not, this might be null, so we'll check before using
+        tilColor = findViewById(R.id.tilColor);
 
+        // Initialize Inputs
         etMake = findViewById(R.id.etMake);
         etModel = findViewById(R.id.etModel);
         etType = findViewById(R.id.etType);
@@ -56,22 +61,22 @@ public class AddVehicleActivity extends AppCompatActivity {
         etPrice = findViewById(R.id.etPrice);
         etPlate = findViewById(R.id.etPlate);
         etSeats = findViewById(R.id.etSeats);
+        etColor = findViewById(R.id.etColor); // New Color Field
 
+        // Initialize Spinners
         spTransmission = findViewById(R.id.spTransmission);
+        spCategory = findViewById(R.id.spCategory); // New Category Spinner
+        spFuel = findViewById(R.id.spFuel);         // New Fuel Spinner
+
         ivPreview = findViewById(R.id.ivPreview);
         tvImageName = findViewById(R.id.tvImageName);
         Button btnAdd = findViewById(R.id.btnAddCar);
         MaterialCardView cvImageSelector = findViewById(R.id.cvImageSelector);
 
-        // Setup transmission spinner
-        String[] transmissions = {"Manual", "Automatic"};
-        ArrayAdapter<String> transmissionAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                transmissions
-        );
-        transmissionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spTransmission.setAdapter(transmissionAdapter);
+        // Setup Spinners
+        setupSpinner(spTransmission, new String[]{"Manual", "Automatic"});
+        setupSpinner(spCategory, new String[]{"Premium", "Luxury", "Economy", "Family", "Sports"});
+        setupSpinner(spFuel, new String[]{"Regular Gasoline", "Premium Gasoline", "Diesel"});
 
         // Initialize gallery launcher
         galleryLauncher = registerForActivityResult(
@@ -112,6 +117,16 @@ public class AddVehicleActivity extends AppCompatActivity {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
+    private void setupSpinner(Spinner spinner, String[] items) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                items
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
     private void addVehicle(CarRentalData db) {
         // Clear previous errors
         clearErrors();
@@ -125,7 +140,11 @@ public class AddVehicleActivity extends AppCompatActivity {
             String priceStr = etPrice.getText().toString().trim();
             String plate = etPlate.getText().toString().trim();
             String seatsStr = etSeats.getText().toString().trim();
+            String color = etColor.getText().toString().trim();
+
             String transmission = spTransmission.getSelectedItem().toString();
+            String category = spCategory.getSelectedItem().toString();
+            String fuel = spFuel.getSelectedItem().toString();
 
             // Validate all fields
             boolean hasError = false;
@@ -145,6 +164,14 @@ public class AddVehicleActivity extends AppCompatActivity {
             if (type.isEmpty()) {
                 tilType.setError("Type is required");
                 if (!hasError) etType.requestFocus();
+                hasError = true;
+            }
+
+            if (color.isEmpty()) {
+                if (tilColor != null) tilColor.setError("Color is required");
+                else etColor.setError("Color is required");
+
+                if (!hasError) etColor.requestFocus();
                 hasError = true;
             }
 
@@ -227,7 +254,8 @@ public class AddVehicleActivity extends AppCompatActivity {
             int seatCount = Integer.parseInt(seatsStr);
 
             // Add to database
-            if (db.addNewCarComplete(make, model, type, year, price, plate, selectedImageBase64, transmission, seatCount)) {
+            if (db.addNewCarComplete(make, model, type, year, price, plate, selectedImageBase64,
+                    transmission, seatCount, color, category, fuel)) {
                 Toast.makeText(this, "Vehicle added successfully! ✓", Toast.LENGTH_LONG).show();
                 finish();
             } else {
@@ -239,13 +267,15 @@ public class AddVehicleActivity extends AppCompatActivity {
     }
 
     private void clearErrors() {
-        tilMake.setError(null);
-        tilModel.setError(null);
-        tilType.setError(null);
-        tilYear.setError(null);
-        tilPrice.setError(null);
-        tilPlate.setError(null);
-        tilSeats.setError(null);
+        if(tilMake != null) tilMake.setError(null);
+        if(tilModel != null) tilModel.setError(null);
+        if(tilType != null) tilType.setError(null);
+        if(tilYear != null) tilYear.setError(null);
+        if(tilPrice != null) tilPrice.setError(null);
+        if(tilPlate != null) tilPlate.setError(null);
+        if(tilSeats != null) tilSeats.setError(null);
+        if(tilColor != null) tilColor.setError(null);
+        else if (etColor != null) etColor.setError(null);
     }
 
     private void openGallery() {

@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:padding="24dp">
 
-        <!-- Header Section -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -36,7 +35,6 @@
             app:layout_constraintTop_toBottomOf="@id/tvTitle"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Vehicle Details Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardVehicleDetails"
             android:layout_width="0dp"
@@ -82,7 +80,7 @@
                         android:hint="Make"
                         android:inputType="textCapWords"
                         android:maxLines="1"
-                        android:contentDescription="Vehicle manufacturer, for example Toyota, Honda, or Ford"/>
+                        android:contentDescription="Vehicle manufacturer"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -103,7 +101,7 @@
                         android:hint="Model"
                         android:inputType="textCapWords"
                         android:maxLines="1"
-                        android:contentDescription="Vehicle model, for example Vios, Civic, or Mustang"/>
+                        android:contentDescription="Vehicle model"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -121,10 +119,31 @@
                         android:id="@+id/etType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Type"
+                        android:hint="Body Type (e.g. Sedan)"
                         android:inputType="textCapWords"
                         android:maxLines="1"
-                        android:contentDescription="Vehicle type, for example Sedan, SUV, Van, or Pickup"/>
+                        android:contentDescription="Body Type"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/rq_orange"
+                    app:hintTextColor="@color/rq_orange"
+                    app:startIconDrawable="@android:drawable/ic_menu_manage"
+                    app:startIconTint="#666">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etColor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Color (e.g. Red, Black)"
+                        android:inputType="textCapWords"
+                        android:maxLines="1"
+                        android:contentDescription="Vehicle Color"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
@@ -151,8 +170,7 @@
                             android:hint="Year"
                             android:inputType="number"
                             android:maxLength="4"
-                            android:maxLines="1"
-                            android:contentDescription="Vehicle manufacturing year"/>
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -172,8 +190,7 @@
                             android:layout_height="wrap_content"
                             android:hint="Rate/Day"
                             android:inputType="numberDecimal"
-                            android:maxLines="1"
-                            android:contentDescription="Daily rental rate in pesos"/>
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -193,14 +210,12 @@
                         android:layout_height="wrap_content"
                         android:hint="Plate Number"
                         android:inputType="textCapCharacters"
-                        android:maxLines="1"
-                        android:contentDescription="Vehicle license plate number"/>
+                        android:maxLines="1"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Specifications Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardSpecifications"
             android:layout_width="0dp"
@@ -250,8 +265,57 @@
                         android:id="@+id/spTransmission"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:paddingHorizontal="12dp"
-                        android:contentDescription="Select transmission type: Manual or Automatic"/>
+                        android:paddingHorizontal="12dp"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Category"
+                    android:textColor="#666"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="8dp"
+                    app:strokeColor="#DDDDDD"
+                    app:strokeWidth="1dp"
+                    app:cardElevation="0dp">
+
+                    <Spinner
+                        android:id="@+id/spCategory"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:paddingHorizontal="12dp"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fuel Type"
+                    android:textColor="#666"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="8dp"
+                    app:strokeColor="#DDDDDD"
+                    app:strokeWidth="1dp"
+                    app:cardElevation="0dp">
+
+                    <Spinner
+                        android:id="@+id/spFuel"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:paddingHorizontal="12dp"/>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -273,14 +337,12 @@
                         android:hint="Seating Capacity"
                         android:inputType="number"
                         android:maxLength="2"
-                        android:maxLines="1"
-                        android:contentDescription="Number of passenger seats"/>
+                        android:maxLines="1"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Image Selection Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardImage"
             android:layout_width="0dp"
@@ -398,7 +460,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Action Buttons -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddCar"
             android:layout_width="0dp"

@@ -17,6 +17,7 @@ public class CarDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_detail);
 
+        // 1. Get Basic Data
         int id = getIntent().getIntExtra("VID", -1);
         double price = getIntent().getDoubleExtra("PRICE", 0.0);
         String name = getIntent().getStringExtra("NAME");
@@ -24,33 +25,44 @@ public class CarDetailActivity extends AppCompatActivity {
         String transmission = getIntent().getStringExtra("TRANSMISSION");
         int seats = getIntent().getIntExtra("SEATS", 5);
 
-        Log.d(TAG, "Vehicle Details - ID: " + id + ", Name: " + name + ", Transmission: " + transmission + ", Seats: " + seats);
+        // 2. Get New Data (Color, Category, Fuel, etc.)
+        String color = getIntent().getStringExtra("COLOR");
+        String category = getIntent().getStringExtra("CATEGORY");
+        String fuel = getIntent().getStringExtra("FUEL");
+        String plate = getIntent().getStringExtra("PLATE");
+        String type = getIntent().getStringExtra("TYPE"); // e.g. Hatchback, Sedan
 
+        Log.d(TAG, "Vehicle Details - ID: " + id + ", Name: " + name +
+                ", Color: " + color + ", Cat: " + category + ", Fuel: " + fuel);
+
+        // 3. Initialize Views
         TextView tvTitle = findViewById(R.id.tvDetailTitle);
         TextView tvPrice = findViewById(R.id.tvDetailPrice);
         TextView tvTransmission = findViewById(R.id.tvTransmission);
         TextView tvSeats = findViewById(R.id.tvSeats);
         ImageView ivCar = findViewById(R.id.ivDetailCar);
 
-        // Set Data (With Null Safety)
-        if(tvTitle != null) {
-            tvTitle.setText(name != null ? name : "Unknown Car");
-        }
+        // New Views (Ensure these IDs exist in activity_car_detail.xml)
+        TextView tvColor = findViewById(R.id.tvColor);
+        TextView tvFuel = findViewById(R.id.tvFuelType);
+        TextView tvType = findViewById(R.id.tvType);       // Body Type (Sedan/SUV)
+        TextView tvCategory = findViewById(R.id.tvCategory); // Category (Luxury/Economy) - You might need to add this ID to your XML
+        TextView tvPlate = findViewById(R.id.tvPlate);     // Optional
 
-        if(tvPrice != null) {
-            tvPrice.setText("$" + price);
-        }
+        // 4. Set Basic Data
+        if(tvTitle != null) tvTitle.setText(name != null ? name : "Unknown Car");
+        if(tvPrice != null) tvPrice.setText("$" + price);
+        if(tvTransmission != null) tvTransmission.setText(transmission != null ? transmission : "Manual");
+        if(tvSeats != null) tvSeats.setText(seats + " Seats");
 
-        // Set transmission
-        if(tvTransmission != null) {
-            tvTransmission.setText(transmission != null ? transmission : "Manual");
-        }
+        // 5. Set New Data
+        if(tvColor != null && color != null) tvColor.setText(color);
+        if(tvFuel != null && fuel != null) tvFuel.setText(fuel);
+        if(tvType != null && type != null) tvType.setText(type);
+        if(tvCategory != null && category != null) tvCategory.setText(category);
+        if(tvPlate != null && plate != null) tvPlate.setText(plate);
 
-        // Set seats
-        if(tvSeats != null) {
-            tvSeats.setText(seats + " Seats");
-        }
-
+        // 6. Image Loading Logic
         if(ivCar != null) {
             if (imgRes != null && !imgRes.isEmpty()) {
                 try {
@@ -60,25 +72,20 @@ public class CarDetailActivity extends AppCompatActivity {
                         ivCar.setImageBitmap(bitmap);
                     } else {
                         int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
-                        if(resId != 0) {
-                            ivCar.setImageResource(resId);
-                        } else {
-                            ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
-                        }
+                        if(resId != 0) ivCar.setImageResource(resId);
+                        else ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
                     }
                 } catch (Exception e) {
                     int resId = getResources().getIdentifier(imgRes, "drawable", getPackageName());
-                    if(resId != 0) {
-                        ivCar.setImageResource(resId);
-                    } else {
-                        ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
-                    }
+                    if(resId != 0) ivCar.setImageResource(resId);
+                    else ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
                 }
             } else {
                 ivCar.setImageResource(android.R.drawable.ic_menu_gallery);
             }
         }
 
+        // 7. Book Now Button
         if (findViewById(R.id.btnBookNow) != null) {
             findViewById(R.id.btnBookNow).setOnClickListener(v -> {
                 try {
@@ -89,6 +96,7 @@ public class CarDetailActivity extends AppCompatActivity {
                     i.putExtra("IMG_RES", imgRes);
                     i.putExtra("TRANSMISSION", transmission);
                     i.putExtra("SEATS", seats);
+                    // Pass new data to booking if needed later, though standard booking usually just needs Price/ID
                     startActivity(i);
                 } catch (Exception e) {
                     Toast.makeText(this, "Error opening booking: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -97,7 +105,7 @@ public class CarDetailActivity extends AppCompatActivity {
             });
         }
 
-        // back Button Logic
+        // Back Button
         if (findViewById(R.id.btnBack) != null) {
             findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         }

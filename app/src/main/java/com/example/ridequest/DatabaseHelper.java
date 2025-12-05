@@ -7,8 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RideQuest.db";
-    // ⚠️ I incremented the version to 12 to force an update!
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 14;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -16,13 +15,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Location Table
-        db.execSQL("CREATE TABLE Location (" +
-                "location_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "location_name TEXT, " +
-                "address TEXT, " +
-                "contact_num TEXT)");
-
         // Make Table
         db.execSQL("CREATE TABLE Make (" +
                 "make_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -52,9 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "employee_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "first_name TEXT, " +
                 "last_name TEXT, " +
-                "role TEXT, " +
-                "location_id INTEGER, " +
-                "FOREIGN KEY(location_id) REFERENCES Location(location_id))");
+                "role TEXT)");
 
         // VehicleModel Table
         db.execSQL("CREATE TABLE VehicleModel (" +
@@ -67,11 +57,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(make_id) REFERENCES Make(make_id), " +
                 "FOREIGN KEY(type_id) REFERENCES Type(type_id))");
 
-        // Vehicle Table
+        // VEHICLE TABLE
         db.execSQL("CREATE TABLE Vehicle (" +
                 "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "model_id INTEGER, " +
-                "location_id INTEGER DEFAULT 1, " +
                 "vin TEXT, " +
                 "plt_number TEXT UNIQUE, " +
                 "status TEXT DEFAULT 'Available', " +
@@ -82,8 +71,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "image_res_name TEXT, " +
                 "last_inspection_date TEXT, " +
                 "car_mileage TEXT, " +
-                "FOREIGN KEY(model_id) REFERENCES VehicleModel(model_id), " +
-                "FOREIGN KEY(location_id) REFERENCES Location(location_id))");
+                "color TEXT, " +
+                "category TEXT, " +
+                "fuel_type TEXT, " +
+                "FOREIGN KEY(model_id) REFERENCES VehicleModel(model_id))");
 
         // MaintenanceRecord Table
         db.execSQL("CREATE TABLE MaintenanceRecord (" +
@@ -133,8 +124,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "reservation_id INTEGER UNIQUE, " +
                 "pickup_odo INTEGER, " +
                 "return_odo INTEGER, " +
-                "pickup_loc_id INTEGER, " +
-                "return_loc_id INTEGER, " +
                 "actual_pickup_dt TEXT, " +
                 "actual_return_dt TEXT, " +
                 "pickup_fuel_level TEXT, " +
@@ -216,10 +205,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id), " +
                 "FOREIGN KEY(booking_id) REFERENCES Reservation(booking_id))");
 
-        // default location and admin user
-        db.execSQL("INSERT INTO Location (location_name, address, contact_num) VALUES " +
-                "('Cebu HQ', 'Cebu City, Philippines', '+63-123-4567')");
-
+        // Default Admin User
         db.execSQL("INSERT INTO Customer (first_name, last_name, email, password, phone, date_of_birth, drivers_license, address) VALUES " +
                 "('Admin', 'User', 'admin', 'admin123', '000', '1990-01-01', 'ADMIN-LIC', 'Admin Office')");
     }

@@ -132,7 +132,7 @@
                 android:id="@+id/btnReturn"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Return"
+                android:text="Returned"
                 android:textColor="@color/white"
                 android:background="@drawable/bg_button_blue"
                 android:textAllCaps="false"

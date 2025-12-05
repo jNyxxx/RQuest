@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#F8F9FA">
 
-    <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -75,7 +74,6 @@
             android:layout_height="wrap_content"
             android:paddingBottom="24dp">
 
-            <!-- Car Image Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardCarImage"
                 android:layout_width="0dp"
@@ -98,7 +96,6 @@
                     android:src="@drawable/ic_launcher_foreground" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Car Info Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardCarInfo"
                 android:layout_width="0dp"
@@ -118,7 +115,6 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Title & Category -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -136,15 +132,16 @@
                                 android:id="@+id/tvDetailTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/tesla_model_s"
+                                android:text="Tesla Model S"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="#333" />
 
                             <TextView
+                                android:id="@+id/tvCategory"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/premium_car"
+                                android:text="Premium Car"
                                 android:textColor="#999"
                                 android:textSize="13sp"
                                 android:layout_marginTop="4dp" />
@@ -160,7 +157,7 @@
                                 android:id="@+id/tvDetailPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/price_sample"
+                                android:text="$18,000"
                                 android:textColor="@color/rq_orange"
                                 android:textSize="22sp"
                                 android:textStyle="bold" />
@@ -175,7 +172,6 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Price per day notice -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -210,7 +206,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Features Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardFeatures"
                 android:layout_width="0dp"
@@ -239,14 +234,12 @@
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Features Grid -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:weightSum="3">
 
-                        <!-- Feature 1: Seats -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
@@ -275,14 +268,13 @@
                                 android:id="@+id/tvSeats"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/five_seats"
+                                android:text="5 Seats"
                                 android:textStyle="bold"
                                 android:textColor="#333"
                                 android:textSize="14sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
 
-                        <!-- Feature 2: Transmission -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
@@ -318,7 +310,6 @@
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
 
-                        <!-- Feature 3: Type -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
@@ -346,7 +337,7 @@
                                 android:id="@+id/tvType"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Premium"
+                                android:text="Sedan"
                                 android:textStyle="bold"
                                 android:textColor="#333"
                                 android:textSize="14sp"
@@ -356,7 +347,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Additional Specifications Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardSpecifications"
                 android:layout_width="0dp"
@@ -385,7 +375,6 @@
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Spec Item 1 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -412,7 +401,6 @@
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
 
-                    <!-- Spec Item 2 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -439,35 +427,15 @@
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
 
-                    <!-- Spec Item 3 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvPlate"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@drawable/bg_input_field"
-                        android:padding="12dp">
+                        android:visibility="gone" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Year Model"
-                            android:textColor="#999"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvYear"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2024"
-                            android:textColor="#333"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Book Now Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBookNow"
                 android:layout_width="0dp"
