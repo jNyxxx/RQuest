@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RideQuest.db";
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -61,16 +61,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Vehicle (" +
                 "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "model_id INTEGER, " +
-                "vin TEXT, " +
                 "plt_number TEXT UNIQUE, " +
                 "status TEXT DEFAULT 'Available', " +
-                "curr_mileage INTEGER, " +
                 "fuel_level TEXT, " +
                 "transmission TEXT DEFAULT 'Manual', " +
                 "seating_capacity INTEGER DEFAULT 5, " +
                 "image_res_name TEXT, " +
                 "last_inspection_date TEXT, " +
-                "car_mileage TEXT, " +
                 "color TEXT, " +
                 "category TEXT, " +
                 "fuel_type TEXT, " +
@@ -105,7 +102,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "payment_method TEXT, " +
                 "payment_id TEXT, " +
                 "payment_status TEXT DEFAULT 'Pending', " +
-                "cancellation_date TEXT, " +
                 "cancellation_fee REAL DEFAULT 0, " +
                 "rental_days INTEGER DEFAULT 1, " +
                 "late_hours INTEGER DEFAULT 0, " +
@@ -118,19 +114,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(customer_num) REFERENCES Customer(customer_id), " +
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id))");
 
-        // Rental Table
+        // RENTAL TABLE
         db.execSQL("CREATE TABLE Rental (" +
                 "rental_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "reservation_id INTEGER UNIQUE, " +
-                "pickup_odo INTEGER, " +
-                "return_odo INTEGER, " +
-                "actual_pickup_dt TEXT, " +
-                "actual_return_dt TEXT, " +
+                "actual_pickup_address TEXT, " +
+                "actual_return_address TEXT, " +
                 "pickup_fuel_level TEXT, " +
                 "return_fuel_level TEXT, " +
                 "total_amount REAL, " +
                 "late_return_fee REAL DEFAULT 0, " +
-                "refueling_fee REAL DEFAULT 0, " +
                 "FOREIGN KEY(reservation_id) REFERENCES Reservation(booking_id))");
 
         // Payment Table
@@ -216,7 +209,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "EmployeeReservation", "EmployeeRental", "Payment",
                 "Rental", "Reservation", "MaintenanceRecord",
                 "Vehicle", "VehicleModel", "Employee", "Customer",
-                "Type", "Make", "Location"};
+                "Type", "Make"};
 
         for (String table : tables) {
             db.execSQL("DROP TABLE IF EXISTS " + table);

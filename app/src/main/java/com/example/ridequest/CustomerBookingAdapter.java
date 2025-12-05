@@ -92,7 +92,7 @@ public class CustomerBookingAdapter extends RecyclerView.Adapter<CustomerBooking
 
             String message = "Are you sure you want to cancel this booking?";
             if (isWithin24Hours) {
-                message += "\n\n⚠️ Cancellation within 24 hours of pickup.\nA 20% cancellation fee of $"
+                message += "\n\n Cancellation within 24 hours of pickup.\nA 20% cancellation fee of $"
                         + String.format(Locale.US, "%.2f", cancellationFee) + " will be applied.";
             } else {
                 message += "\n\nYou will receive a full refund.";

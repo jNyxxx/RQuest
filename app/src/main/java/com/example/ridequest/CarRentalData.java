@@ -198,18 +198,15 @@ public class CarRentalData {
     // ===================== VEHICLE PICKUP =====================
 
     public boolean recordVehiclePickup(int rentalId, int vehicleId, int inspectorId,
-                                       int pickupOdometer, String pickupFuelLevel,
+                                       String pickupFuelLevel, String pickupAddress,
                                        String conditionNotes, String photos) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
         try {
-            // ⭐ UPDATE RENTAL WITH PICKUP DETAILS
             ContentValues vRental = new ContentValues();
-            vRental.put("pickup_odo", pickupOdometer);
+            vRental.put("actual_pickup_address", pickupAddress);
             vRental.put("pickup_fuel_level", pickupFuelLevel);
-            vRental.put("actual_pickup_dt", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-                    Locale.US).format(new Date()));
 
             int rows = db.update("Rental", vRental, "rental_id=?",
                     new String[]{String.valueOf(rentalId)});
@@ -218,17 +215,16 @@ public class CarRentalData {
                 throw new Exception("Rental not found");
             }
 
-            // ⭐ CREATE PICKUP INSPECTION RECORD
+            // PICKUP INSPECTION RECORD
             ContentValues vInspection = new ContentValues();
             vInspection.put("rental_id", rentalId);
             vInspection.put("vehicle_id", vehicleId);
             vInspection.put("inspection_type", "Pickup");
-            vInspection.put("mileage", pickupOdometer);
             vInspection.put("fuel_level", pickupFuelLevel);
             vInspection.put("condition_notes", conditionNotes != null ? conditionNotes : "Good condition");
             vInspection.put("damage_report", "None");
             vInspection.put("inspector_id", inspectorId);
-            vInspection.put("photos", photos); // Base64 encoded images
+            vInspection.put("photos", photos);
 
             long inspectionId = db.insert("Inspection", null, vInspection);
 
@@ -236,9 +232,8 @@ public class CarRentalData {
                 throw new Exception("Failed to create inspection record");
             }
 
-            // UPDATE VEHICLE MILEAGE AND FUEL
+            // UPDATE VEHICLE
             ContentValues vVehicle = new ContentValues();
-            vVehicle.put("curr_mileage", pickupOdometer);
             vVehicle.put("fuel_level", pickupFuelLevel);
             vVehicle.put("last_inspection_date", new SimpleDateFormat("yyyy-MM-dd",
                     Locale.US).format(new Date()));
@@ -248,22 +243,24 @@ public class CarRentalData {
 
             db.setTransactionSuccessful();
 
-            Log.d(TAG, "✅ Vehicle pickup recorded successfully");
+            Log.d(TAG, "Vehicle pickup recorded successfully");
             Log.d(TAG, "Inspection ID: " + inspectionId);
+            Log.d(TAG, "Pickup Address: " + pickupAddress);
             return true;
 
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error recording pickup: " + e.getMessage(), e);
+            Log.e(TAG, "Error recording pickup: " + e.getMessage(), e);
             return false;
         } finally {
             db.endTransaction();
         }
     }
 
+
     // ===================== VEHICLE RETURN =====================
 
     public boolean recordVehicleReturn(int rentalId, int vehicleId, int inspectorId,
-                                       int returnOdometer, String returnFuelLevel,
+                                       String returnFuelLevel, String returnAddress,
                                        String conditionNotes, String damageReport,
                                        String photos, double additionalCharges) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -271,7 +268,7 @@ public class CarRentalData {
 
         try {
             // Get rental details
-            Cursor c = db.rawQuery("SELECT pickup_odo, pickup_fuel_level, total_amount " +
+            Cursor c = db.rawQuery("SELECT pickup_fuel_level, total_amount " +
                             "FROM Rental WHERE rental_id=?",
                     new String[]{String.valueOf(rentalId)});
 
@@ -280,35 +277,23 @@ public class CarRentalData {
                 throw new Exception("Rental not found");
             }
 
-            int pickupOdo = c.getInt(0);
-            String pickupFuel = c.getString(1);
-            double baseAmount = c.getDouble(2);
+            String pickupFuel = c.getString(0);
+            double baseAmount = c.getDouble(1);
             c.close();
 
-            // CALCULATE REFUELING FEE if fuel level is lower
-            double refuelingFee = 0;
-            if (!returnFuelLevel.equalsIgnoreCase(pickupFuel)) {
-                refuelingFee = 50.0;
-                Log.d(TAG, "⛽ Refueling fee applied: $" + refuelingFee);
-            }
-
-            // UPDATE RENTAL WITH RETURN DETAILS
+            // UPDATE RENTAL
             ContentValues vRental = new ContentValues();
-            vRental.put("return_odo", returnOdometer);
+            vRental.put("actual_return_address", returnAddress);
             vRental.put("return_fuel_level", returnFuelLevel);
-            vRental.put("actual_return_dt", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-                    Locale.US).format(new Date()));
-            vRental.put("refueling_fee", refuelingFee);
 
             db.update("Rental", vRental, "rental_id=?",
                     new String[]{String.valueOf(rentalId)});
 
-            // CREATE RETURN INSPECTION RECORD
+            // RETURN INSPECTION RECORD
             ContentValues vInspection = new ContentValues();
             vInspection.put("rental_id", rentalId);
             vInspection.put("vehicle_id", vehicleId);
             vInspection.put("inspection_type", "Return");
-            vInspection.put("mileage", returnOdometer);
             vInspection.put("fuel_level", returnFuelLevel);
             vInspection.put("condition_notes", conditionNotes != null ? conditionNotes : "Good condition");
             vInspection.put("damage_report", damageReport != null ? damageReport : "None");
@@ -321,10 +306,9 @@ public class CarRentalData {
                 throw new Exception("Failed to create return inspection");
             }
 
-            // UPDATE VEHICLE STATUS BACK TO AVAILABLE
+            //  VEHICLE STATUS
             ContentValues vVehicle = new ContentValues();
             vVehicle.put("status", "Available");
-            vVehicle.put("curr_mileage", returnOdometer);
             vVehicle.put("fuel_level", returnFuelLevel);
             vVehicle.put("last_inspection_date", new SimpleDateFormat("yyyy-MM-dd",
                     Locale.US).format(new Date()));
@@ -332,9 +316,9 @@ public class CarRentalData {
             db.update("Vehicle", vVehicle, "vehicle_id=?",
                     new String[]{String.valueOf(vehicleId)});
 
-            // CREATE FINAL PAYMENT RECORD if balance was paid
+            // PAYMENT RECORD
             double balanceDue = baseAmount * 0.70;
-            double finalPayment = balanceDue + refuelingFee + additionalCharges;
+            double finalPayment = balanceDue + additionalCharges;
 
             ContentValues vPayment = new ContentValues();
             vPayment.put("rental_id", rentalId);
@@ -346,15 +330,15 @@ public class CarRentalData {
 
             db.setTransactionSuccessful();
 
-            Log.d(TAG, "✅ Vehicle return recorded successfully");
+            Log.d(TAG, "Vehicle return recorded successfully");
             Log.d(TAG, "Return Inspection ID: " + inspectionId);
-            Log.d(TAG, "Mileage driven: " + (returnOdometer - pickupOdo) + " km");
+            Log.d(TAG, "Return Address: " + returnAddress);
             Log.d(TAG, "Final payment: $" + finalPayment);
 
             return true;
 
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error recording return: " + e.getMessage(), e);
+            Log.e(TAG, "Error recording return: " + e.getMessage(), e);
             return false;
         } finally {
             db.endTransaction();
@@ -423,18 +407,18 @@ public class CarRentalData {
 
         // -VALIDATION
         if (paymentMethod == null || paymentMethod.isEmpty()) {
-            Log.e(TAG, "❌ Payment method required");
+            Log.e(TAG, "Payment method required");
             return false;
         }
 
         if (pickupAddress == null || pickupAddress.isEmpty() ||
                 returnAddress == null || returnAddress.isEmpty()) {
-            Log.e(TAG, "❌ Addresses are required");
+            Log.e(TAG, "Addresses are required");
             return false;
         }
 
         if (!isCarAvailable(vehicleId, pickupDate, returnDate)) {
-            Log.e(TAG, "❌ Car not available for selected dates");
+            Log.e(TAG, "Car not available for selected dates");
             return false;
         }
 
@@ -491,12 +475,12 @@ public class CarRentalData {
 
             db.setTransactionSuccessful();
 
-            Log.d(TAG, "✅ Booking created successfully!");
+            Log.d(TAG, "Booking created successfully!");
             Log.d(TAG, "Booking ID: " + bookingId + " | Ref: " + bookingRef);
             return true;
 
         } catch (Exception ex) {
-            Log.e(TAG, "❌ Booking creation failed: " + ex.getMessage(), ex);
+            Log.e(TAG, "Booking creation failed: " + ex.getMessage(), ex);
             return false;
         } finally {
             db.endTransaction();
@@ -509,12 +493,13 @@ public class CarRentalData {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
-            Cursor c = db.rawQuery("SELECT pickup_date, pickup_time, total_cost, status, vehicle_id FROM Reservation WHERE booking_id=?",
+            Cursor c = db.rawQuery("SELECT pickup_date, pickup_time, total_cost, status, vehicle_id " +
+                            "FROM Reservation WHERE booking_id=?",
                     new String[]{String.valueOf(bookingId)});
 
             if (!c.moveToFirst()) {
                 c.close();
-                Log.e(TAG, "❌ Booking #" + bookingId + " not found");
+                Log.e(TAG, "Booking #" + bookingId + " not found");
                 return false;
             }
 
@@ -522,12 +507,11 @@ public class CarRentalData {
             String pickupTime = c.getString(1);
             double totalCost = c.getDouble(2);
             String currentStatus = c.getString(3);
-            int vehicleId = c.getInt(4); // Captured from Original Code logic
+            int vehicleId = c.getInt(4);
             c.close();
 
-            // Cant cancel if already cancelled
             if (currentStatus.equals("Cancelled")) {
-                Log.e(TAG, "❌ Booking already cancelled");
+                Log.e(TAG, "Booking already cancelled");
                 return false;
             }
 
@@ -544,21 +528,19 @@ public class CarRentalData {
                     long hoursUntilPickup = TimeUnit.MILLISECONDS.toHours(diff);
 
                     if (hoursUntilPickup < 24) {
-                        // 20% fee for less than 24 hours
                         cancellationFee = totalCost * 0.20;
-                        Log.d(TAG, "⚠️ Cancellation within 24 hours - Fee: $" + cancellationFee);
+                        Log.d(TAG, "⚠Cancellation within 24 hours - Fee: $" + cancellationFee);
                     } else {
-                        Log.d(TAG, "✅ Cancellation more than 24 hours before pickup - No fee");
+                        Log.d(TAG, "Cancellation more than 24 hours before pickup - No fee");
                     }
                 }
             } else {
                 Log.d(TAG, "ℹ️ Admin cancellation - No fee charged");
             }
 
-            // UPDATES THE RESERVATION STATUS
+            // UPDATES RESERVATION
             ContentValues v = new ContentValues();
             v.put("status", "Cancelled");
-            v.put("cancellation_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()));
             v.put("cancellation_fee", cancellationFee);
 
             int rows = db.update("Reservation", v, "booking_id=?",
@@ -570,15 +552,15 @@ public class CarRentalData {
                 vCar.put("status", "Available");
                 db.update("Vehicle", vCar, "vehicle_id=?", new String[]{String.valueOf(vehicleId)});
 
-                Log.d(TAG, "✅ Booking #" + bookingId + " cancelled successfully");
-                Log.d(TAG, "✅ Vehicle #" + vehicleId + " is now Available again.");
+                Log.d(TAG, "Booking #" + bookingId + " cancelled successfully");
+                Log.d(TAG, "Vehicle #" + vehicleId + " is now Available again.");
                 return true;
             }
 
             return false;
 
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error cancelling booking: " + e.getMessage(), e);
+            Log.e(TAG, "Error cancelling booking: " + e.getMessage(), e);
             return false;
         }
     }
@@ -590,39 +572,42 @@ public class CarRentalData {
         db.beginTransaction();
 
         try {
-            Cursor c = db.rawQuery("SELECT vehicle_id, total_cost FROM Reservation WHERE booking_id=?",
+            // Gets reservation details including addresses
+            Cursor c = db.rawQuery("SELECT vehicle_id, total_cost, pickup_address, return_address " +
+                            "FROM Reservation WHERE booking_id=?",
                     new String[]{String.valueOf(bookingId)});
 
             if (!c.moveToFirst()) {
                 c.close();
-                Log.e(TAG, "❌ Booking #" + bookingId + " not found");
+                Log.e(TAG, "Booking #" + bookingId + " not found");
                 return false;
             }
 
             int vehicleId = c.getInt(0);
             double totalCost = c.getDouble(1);
+            String pickupAddress = c.getString(2);
+            String returnAddress = c.getString(3);
             c.close();
 
-            // UPDATE RESERVATION STATUS
+            // UPDATES RESERVATION STATUS TO CONFIRMED
             ContentValues vReservation = new ContentValues();
             vReservation.put("status", "Confirmed");
             vReservation.put("payment_status", "Paid");
             db.update("Reservation", vReservation, "booking_id=?",
                     new String[]{String.valueOf(bookingId)});
 
-            // UPDATE VEHICLE STATUS
+            // UPDATES VEHICLE STATUS TO RENTED
             ContentValues vCar = new ContentValues();
             vCar.put("status", "Rented");
             db.update("Vehicle", vCar, "vehicle_id=?",
                     new String[]{String.valueOf(vehicleId)});
 
-            // CREATE RENTAL RECORD
             ContentValues vRental = new ContentValues();
             vRental.put("reservation_id", bookingId);
+            vRental.put("actual_pickup_address", pickupAddress);
+            vRental.put("actual_return_address", returnAddress);
             vRental.put("total_amount", totalCost);
-            // ⚠️ REMOVED: pickup_loc_id and return_loc_id
             vRental.put("late_return_fee", 0.0);
-            vRental.put("refueling_fee", 0.0);
 
             long rentalId = db.insert("Rental", null, vRental);
 
@@ -630,17 +615,22 @@ public class CarRentalData {
                 throw new Exception("Failed to create rental record");
             }
 
-            // Record Payment
+            // records 30% downpayment
             ContentValues vPayment = new ContentValues();
             vPayment.put("rental_id", rentalId);
-            vPayment.put("amount", totalCost * 0.30); // Records a 30% downpayment
+            vPayment.put("amount", totalCost * 0.30);
             vPayment.put("payment_mthd", "QR Code/Cash");
             vPayment.put("payment_status", "Completed");
 
             long paymentId = db.insert("Payment", null, vPayment);
 
             db.setTransactionSuccessful();
-            Log.d(TAG, "✅ Booking approved successfully!");
+
+            Log.d(TAG, "Booking approved successfully!");
+            Log.d(TAG, "Rental ID: " + rentalId);
+            Log.d(TAG, "Pickup Address: " + pickupAddress);
+            Log.d(TAG, "Return Address: " + returnAddress);
+
             return true;
 
         } catch (Exception e) {
@@ -721,7 +711,7 @@ public class CarRentalData {
             }
             cMake.close();
 
-            // Type Logic (Body Type like Sedan/Hatchback)
+            // Type
             Cursor cType = db.rawQuery("SELECT type_id FROM Type WHERE type_name=?", new String[]{type});
             if (cType.moveToFirst()) typeId = cType.getInt(0);
             else {
@@ -731,7 +721,7 @@ public class CarRentalData {
             }
             cType.close();
 
-            // Model Logic
+            // Model
             ContentValues vModel = new ContentValues();
             vModel.put("make_id", makeId);
             vModel.put("type_id", typeId);
@@ -740,7 +730,7 @@ public class CarRentalData {
             vModel.put("daily_rate", price);
             modelId = db.insert("VehicleModel", null, vModel);
 
-            // Vehicle Logic
+            // Vehicle
             ContentValues vCar = new ContentValues();
             vCar.put("model_id", modelId);
             vCar.put("plt_number", plate);
@@ -748,7 +738,6 @@ public class CarRentalData {
             vCar.put("image_res_name", imageRes);
             vCar.put("transmission", transmission);
             vCar.put("seating_capacity", seats);
-            // ⭐ NEW FIELDS
             vCar.put("color", color);
             vCar.put("category", category);
             vCar.put("fuel_type", fuelType);
@@ -849,7 +838,6 @@ public class CarRentalData {
     public List<VehicleItem> getAllVehicles() {
         List<VehicleItem> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        // Updated Query to fetch new columns
         String query = "SELECT v.vehicle_id, mk.make_name, vm.model_name, t.type_name, " +
                 "vm.daily_rate, v.status, v.image_res_name, v.transmission, v.seating_capacity, " +
                 "v.plt_number, v.color, v.category, v.fuel_type " + // Added cols
@@ -892,10 +880,10 @@ public class CarRentalData {
         String query = "SELECT r.booking_id, r.booking_reference, " +
                 "c.first_name || ' ' || c.last_name as customer_name, " +
                 "c.email, " +
-                "c.phone, " + // ⭐ ADDED: Customer phone number
+                "c.phone, " +
                 "mk.make_name || ' ' || vm.model_name as car_name, " +
-                "r.pickup_date, r.pickup_time, r.pickup_address, " + // CUSTOM ADDRESS
-                "r.return_date, r.return_time, r.return_address, " + // CUSTOM ADDRESS
+                "r.pickup_date, r.pickup_time, r.pickup_address, " +
+                "r.return_date, r.return_time, r.return_address, " +
                 "r.status, r.payment_method, r.total_cost " +
                 "FROM Reservation r " +
                 "JOIN Customer c ON r.customer_num = c.customer_id " +
@@ -928,7 +916,7 @@ public class CarRentalData {
                 } while(c.moveToNext());
             }
             c.close();
-            Log.d(TAG, "✅ Loaded " + list.size() + " bookings for admin");
+            Log.d(TAG, "Loaded " + list.size() + " bookings for admin");
         } catch(Exception e) {
             Log.e(TAG, "Error fetching admin bookings: " + e.getMessage(), e);
         }
@@ -952,15 +940,14 @@ public class CarRentalData {
             int vehicleId = c.getInt(0);
             c.close();
 
-            // 2. Update Reservation Status to 'Completed'
+            // Updates Reservation Status to Completed
             ContentValues vRes = new ContentValues();
             vRes.put("status", "Completed");
-            // Optional: You can record the actual return timestamp here if you want
             vRes.put("updated_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()));
 
             db.update("Reservation", vRes, "booking_id=?", new String[]{String.valueOf(bookingId)});
 
-            // 3. Update Vehicle Status back to 'Available'
+            // Updates Vehicle Status back to Available after returned
             ContentValues vVeh = new ContentValues();
             vVeh.put("status", "Available");
             db.update("Vehicle", vVeh, "vehicle_id=?", new String[]{String.valueOf(vehicleId)});
@@ -1009,16 +996,15 @@ public class CarRentalData {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         BookingDetailItem booking = null;
 
-        // ⭐ FIXED QUERY: Now includes customer phone and custom addresses
         String query = "SELECT r.booking_id, r.booking_reference, r.status, " +
                 "c.first_name || ' ' || c.last_name as customer_name, " +
                 "c.email, " +
-                "c.phone, " + //
+                "c.phone, " +
                 "mk.make_name || ' ' || vm.model_name as car_name, " +
                 "v.image_res_name, " +
                 "r.pickup_date, r.pickup_time, r.return_date, r.return_time, " +
-                "r.pickup_address, r.return_address, " + //
-                "r.total_cost, r.payment_method, r.payment_id " + // payment_id = receipt image
+                "r.pickup_address, r.return_address, " +
+                "r.total_cost, r.payment_method, r.payment_id " +
                 "FROM Reservation r " +
                 "JOIN Customer c ON r.customer_num = c.customer_id " +
                 "JOIN Vehicle v ON r.vehicle_id = v.vehicle_id " +
@@ -1048,13 +1034,13 @@ public class CarRentalData {
                         c.getString(15),  // payment_method
                         c.getString(16)   // payment_receipt
                 );
-                Log.d(TAG, "✅ Loaded booking details for ID: " + bookingId);
+                Log.d(TAG, "Loaded booking details for ID: " + bookingId);
             } else {
-                Log.e(TAG, "❌ No booking found with ID: " + bookingId);
+                Log.e(TAG, "No booking found with ID: " + bookingId);
             }
             c.close();
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error fetching booking details: " + e.getMessage(), e);
+            Log.e(TAG, "Error fetching booking details: " + e.getMessage(), e);
         }
         return booking;
     }
@@ -1094,9 +1080,9 @@ public class CarRentalData {
                 } while (c.moveToNext());
             }
             c.close();
-            Log.d(TAG, "✅ Loaded " + list.size() + " bookings for customer ID: " + customerId);
+            Log.d(TAG, "Loaded " + list.size() + " bookings for customer ID: " + customerId);
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error fetching customer bookings: " + e.getMessage(), e);
+            Log.e(TAG, "Error fetching customer bookings: " + e.getMessage(), e);
         }
         return list;
     }
@@ -1275,7 +1261,7 @@ public class CarRentalData {
 
     public static class AdminBookingItem {
         public int id;
-        public String bookingReference, customerName, customerEmail, customerPhone; // ⭐ ADDED PHONE
+        public String bookingReference, customerName, customerEmail, customerPhone;
         public String carName;
         public String pickupDate, pickupTime, pickupAddress;
         public String returnDate, returnTime, returnAddress;

@@ -34,7 +34,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         Log.d(TAG, "=== PaymentActivity Started ===");
 
-        // ⭐ GET ALL DATA FROM BOOKING ACTIVITY
+        // gets ALL DATA FROM BOOKING ACTIVITY
         int vid = getIntent().getIntExtra("VID", -1);
         double dailyRate = getIntent().getDoubleExtra("DAILY_RATE", 0.0);
         double baseCost = getIntent().getDoubleExtra("BASE_COST", 0.0);
@@ -60,7 +60,6 @@ public class PaymentActivity extends AppCompatActivity {
         downpaymentAmount = totalCost * 0.30;
         double remainingBalance = totalCost - downpaymentAmount;
 
-        // ⭐ LOG ALL COST DETAILS
         Log.d(TAG, "Base Cost: $" + baseCost);
         Log.d(TAG, "Insurance: " + insuranceType + " - $" + insuranceFee);
         Log.d(TAG, "Late Fee: $" + lateFee);
@@ -96,7 +95,7 @@ public class PaymentActivity extends AppCompatActivity {
         if(tvCarName != null) tvCarName.setText(carName != null ? carName : "Unknown Vehicle");
         if(tvDates != null) tvDates.setText(pickupDate + " " + pickupTime + " → " + returnDate + " " + returnTime);
 
-        // ⭐ SHOW COST BREAKDOWN
+        // COST BREAKDOWN
         if(tvBaseCost != null) tvBaseCost.setText("Base Cost (" + rentalDays + " days): $" + String.format("%.2f", baseCost));
         if(tvInsurance != null) {
             if(insuranceFee > 0) {
@@ -115,18 +114,16 @@ public class PaymentActivity extends AppCompatActivity {
         if(tvLateFeeWarning != null) {
             if(lateFee > 0) {
                 tvLateFeeWarning.setVisibility(View.VISIBLE);
-                tvLateFeeWarning.setText("⚠️ Late return penalty included: $" + String.format("%.2f", lateFee));
+                tvLateFeeWarning.setText("Late return penalty included: $" + String.format("%.2f", lateFee));
             } else {
                 tvLateFeeWarning.setVisibility(View.GONE);
             }
         }
 
-        // Load QR Code
         if(ivQRCode != null) {
             ivQRCode.setImageResource(R.drawable.qr_code_payment);
         }
 
-        // Initialize gallery launcher
         galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -151,7 +148,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         btnUploadReceipt.setOnClickListener(v -> openGallery());
 
-        // ⭐ CONFIRM PAYMENT BUTTON - PASS ALL COST DETAILS
+        // CONFIRM PAYMENT
         btnConfirm.setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
@@ -162,8 +159,6 @@ public class PaymentActivity extends AppCompatActivity {
 
             CarRentalData db = new CarRentalData(this);
 
-            // ⭐ INTEGRATION POINT: Calling the updated createPendingBooking method
-            // We removed 'createPendingBookingComplete' and merged it into this single method.
             boolean success = db.createPendingBooking(
                     uid, vid, carName,
                     pickupDate, returnDate,
@@ -175,9 +170,9 @@ public class PaymentActivity extends AppCompatActivity {
             );
 
             if(success) {
-                Log.d(TAG, "✅ Booking created with all details!");
+                Log.d(TAG, "Booking created with all details!");
 
-                String message = "✅ Booking Submitted Successfully!\n\n" +
+                String message = "Booking Submitted Successfully!\n\n" +
                         "Your booking is pending admin verification.\n\n" +
                         "Cost Breakdown:\n" +
                         "Base Cost: $" + String.format("%.2f", baseCost) + "\n" +
@@ -188,7 +183,7 @@ public class PaymentActivity extends AppCompatActivity {
                         "Balance Due at Pickup: $" + String.format("%.2f", remainingBalance) + "\n\n" +
                         "Pickup: " + pickupAddress + "\n" +
                         "Return: " + returnAddress + "\n\n" +
-                        "⚠️ IMPORTANT - Bring to Pickup:\n" +
+                        "IMPORTANT - Bring to Pickup:\n" +
                         "• Valid driver's license\n" +
                         "• Government-issued ID\n" +
                         "• Cash for remaining balance\n" +
@@ -202,8 +197,8 @@ public class PaymentActivity extends AppCompatActivity {
                 finish();
 
             } else {
-                Log.e(TAG, "❌ Booking failed!");
-                Toast.makeText(this, "❌ Booking Failed\n\nPlease try again.", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Booking failed!");
+                Toast.makeText(this, "Booking Failed\n\nPlease try again.", Toast.LENGTH_LONG).show();
             }
         });
 

@@ -30,7 +30,7 @@ public class MyBookingsActivity extends AppCompatActivity {
         tvNoBookings = findViewById(R.id.tvNoBookings);
         ImageView btnBack = findViewById(R.id.btnBack);
 
-        // Setup RecyclerView
+        // RecyclerView
         rvBookings.setLayoutManager(new LinearLayoutManager(this));
 
         // Back button

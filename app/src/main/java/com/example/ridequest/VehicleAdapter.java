@@ -70,7 +70,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 }
             } else if (v.status != null && v.status.equalsIgnoreCase("Pending")) {
                 // PENDING
-                holder.status.setTextColor(Color.parseColor("#FFA500")); // Orange
+                holder.status.setTextColor(Color.parseColor("#FFA500"));
 
                 if (!isAdmin) {
                     holder.btnDetails.setText("Pending");
@@ -79,7 +79,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 }
             } else {
                 // AVAILABLE
-                holder.status.setTextColor(Color.parseColor("#4CAF50")); // Green
+                holder.status.setTextColor(Color.parseColor("#4CAF50"));
 
                 if (!isAdmin) {
                     holder.btnDetails.setText("View Details");
@@ -89,7 +89,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             }
         }
 
-        // Load Image
         if (holder.img != null) {
             if(v.imageRes != null && !v.imageRes.isEmpty()) {
                 try {
@@ -112,7 +111,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             }
         }
 
-        // Customer: Open Details Logic
+        // Customer: Open Details
         View.OnClickListener openDetails = view -> {
             // Prevent opening details if rented or pending
             if (!isAdmin && v.status != null) {
@@ -140,7 +139,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 i.putExtra("CATEGORY", v.category);
                 i.putExtra("FUEL", v.fuelType);
                 i.putExtra("PLATE", v.plate);
-                i.putExtra("TYPE", v.type); // Body Type
+                i.putExtra("TYPE", v.type);
 
                 context.startActivity(i);
             } catch (Exception e) {
@@ -151,12 +150,10 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         if (isAdmin) {
             if (holder.btnDetails != null) holder.btnDetails.setVisibility(View.GONE);
 
-            // Admin: Edit Logic
+            // Admin: Edit
             if (holder.btnEdit != null) {
                 holder.btnEdit.setVisibility(View.VISIBLE);
                 holder.btnEdit.setOnClickListener(x -> {
-                    // We can use the interface callback if available, OR start intent directly.
-                    // Since we updated the Intent logic, we'll do it here directly to ensure params are passed.
 
                     Intent intent = new Intent(context, EditVehicleActivity.class);
                     intent.putExtra("VEHICLE_ID", v.id);
@@ -167,7 +164,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                     intent.putExtra("TRANSMISSION", v.transmission);
                     intent.putExtra("SEATS", v.seats);
 
-                    // ⭐ PASS NEW DATA (Admin Edit View)
                     intent.putExtra("COLOR", v.color);
                     intent.putExtra("CATEGORY", v.category);
                     intent.putExtra("FUEL", v.fuelType);
@@ -176,7 +172,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 });
             }
 
-            // Admin: Delete Logic
+            // Admin: Delete
             if (holder.btnDelete != null) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
                 holder.btnDelete.setOnClickListener(x -> {
