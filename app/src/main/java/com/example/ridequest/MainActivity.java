@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "No vehicles available. Please add vehicles as admin.", Toast.LENGTH_LONG).show();
             }
 
-            // Apply current filters
+            // filters
             filterVehicles();
 
         } catch (Exception e) {

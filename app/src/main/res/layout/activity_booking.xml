@@ -364,6 +364,60 @@
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Insurance Coverage"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Choose your insurance protection level"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray"
+                        android:layout_marginBottom="16dp"/>
+
+                    <RadioGroup
+                        android:id="@+id/rgInsurance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@+id/rbNone">
+
+                        <RadioButton
+                            android:id="@+id/rbNone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No Insurance (Free)"
+                            android:textSize="16sp"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_input_field"
+                            android:layout_marginBottom="8dp"/>
+
+                        <RadioButton
+                            android:id="@+id/rbBasic"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Personal Insurance"
+                            android:textSize="16sp"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_input_field"
+                            android:layout_marginBottom="8dp"/>
+
+                        <RadioButton
+                            android:id="@+id/rbPremium"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Basic Insurance\n+20% of daily rate\n• Full coverage\n• Roadside assistance\n• Personal injury protection\n• Collision coverage\n• Theft protection"
+                            android:textSize="16sp"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_input_field"/>
+                    </RadioGroup>
+
                     <!-- Important Notice -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"

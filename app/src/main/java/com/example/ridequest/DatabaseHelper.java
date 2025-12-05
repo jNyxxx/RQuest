@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RideQuest.db";
-    private static final int DATABASE_VERSION = 10; // Updated version
+    private static final int DATABASE_VERSION = 14;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -15,13 +15,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Location Table
-        db.execSQL("CREATE TABLE Location (" +
-                "location_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "location_name TEXT, " +
-                "address TEXT, " +
-                "contact_num TEXT)");
-
         // Make Table
         db.execSQL("CREATE TABLE Make (" +
                 "make_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -35,15 +28,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Customer Table
         db.execSQL("CREATE TABLE Customer (" +
                 "customer_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "first_name TEXT, " +
-                "last_name TEXT, " +
-                "email TEXT UNIQUE, " +
-                "password TEXT, " +
-                "phone TEXT UNIQUE, " +
-                "date_of_birth TEXT, " +
-                "drivers_license TEXT, " +
+                "first_name TEXT NOT NULL, " +
+                "last_name TEXT NOT NULL, " +
+                "email TEXT UNIQUE NOT NULL, " +
+                "password TEXT NOT NULL, " +
+                "phone TEXT UNIQUE NOT NULL, " +
+                "date_of_birth TEXT NOT NULL, " +
+                "drivers_license TEXT NOT NULL, " +
                 "license_verified INTEGER DEFAULT 0, " +
-                "address TEXT, " +
+                "address TEXT NOT NULL, " +
                 "created_date TEXT DEFAULT CURRENT_TIMESTAMP)");
 
         // Employee Table
@@ -51,9 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "employee_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "first_name TEXT, " +
                 "last_name TEXT, " +
-                "role TEXT, " +
-                "location_id INTEGER, " +
-                "FOREIGN KEY(location_id) REFERENCES Location(location_id))");
+                "role TEXT)");
 
         // VehicleModel Table
         db.execSQL("CREATE TABLE VehicleModel (" +
@@ -66,23 +57,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(make_id) REFERENCES Make(make_id), " +
                 "FOREIGN KEY(type_id) REFERENCES Type(type_id))");
 
-        // Vehicle Table
+        // VEHICLE TABLE
         db.execSQL("CREATE TABLE Vehicle (" +
                 "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "model_id INTEGER, " +
-                "location_id INTEGER, " +
                 "vin TEXT, " +
                 "plt_number TEXT UNIQUE, " +
                 "status TEXT DEFAULT 'Available', " +
                 "curr_mileage INTEGER, " +
                 "fuel_level TEXT, " +
-                "transmission TEXT, " +
-                "seating_capacity INTEGER, " +
+                "transmission TEXT DEFAULT 'Manual', " +
+                "seating_capacity INTEGER DEFAULT 5, " +
                 "image_res_name TEXT, " +
                 "last_inspection_date TEXT, " +
                 "car_mileage TEXT, " +
-                "FOREIGN KEY(model_id) REFERENCES VehicleModel(model_id), " +
-                "FOREIGN KEY(location_id) REFERENCES Location(location_id))");
+                "color TEXT, " +
+                "category TEXT, " +
+                "fuel_type TEXT, " +
+                "FOREIGN KEY(model_id) REFERENCES VehicleModel(model_id))");
 
         // MaintenanceRecord Table
         db.execSQL("CREATE TABLE MaintenanceRecord (" +
@@ -95,33 +87,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id))");
 
-        // Reservation Table
+        // RESERVATION TABLE
         db.execSQL("CREATE TABLE Reservation (" +
                 "booking_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "customer_num INTEGER, " +
-                "vehicle_id INTEGER, " +
+                "customer_num INTEGER NOT NULL, " +
+                "vehicle_id INTEGER NOT NULL, " +
                 "reservation_date TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                "pickup_date TEXT, " +
-                "return_date TEXT, " +
-                "pickup_time TEXT, " +
-                "return_time TEXT, " +
-                "pickup_loc_id INTEGER, " +
-                "return_loc_id INTEGER, " +
-                "pickup_address TEXT, " +
-                "return_address TEXT, " +
+                "pickup_date TEXT NOT NULL, " +
+                "return_date TEXT NOT NULL, " +
+                "pickup_time TEXT NOT NULL, " +
+                "return_time TEXT NOT NULL, " +
+                "pickup_address TEXT NOT NULL, " +
+                "return_address TEXT NOT NULL, " +
                 "status TEXT DEFAULT 'Pending', " +
-                "total_cost REAL, " +
+                "total_cost REAL NOT NULL, " +
                 "booking_reference TEXT UNIQUE, " +
                 "payment_method TEXT, " +
                 "payment_id TEXT, " +
                 "payment_status TEXT DEFAULT 'Pending', " +
                 "cancellation_date TEXT, " +
                 "cancellation_fee REAL DEFAULT 0, " +
+                "rental_days INTEGER DEFAULT 1, " +
+                "late_hours INTEGER DEFAULT 0, " +
+                "late_fee REAL DEFAULT 0, " +
+                "base_cost REAL, " +
+                "insurance_type TEXT, " +
+                "insurance_fee REAL DEFAULT 0, " +
                 "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
                 "FOREIGN KEY(customer_num) REFERENCES Customer(customer_id), " +
-                "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
-                "FOREIGN KEY(pickup_loc_id) REFERENCES Location(location_id), " +
-                "FOREIGN KEY(return_loc_id) REFERENCES Location(location_id))");
+                "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id))");
 
         // Rental Table
         db.execSQL("CREATE TABLE Rental (" +
@@ -129,8 +124,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "reservation_id INTEGER UNIQUE, " +
                 "pickup_odo INTEGER, " +
                 "return_odo INTEGER, " +
-                "pickup_loc_id INTEGER, " +
-                "return_loc_id INTEGER, " +
                 "actual_pickup_dt TEXT, " +
                 "actual_return_dt TEXT, " +
                 "pickup_fuel_level TEXT, " +
@@ -212,12 +205,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id), " +
                 "FOREIGN KEY(booking_id) REFERENCES Reservation(booking_id))");
 
-        // Seed Data
-        db.execSQL("INSERT INTO Location (location_name, address, contact_num) VALUES " +
-                "('Cebu HQ', 'Cebu City, Philippines', '+63-123-4567')");
-
-        db.execSQL("INSERT INTO Customer (first_name, last_name, email, password, phone) VALUES " +
-                "('Admin', 'User', 'admin', 'admin123', '000')");
+        // Default Admin User
+        db.execSQL("INSERT INTO Customer (first_name, last_name, email, password, phone, date_of_birth, drivers_license, address) VALUES " +
+                "('Admin', 'User', 'admin', 'admin123', '000', '1990-01-01', 'ADMIN-LIC', 'Admin Office')");
     }
 
     @Override
@@ -227,6 +217,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "Rental", "Reservation", "MaintenanceRecord",
                 "Vehicle", "VehicleModel", "Employee", "Customer",
                 "Type", "Make", "Location"};
+
         for (String table : tables) {
             db.execSQL("DROP TABLE IF EXISTS " + table);
         }

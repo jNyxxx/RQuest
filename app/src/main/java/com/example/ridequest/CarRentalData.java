@@ -96,6 +96,7 @@ public class CarRentalData {
             Log.e(TAG, "Login error: " + e.getMessage(), e);
         } finally {
             if (c != null) c.close();
+            db.close();
         }
 
         return id;
@@ -176,6 +177,7 @@ public class CarRentalData {
             Log.e(TAG, "Registration error: " + e.getMessage(), e);
             return false;
         } finally {
+            db.close();
         }
     }
 
@@ -193,6 +195,7 @@ public class CarRentalData {
             Log.d(TAG, "No customers found");
         }
         c.close();
+        db.close();
     }
 
     // ===================== Car Availability & Management =====================
@@ -204,6 +207,7 @@ public class CarRentalData {
                 new String[]{String.valueOf(vehicleId)});
         if (!cStatus.moveToFirst() || !cStatus.getString(0).equals("Available")) {
             cStatus.close();
+            db.close();
             return false;
         }
         cStatus.close();
@@ -222,6 +226,7 @@ public class CarRentalData {
         }
 
         c.close();
+        db.close();
         return available;
     }
 
@@ -284,6 +289,7 @@ public class CarRentalData {
             return false;
         } finally {
             db.endTransaction();
+            db.close();
         }
     }
 
@@ -343,6 +349,7 @@ public class CarRentalData {
             Log.e(TAG, "Error cancelling booking: " + e.getMessage(), e);
             return false;
         } finally {
+            db.close();
         }
     }
 
@@ -379,6 +386,7 @@ public class CarRentalData {
             return false;
         } finally {
             db.endTransaction();
+            db.close();
         }
     }
 
@@ -401,6 +409,7 @@ public class CarRentalData {
         v.put("photos", photos);
 
         long res = db.insert("Inspection", null, v);
+        db.close();
 
         return res != -1;
     }
@@ -421,6 +430,7 @@ public class CarRentalData {
         } catch (Exception e) {
             Log.e(TAG, "Error fetching locations: " + e.getMessage(), e);
         }
+        db.close();
         return list;
     }
 
@@ -437,6 +447,7 @@ public class CarRentalData {
         } catch(Exception e) {
             Log.e(TAG, "Error fetching location address: " + e.getMessage(), e);
         }
+        db.close();
         return address;
     }
 
@@ -452,6 +463,7 @@ public class CarRentalData {
                     c.getString(3), c.getString(5));
         }
         c.close();
+        db.close();
         return cust;
     }
 
@@ -463,6 +475,7 @@ public class CarRentalData {
         v.put("email", e);
         v.put("phone", p);
         int rows = db.update("Customer", v, "customer_id=?", new String[]{String.valueOf(id)});
+        db.close();
         return rows > 0;
     }
 
@@ -522,6 +535,7 @@ public class CarRentalData {
             return false;
         } finally {
             db.endTransaction();
+            db.close();
         }
     }
 
@@ -597,12 +611,14 @@ public class CarRentalData {
             return false;
         } finally {
             db.endTransaction();
+            db.close();
         }
     }
 
     public void deleteVehicle(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete("Vehicle", "vehicle_id=?", new String[]{String.valueOf(id)});
+        db.close();
     }
 
     public List<VehicleItem> getAllVehicles() {
@@ -638,6 +654,7 @@ public class CarRentalData {
         } catch (Exception e) {
             Log.e(TAG, "Error: " + e.getMessage(), e);
         }
+        db.close();
         return list;
     }
 
@@ -676,6 +693,7 @@ public class CarRentalData {
         } catch(Exception e) {
             Log.e(TAG, "Error fetching admin bookings: " + e.getMessage(), e);
         }
+        db.close();
         return list;
     }
 
@@ -703,6 +721,7 @@ public class CarRentalData {
         } catch(Exception e) {
             Log.e(TAG, "Error fetching bookings: " + e.getMessage(), e);
         }
+        db.close();
         return list;
     }
 
@@ -752,6 +771,7 @@ public class CarRentalData {
         } catch (Exception e) {
             Log.e(TAG, "Error fetching booking details: " + e.getMessage(), e);
         }
+        db.close();
         return booking;
     }
 
@@ -793,6 +813,7 @@ public class CarRentalData {
         } catch (Exception e) {
             Log.e(TAG, "Error fetching customer bookings: " + e.getMessage(), e);
         }
+        db.close();
         return list;
     }
 
