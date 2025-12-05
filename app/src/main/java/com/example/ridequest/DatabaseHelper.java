@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RideQuest.db";
-    private static final int DATABASE_VERSION = 11; // ⚠️ INCREMENTED VERSION TO TRIGGER UPGRADE
+    // ⚠️ I incremented the version to 12 to force an update!
+    private static final int DATABASE_VERSION = 12;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "type_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "type_name TEXT)");
 
-        // Customer Table - FIXED: Added missing columns for full profile
+        // Customer Table
         db.execSQL("CREATE TABLE Customer (" +
                 "customer_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "first_name TEXT NOT NULL, " +
@@ -66,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(make_id) REFERENCES Make(make_id), " +
                 "FOREIGN KEY(type_id) REFERENCES Type(type_id))");
 
-        // Vehicle Table - FIXED: Added transmission and seating_capacity
+        // Vehicle Table
         db.execSQL("CREATE TABLE Vehicle (" +
                 "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "model_id INTEGER, " +
@@ -95,7 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id))");
 
-        // ⭐ FIXED Reservation Table - NOW STORES CUSTOM ADDRESSES AND ALL BOOKING DATA
+        // RESERVATION TABLE
         db.execSQL("CREATE TABLE Reservation (" +
                 "booking_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "customer_num INTEGER NOT NULL, " +
@@ -105,36 +106,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "return_date TEXT NOT NULL, " +
                 "pickup_time TEXT NOT NULL, " +
                 "return_time TEXT NOT NULL, " +
-                // ⭐ KEEP location IDs for future compatibility but make them optional
-                "pickup_loc_id INTEGER DEFAULT NULL, " +
-                "return_loc_id INTEGER DEFAULT NULL, " +
-                // ⭐ CUSTOM ADDRESSES - Primary fields for storing user-entered addresses
                 "pickup_address TEXT NOT NULL, " +
                 "return_address TEXT NOT NULL, " +
-                // Booking status and payment
                 "status TEXT DEFAULT 'Pending', " +
                 "total_cost REAL NOT NULL, " +
                 "booking_reference TEXT UNIQUE, " +
                 "payment_method TEXT, " +
-                "payment_id TEXT, " + // Stores receipt image (Base64)
+                "payment_id TEXT, " +
                 "payment_status TEXT DEFAULT 'Pending', " +
-                // Cancellation tracking
                 "cancellation_date TEXT, " +
                 "cancellation_fee REAL DEFAULT 0, " +
-                // Rental details
                 "rental_days INTEGER DEFAULT 1, " +
                 "late_hours INTEGER DEFAULT 0, " +
                 "late_fee REAL DEFAULT 0, " +
                 "base_cost REAL, " +
                 "insurance_type TEXT, " +
                 "insurance_fee REAL DEFAULT 0, " +
-                // Timestamps
                 "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
                 "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
                 "FOREIGN KEY(customer_num) REFERENCES Customer(customer_id), " +
-                "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
-                "FOREIGN KEY(pickup_loc_id) REFERENCES Location(location_id), " +
-                "FOREIGN KEY(return_loc_id) REFERENCES Location(location_id))");
+                "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id))");
 
         // Rental Table
         db.execSQL("CREATE TABLE Rental (" +
@@ -225,7 +216,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id), " +
                 "FOREIGN KEY(booking_id) REFERENCES Reservation(booking_id))");
 
-        // ⭐ SEED DATA - Default location and admin user
+        // default location and admin user
         db.execSQL("INSERT INTO Location (location_name, address, contact_num) VALUES " +
                 "('Cebu HQ', 'Cebu City, Philippines', '+63-123-4567')");
 
@@ -235,7 +226,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop all tables in reverse dependency order
         String[] tables = {"AccidentReport", "Insurance", "Inspection",
                 "EmployeeReservation", "EmployeeRental", "Payment",
                 "Rental", "Reservation", "MaintenanceRecord",
@@ -245,8 +235,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         for (String table : tables) {
             db.execSQL("DROP TABLE IF EXISTS " + table);
         }
-
-        // Recreate all tables
         onCreate(db);
     }
 }

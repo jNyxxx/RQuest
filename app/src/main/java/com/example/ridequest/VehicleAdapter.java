@@ -2,6 +2,7 @@ package com.example.ridequest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color; // Import for colors
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         void onEdit(CarRentalData.VehicleItem vehicle);
     }
 
-    // admin view (with edit and delete)
     public VehicleAdapter(Context ctx, List<CarRentalData.VehicleItem> list, boolean admin,
                           OnDeleteListener delListener, OnEditListener editListener) {
         this.context = ctx;
@@ -38,7 +38,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         this.editListener = editListener;
     }
 
-    // Constructor for customer view (no edit/delete)
     public VehicleAdapter(Context ctx, List<CarRentalData.VehicleItem> list, boolean admin, OnDeleteListener listener) {
         this(ctx, list, admin, listener, null);
     }
@@ -53,28 +52,57 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CarRentalData.VehicleItem v = vehicles.get(position);
 
-        // Set Text Data
         if (holder.name != null) holder.name.setText(v.title);
         if (holder.type != null) holder.type.setText(v.type);
         if (holder.price != null) holder.price.setText("$" + v.price);
 
-        // Load Image Safely (Base64 or Drawable)
+        if (holder.status != null) {
+            holder.status.setText(v.status);
+
+            if (v.status != null && v.status.equalsIgnoreCase("Rented")) {
+                // RENTED
+                holder.status.setTextColor(Color.RED);
+
+                if (!isAdmin) {
+                    holder.btnDetails.setText("Rented");
+                    holder.btnDetails.setEnabled(false);
+                    holder.btnDetails.setBackgroundColor(Color.GRAY);
+                }
+            } else if (v.status != null && v.status.equalsIgnoreCase("Pending")) {
+                // PENDING
+                holder.status.setTextColor(Color.parseColor("#FFA500")); // Orange
+
+                if (!isAdmin) {
+                    holder.btnDetails.setText("Pending");
+                    holder.btnDetails.setEnabled(false);
+                    holder.btnDetails.setBackgroundColor(Color.GRAY);
+                }
+            } else {
+                // AVAILABLE
+                holder.status.setTextColor(Color.parseColor("#4CAF50")); // Green
+
+                if (!isAdmin) {
+                    holder.btnDetails.setText("View Details");
+                    holder.btnDetails.setEnabled(true);
+                    holder.btnDetails.setBackgroundColor(context.getResources().getColor(R.color.rq_orange));
+                }
+            }
+        }
+
+        // Load Image
         if (holder.img != null) {
             if(v.imageRes != null && !v.imageRes.isEmpty()) {
                 try {
-                    // Try to decode as Base64
                     byte[] decodedBytes = android.util.Base64.decode(v.imageRes, android.util.Base64.DEFAULT);
                     android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                     if (bitmap != null) {
                         holder.img.setImageBitmap(bitmap);
                     } else {
-                        // Try as drawable resource (old format compatibility)
                         int resId = context.getResources().getIdentifier(v.imageRes, "drawable", context.getPackageName());
                         if(resId != 0) holder.img.setImageResource(resId);
                         else holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
                     }
                 } catch (Exception e) {
-                    // If Base64 decode fails, try as drawable resource
                     int resId = context.getResources().getIdentifier(v.imageRes, "drawable", context.getPackageName());
                     if(resId != 0) holder.img.setImageResource(resId);
                     else holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
@@ -84,8 +112,19 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             }
         }
 
-        // CLICK LISTENER Logic for "View Details"
         View.OnClickListener openDetails = view -> {
+            // Prevent opening details if rented or pending
+            if (!isAdmin && v.status != null) {
+                if (v.status.equalsIgnoreCase("Rented")) {
+                    Toast.makeText(context, "This vehicle is currently rented.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (v.status.equalsIgnoreCase("Pending")) {
+                    Toast.makeText(context, "This vehicle is pending approval.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
             try {
                 Intent i = new Intent(context, CarDetailActivity.class);
                 i.putExtra("VID", v.id);
@@ -97,42 +136,31 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 context.startActivity(i);
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         };
 
         if (isAdmin) {
-            // Admin view: Show Edit and Delete buttons
             if (holder.btnDetails != null) holder.btnDetails.setVisibility(View.GONE);
-
             if (holder.btnEdit != null) {
                 holder.btnEdit.setVisibility(View.VISIBLE);
                 holder.btnEdit.setOnClickListener(x -> {
-                    if (editListener != null) {
-                        editListener.onEdit(v);
-                    }
+                    if (editListener != null) editListener.onEdit(v);
                 });
             }
-
             if (holder.btnDelete != null) {
                 holder.btnDelete.setVisibility(View.VISIBLE);
                 holder.btnDelete.setOnClickListener(x -> {
-                    if (deleteListener != null) {
-                        deleteListener.onDelete(v.id);
-                    }
+                    if (deleteListener != null) deleteListener.onDelete(v.id);
                 });
             }
         } else {
-            // Customer view: Show View Details button only
             if (holder.btnDelete != null) holder.btnDelete.setVisibility(View.GONE);
             if (holder.btnEdit != null) holder.btnEdit.setVisibility(View.GONE);
 
-            // Attach click to "View Details" button
             if (holder.btnDetails != null) {
                 holder.btnDetails.setVisibility(View.VISIBLE);
                 holder.btnDetails.setOnClickListener(openDetails);
             }
-            // Also attach click to the whole card for better UX
             holder.itemView.setOnClickListener(openDetails);
         }
     }
@@ -143,16 +171,17 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name, type, price;
+        TextView name, type, price, status;
         ImageView img;
         Button btnDelete, btnDetails, btnEdit;
 
         public ViewHolder(View v) {
             super(v);
-            // Find Views by ID matching item_vehicle.xml
             name = v.findViewById(R.id.tvCarName);
             type = v.findViewById(R.id.tvType);
             price = v.findViewById(R.id.tvPrice);
+            status = v.findViewById(R.id.tvStatus);
+
             img = v.findViewById(R.id.ivCar);
             btnDelete = v.findViewById(R.id.btnDelete);
             btnDetails = v.findViewById(R.id.btnDetails);

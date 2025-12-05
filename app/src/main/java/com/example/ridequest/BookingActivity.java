@@ -3,8 +3,11 @@ package com.example.ridequest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,18 +19,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import android.widget.ArrayAdapter;
 
 public class BookingActivity extends AppCompatActivity {
 
     private double dailyRate;
+    private RadioGroup rgInsurance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
 
-        // gets Data from Intent
+        // Get Data from Intent
         int vid = getIntent().getIntExtra("VID", -1);
         dailyRate = getIntent().getDoubleExtra("PRICE", 0.0);
         String name = getIntent().getStringExtra("NAME");
@@ -41,12 +44,14 @@ public class BookingActivity extends AppCompatActivity {
         EditText etPickup = findViewById(R.id.etPickupDate);
         EditText etReturn = findViewById(R.id.etReturnDate);
 
-
         EditText etPickupAddress = findViewById(R.id.etPickupAddress);
         EditText etReturnAddress = findViewById(R.id.etReturnAddress);
 
         Spinner spTimeP = findViewById(R.id.spPickupTime);
         Spinner spTimeR = findViewById(R.id.spReturnTime);
+
+        // ⭐ INSURANCE RADIO GROUP (ADD THIS TO YOUR XML)
+        rgInsurance = findViewById(R.id.rgInsurance);
 
         // Set Car Info
         if(tvName != null) tvName.setText(name);
@@ -69,7 +74,7 @@ public class BookingActivity extends AppCompatActivity {
             }
         }
 
-        // Setup Time Spinners (24-hour format for easier calculation)
+        // Setup Time Spinners
         List<String> times = new ArrayList<>();
         for(int h = 0; h < 24; h++) {
             for(int m = 0; m < 60; m += 30) {
@@ -97,7 +102,6 @@ public class BookingActivity extends AppCompatActivity {
             String pickupTime = spTimeP.getSelectedItem().toString();
             String returnTime = spTimeR.getSelectedItem().toString();
 
-            // CHANGED: Get addresses from EditText
             String pickupAddress = etPickupAddress.getText().toString().trim();
             String returnAddress = etReturnAddress.getText().toString().trim();
 
@@ -119,27 +123,48 @@ public class BookingActivity extends AppCompatActivity {
                 return;
             }
 
-            // Validate 24-hour rule and calculate cost
-            RentalCalculation calc = calculateRentalCost(pickupDate, pickupTime, returnDate, returnTime);
+            // ⭐ GET INSURANCE SELECTION
+            String insuranceType = "None";
+            double insuranceFee = 0.0;
 
-            if (calc == null) {
-                return; // Error already shown in calculateRentalCost
+            int selectedInsuranceId = rgInsurance.getCheckedRadioButtonId();
+            if (selectedInsuranceId != -1) {
+                RadioButton selectedInsurance = findViewById(selectedInsuranceId);
+                insuranceType = selectedInsurance.getText().toString();
+
+                // Calculate insurance fee based on selection
+                if (insuranceType.contains("Basic")) {
+                    insuranceFee = dailyRate * 0.10; // 10% of daily rate
+                } else if (insuranceType.contains("Premium")) {
+                    insuranceFee = dailyRate * 0.20; // 20% of daily rate
+                }
             }
 
-            // Pass everything to PaymentActivity
+            // ⭐ CALCULATE RENTAL COST WITH ALL DETAILS
+            RentalCalculation calc = calculateRentalCost(pickupDate, pickupTime, returnDate, returnTime, insuranceFee);
+
+            if (calc == null) {
+                return; // Error already shown
+            }
+
+            // ⭐ PASS ALL DATA TO PAYMENT ACTIVITY
             Intent i = new Intent(this, PaymentActivity.class);
             i.putExtra("VID", vid);
             i.putExtra("DAILY_RATE", dailyRate);
+            i.putExtra("BASE_COST", calc.baseCost);
+            i.putExtra("INSURANCE_TYPE", insuranceType);
+            i.putExtra("INSURANCE_FEE", insuranceFee);
             i.putExtra("TOTAL_COST", calc.totalCost);
             i.putExtra("NAME", name);
             i.putExtra("PICKUP_DATE", pickupDate);
             i.putExtra("RETURN_DATE", returnDate);
             i.putExtra("PICKUP_TIME", pickupTime);
             i.putExtra("RETURN_TIME", returnTime);
-            i.putExtra("PICKUP_ADDRESS", pickupAddress);  // CHANGED: Pass custom address
-            i.putExtra("RETURN_ADDRESS", returnAddress);  // CHANGED: Pass custom address
+            i.putExtra("PICKUP_ADDRESS", pickupAddress);
+            i.putExtra("RETURN_ADDRESS", returnAddress);
             i.putExtra("LATE_HOURS", calc.lateHours);
             i.putExtra("LATE_FEE", calc.lateFee);
+            i.putExtra("RENTAL_DAYS", calc.fullDays);
             startActivity(i);
         });
 
@@ -164,7 +189,6 @@ public class BookingActivity extends AppCompatActivity {
         dpd.show();
     }
 
-
     private static class RentalCalculation {
         double baseCost;
         double lateFee;
@@ -174,9 +198,9 @@ public class BookingActivity extends AppCompatActivity {
     }
 
     private RentalCalculation calculateRentalCost(String pickupDateStr, String pickupTimeStr,
-                                                  String returnDateStr, String returnTimeStr) {
+                                                  String returnDateStr, String returnTimeStr,
+                                                  double insuranceFee) {
         try {
-            // dates and times
             SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy HH:mm", Locale.US);
             String pickupDateTime = pickupDateStr + " " + pickupTimeStr;
             String returnDateTime = returnDateStr + " " + returnTimeStr;
@@ -189,21 +213,17 @@ public class BookingActivity extends AppCompatActivity {
                 return null;
             }
 
-            // checks if return is before pickup
             if(returnDT.before(pickupDT)) {
                 Toast.makeText(this, "Return date/time cannot be before pickup!", Toast.LENGTH_LONG).show();
                 return null;
             }
 
-            // calculates total hours
             long diffInMillis = returnDT.getTime() - pickupDT.getTime();
             long totalHours = diffInMillis / (1000 * 60 * 60);
 
-            // calculate full 24-hour periods
             int fullDays = (int) (totalHours / 24);
             int remainingHours = (int) (totalHours % 24);
 
-            // Pparse times to check 24-hour rule
             String[] pickupTimeParts = pickupTimeStr.split(":");
             String[] returnTimeParts = returnTimeStr.split(":");
 
@@ -225,37 +245,31 @@ public class BookingActivity extends AppCompatActivity {
                 calc.fullDays = 1;
             }
 
-            // Check 24-hour rule: Return time must be SAME or EARLIER than pickup time
+            // Check 24-hour rule
             if(returnTotalMinutes > pickupTotalMinutes) {
-                // if return time is LATER than pickup time - this violates the 24hr rule hence will charge the excess time by hour
                 calc.lateHours = (int) Math.ceil((returnTotalMinutes - pickupTotalMinutes) / 60.0);
-
-                // Calculate late fee: 1/4 of daily rate per hour
                 double hourlyRate = dailyRate / 4.0;
                 calc.lateFee = calc.lateHours * hourlyRate;
 
-                // shows warning to user
-                Toast.makeText(this,
-                        "⚠️ LATE RETURN DETECTED! ⚠️",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "⚠️ LATE RETURN DETECTED! ⚠️", Toast.LENGTH_LONG).show();
             }
 
-            // calculate base cost
+            // ⭐ CALCULATE BASE COST (before insurance and late fees)
             calc.baseCost = (fullDays > 0 ? fullDays : 1) * dailyRate;
 
-            // total cost = base cost + late fee(per hour late)
-            calc.totalCost = calc.baseCost + calc.lateFee;
+            // ⭐ TOTAL COST = base + insurance + late fee
+            calc.totalCost = calc.baseCost + insuranceFee + calc.lateFee;
 
-            // shows breakdown to user
+            // Show breakdown
             String message;
             if(calc.lateFee > 0) {
                 message = String.format(Locale.US,
-                        "Total: $%.2f (Late: $%.2f)",
-                        calc.totalCost, calc.lateFee);
+                        "Base: $%.2f\nInsurance: $%.2f\nLate: $%.2f\nTotal: $%.2f",
+                        calc.baseCost, insuranceFee, calc.lateFee, calc.totalCost);
             } else {
                 message = String.format(Locale.US,
-                        "Total: $%.2f ✓ On time",
-                        calc.totalCost);
+                        "Base: $%.2f\nInsurance: $%.2f\nTotal: $%.2f ✓",
+                        calc.baseCost, insuranceFee, calc.totalCost);
             }
 
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();

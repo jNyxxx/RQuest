@@ -19,6 +19,7 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
     public interface BookingActionListener {
         void onApprove(CarRentalData.AdminBookingItem booking);
         void onCancel(CarRentalData.AdminBookingItem booking);
+        void onReturn(CarRentalData.AdminBookingItem booking);
         void onViewDetails(CarRentalData.AdminBookingItem booking);
     }
 
@@ -39,7 +40,6 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CarRentalData.AdminBookingItem booking = bookings.get(position);
 
-        // Set booking info
         holder.tvBookingId.setText("Booking #" + booking.id);
         holder.tvCustomer.setText("Customer: " + booking.customerName);
         holder.tvCar.setText("Car: " + booking.carName);
@@ -47,53 +47,50 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
         holder.tvTotal.setText("$" + String.format("%.2f", booking.totalCost));
         holder.tvStatus.setText(booking.status);
 
-        // Style status badge
-        switch(booking.status) {
+        // Reset visibility
+        holder.btnApprove.setVisibility(View.GONE);
+        holder.btnCancel.setVisibility(View.GONE);
+        holder.btnReturn.setVisibility(View.GONE);
+
+        switch (booking.status) {
             case "Pending":
                 holder.tvStatus.setBackgroundResource(R.drawable.bg_status_pending);
                 holder.tvStatus.setTextColor(context.getResources().getColor(R.color.rq_orange));
+                holder.btnApprove.setVisibility(View.VISIBLE);
+                holder.btnCancel.setVisibility(View.VISIBLE);
                 break;
+
             case "Confirmed":
                 holder.tvStatus.setBackgroundResource(R.drawable.bg_status_confirmed);
                 holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
+                // ⭐ THIS MAKES THE BUTTON VISIBLE
+                holder.btnReturn.setVisibility(View.VISIBLE);
                 break;
+
             case "Cancelled":
                 holder.tvStatus.setBackgroundResource(R.drawable.bg_status_cancelled);
                 holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
                 break;
+
+            case "Completed":
+                holder.tvStatus.setBackgroundResource(R.drawable.bg_status_confirmed);
+                holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
+                break;
         }
 
-        // Show/hide action buttons based on status
-        if(booking.status.equals("Pending")) {
-            holder.btnApprove.setVisibility(View.VISIBLE);
-            holder.btnCancel.setVisibility(View.VISIBLE);
-
-            holder.btnApprove.setOnClickListener(v -> {
-                if(listener != null) listener.onApprove(booking);
-            });
-
-            holder.btnCancel.setOnClickListener(v -> {
-                if(listener != null) listener.onCancel(booking);
-            });
-        } else {
-            holder.btnApprove.setVisibility(View.GONE);
-            holder.btnCancel.setVisibility(View.GONE);
-        }
-
-        // View details
-        holder.itemView.setOnClickListener(v -> {
-            if(listener != null) listener.onViewDetails(booking);
-        });
+        // Click Listeners
+        holder.btnApprove.setOnClickListener(v -> { if(listener != null) listener.onApprove(booking); });
+        holder.btnCancel.setOnClickListener(v -> { if(listener != null) listener.onCancel(booking); });
+        holder.btnReturn.setOnClickListener(v -> { if(listener != null) listener.onReturn(booking); });
+        holder.itemView.setOnClickListener(v -> { if(listener != null) listener.onViewDetails(booking); });
     }
 
     @Override
-    public int getItemCount() {
-        return bookings.size();
-    }
+    public int getItemCount() { return bookings.size(); }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvBookingId, tvCustomer, tvCar, tvDates, tvTotal, tvStatus;
-        Button btnApprove, btnCancel;
+        Button btnApprove, btnCancel, btnReturn;
 
         public ViewHolder(View view) {
             super(view);
@@ -103,8 +100,11 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
             tvDates = view.findViewById(R.id.tvDates);
             tvTotal = view.findViewById(R.id.tvTotal);
             tvStatus = view.findViewById(R.id.tvStatus);
+
+            // BIND BUTTONS
             btnApprove = view.findViewById(R.id.btnApprove);
             btnCancel = view.findViewById(R.id.btnCancel);
+            btnReturn = view.findViewById(R.id.btnReturn);
         }
     }
 }

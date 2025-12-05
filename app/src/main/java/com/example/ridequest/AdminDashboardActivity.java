@@ -1,6 +1,7 @@
 package com.example.ridequest;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,12 +9,17 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat; // Added for color handling
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+
+import java.util.ArrayList; // Added for empty lists
 import java.util.List;
 
 public class AdminDashboardActivity extends AppCompatActivity {
@@ -24,9 +30,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton fab;
     private LinearLayout layoutEmpty, layoutStats;
     private TextView tvSectionTitle, tvItemCount, tvTotalVehicles, tvActiveBookings, tvAdminSubtitle;
+
+    // State tracking
     private boolean showingVehicles = true;
 
-    private MaterialButton btnVehicles, btnBookings;
+    private MaterialButton btnVehicles, btnBookings, btnMaintenance, btnInspections;
     private MaterialCardView cardAdminProfile;
 
     @Override
@@ -48,25 +56,23 @@ public class AdminDashboardActivity extends AppCompatActivity {
         tvAdminSubtitle = findViewById(R.id.tvAdminSubtitle);
         cardAdminProfile = findViewById(R.id.cardAdminProfile);
 
+        // Initialize Buttons
         btnVehicles = findViewById(R.id.btnViewVehicles);
         btnBookings = findViewById(R.id.btnViewBookings);
+        btnMaintenance = findViewById(R.id.btnViewMaintenance);
+        btnInspections = findViewById(R.id.btnViewInspections);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Tab switching
-        btnVehicles.setOnClickListener(v -> {
-            showingVehicles = true;
-            updateTabStyles();
-            loadVehicles();
-        });
+        // --- NEW TAB SWITCHING LOGIC ---
 
-        btnBookings.setOnClickListener(v -> {
-            showingVehicles = false;
-            updateTabStyles();
-            loadBookings();
-        });
+        // 1. Set Click Listeners calling the new selectTab method
+        btnVehicles.setOnClickListener(v -> selectTab((MaterialButton) v));
+        btnBookings.setOnClickListener(v -> selectTab((MaterialButton) v));
+        btnMaintenance.setOnClickListener(v -> selectTab((MaterialButton) v));
+        btnInspections.setOnClickListener(v -> selectTab((MaterialButton) v));
 
-        // Profile menu - logout
+        // 2. Profile menu - logout (Kept from original)
         if (cardAdminProfile != null) {
             cardAdminProfile.setOnClickListener(v -> {
                 PopupMenu popup = new PopupMenu(AdminDashboardActivity.this, cardAdminProfile);
@@ -77,15 +83,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 popup.setOnMenuItemClickListener(item -> {
                     switch (item.getItemId()) {
                         case 1:
-                            // TODO: Open profile
                             Toast.makeText(this, "Profile coming soon", Toast.LENGTH_SHORT).show();
                             return true;
                         case 2:
-                            // TODO: Open settings
                             Toast.makeText(this, "Settings coming soon", Toast.LENGTH_SHORT).show();
                             return true;
                         case 3:
-                            // Logout - Go directly to LoginActivity
                             Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
@@ -98,16 +101,16 @@ public class AdminDashboardActivity extends AppCompatActivity {
             });
         }
 
-        // FAB for adding vehicles
+        // 3. FAB for adding vehicles (Kept from original)
         fab.setOnClickListener(v -> {
             if (showingVehicles) {
                 startActivity(new Intent(AdminDashboardActivity.this, AddVehicleActivity.class));
             } else {
-                Toast.makeText(this, "Switch to Vehicles tab to add cars", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Action not available in this tab", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // FAB scroll behavior
+        // 4. FAB scroll behavior (Kept from original)
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -119,51 +122,85 @@ public class AdminDashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Start with vehicles view
-        updateTabStyles();
-        loadVehicles();
+        // 5. Initial Load - Default to Vehicles
+        selectTab(btnVehicles);
         updateStats();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Refresh the current view
         if (showingVehicles) loadVehicles();
-        else loadBookings();
+        else if (btnBookings.getText().toString().equals("Bookings")) loadBookings();
         updateStats();
     }
 
-    private void updateTabStyles() {
-        if (showingVehicles) {
-            // Vehicles tab active
-            btnVehicles.setBackgroundColor(getResources().getColor(R.color.rq_orange, null));
-            btnVehicles.setTextColor(getResources().getColor(R.color.white, null));
-            btnVehicles.setStrokeWidth(0);
+    // --- INTEGRATED SELECT TAB METHOD ---
+    private void selectTab(MaterialButton selectedButton) {
+        int orangeColor = ContextCompat.getColor(this, R.color.rq_orange);
+        int whiteColor = ContextCompat.getColor(this, android.R.color.white);
+        int transparentColor = ContextCompat.getColor(this, android.R.color.transparent);
+        int strokeWidthPx = (int) (2 * getResources().getDisplayMetrics().density); // 2dp
 
-            btnBookings.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
-            btnBookings.setTextColor(getResources().getColor(R.color.rq_orange, null));
-            btnBookings.setStrokeWidth(4);
-            btnBookings.setStrokeColor(getColorStateList(R.color.rq_orange));
+        // 1. Reset ALL buttons to Inactive State (Abbreviated, Transparent Background, Orange Outline)
+        resetButtonStyle(btnVehicles, "V", orangeColor, transparentColor, strokeWidthPx);
+        resetButtonStyle(btnBookings, "B", orangeColor, transparentColor, strokeWidthPx);
+        resetButtonStyle(btnMaintenance, "M", orangeColor, transparentColor, strokeWidthPx);
+        resetButtonStyle(btnInspections, "I", orangeColor, transparentColor, strokeWidthPx);
 
+        // 2. Style the SELECTED button (Full Text, Filled Orange, No Stroke)
+        selectedButton.setBackgroundTintList(ColorStateList.valueOf(orangeColor));
+        selectedButton.setTextColor(whiteColor);
+        selectedButton.setStrokeWidth(0);
+
+        // 3. Update Content based on selection
+        int id = selectedButton.getId();
+
+        if (id == R.id.btnViewVehicles) {
+            selectedButton.setText("Vehicles");
+            showingVehicles = true;
             tvSectionTitle.setText("All Vehicles");
             tvAdminSubtitle.setText("Manage your fleet");
             fab.setText("Add Vehicle");
             fab.setVisibility(View.VISIBLE);
-        } else {
-            // Bookings tab active
-            btnBookings.setBackgroundColor(getResources().getColor(R.color.rq_orange, null));
-            btnBookings.setTextColor(getResources().getColor(R.color.white, null));
-            btnBookings.setStrokeWidth(0);
+            loadVehicles();
 
-            btnVehicles.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
-            btnVehicles.setTextColor(getResources().getColor(R.color.rq_orange, null));
-            btnVehicles.setStrokeWidth(4);
-            btnVehicles.setStrokeColor(getColorStateList(R.color.rq_orange));
-
+        } else if (id == R.id.btnViewBookings) {
+            selectedButton.setText("Bookings");
+            showingVehicles = false;
             tvSectionTitle.setText("All Bookings");
             tvAdminSubtitle.setText("Manage reservations");
             fab.setVisibility(View.GONE);
+            loadBookings();
+
+        } else if (id == R.id.btnViewMaintenance) {
+            selectedButton.setText("Maintenance");
+            showingVehicles = false;
+            tvSectionTitle.setText("Maintenance");
+            tvAdminSubtitle.setText("Vehicle upkeep status");
+            fab.setVisibility(View.GONE);
+            showEmptyState("No maintenance records", "Maintenance tracking coming soon");
+            tvItemCount.setText("0 items");
+
+        } else if (id == R.id.btnViewInspections) {
+            selectedButton.setText("Inspections");
+            showingVehicles = false;
+            tvSectionTitle.setText("Inspections");
+            tvAdminSubtitle.setText("Quality control checks");
+            fab.setVisibility(View.GONE);
+            showEmptyState("No inspections found", "Inspection logs coming soon");
+            tvItemCount.setText("0 items");
         }
+    }
+
+    // Helper method to reset button to "Inactive" state
+    private void resetButtonStyle(MaterialButton btn, String abbrText, int orange, int transparent, int stroke) {
+        btn.setText(abbrText);
+        btn.setBackgroundTintList(ColorStateList.valueOf(transparent));
+        btn.setStrokeColor(ColorStateList.valueOf(orange));
+        btn.setStrokeWidth(stroke);
+        btn.setTextColor(orange);
     }
 
     private void updateStats() {
@@ -177,13 +214,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
         tvTotalVehicles.setText(String.valueOf(vehicleCount));
         tvActiveBookings.setText(String.valueOf(bookingCount));
 
-        // Show stats section
         layoutStats.setVisibility(View.VISIBLE);
     }
 
     private void loadVehicles() {
         Log.d(TAG, "Loading vehicles...");
-
         List<CarRentalData.VehicleItem> vehicles = db.getAllVehicles();
 
         if (vehicles.isEmpty()) {
@@ -222,7 +257,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private void loadBookings() {
         Log.d(TAG, "Loading bookings...");
-
         List<CarRentalData.AdminBookingItem> bookings = db.getAllBookingsForAdmin();
 
         if (bookings.isEmpty()) {
@@ -243,6 +277,18 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         @Override
                         public void onCancel(CarRentalData.AdminBookingItem booking) {
                             cancelBooking(booking);
+                        }
+
+                        // ⭐ THIS IS THE MISSING METHOD CAUSING YOUR ERROR ⭐
+                        @Override
+                        public void onReturn(CarRentalData.AdminBookingItem booking) {
+                            if (db.markBookingAsReturned(booking.id)) {
+                                Toast.makeText(AdminDashboardActivity.this, "Vehicle Returned & Available ✓", Toast.LENGTH_SHORT).show();
+                                loadBookings(); // Refresh the list
+                                updateStats();  // Update the counters
+                            } else {
+                                Toast.makeText(AdminDashboardActivity.this, "Failed to update status", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         @Override
@@ -272,8 +318,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void approveBooking(CarRentalData.AdminBookingItem booking) {
-        Log.d(TAG, "Approving booking: " + booking.id);
-
         if (db.approveBooking(booking.id)) {
             String receipt = generateReceipt(booking);
             Toast.makeText(this, "Booking Approved! ✓", Toast.LENGTH_LONG).show();
@@ -286,8 +330,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void cancelBooking(CarRentalData.AdminBookingItem booking) {
-        Log.d(TAG, "Cancelling booking: " + booking.id);
-
         if (db.cancelBooking(booking.id, true)) {
             Toast.makeText(this, "Booking Cancelled ✓", Toast.LENGTH_SHORT).show();
             sendCancellationEmailToCustomer(booking);
@@ -324,7 +366,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private void sendApprovalEmailToCustomer(CarRentalData.AdminBookingItem booking, String receipt) {
         String subject = "✅ Booking Confirmed - " + booking.bookingReference;
-
         String body = "Dear " + booking.customerName + ",\n\n" +
                 "Great news! Your booking has been APPROVED.\n\n" +
                 receipt + "\n\n" +
@@ -349,7 +390,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private void sendCancellationEmailToCustomer(CarRentalData.AdminBookingItem booking) {
         String subject = "❌ Booking Cancelled - " + booking.bookingReference;
-
         String body = "Dear " + booking.customerName + ",\n\n" +
                 "Unfortunately, we had to cancel your booking.\n\n" +
                 "Booking ID: " + booking.bookingReference + "\n" +

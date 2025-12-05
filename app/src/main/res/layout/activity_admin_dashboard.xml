@@ -97,27 +97,27 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewVehicles"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="48dp"
-                    android:text="Vehicles"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="View and manage vehicles"
+                    android:text="V"
+                    android:textColor="@color/white"
+                    android:textSize="9sp"
                     android:textStyle="bold"
-                    android:textSize="14sp"
-                    app:icon="@android:drawable/ic_menu_view"
-                    app:iconGravity="textStart"
-                    app:iconSize="18dp"
                     app:backgroundTint="@color/rq_orange"
                     app:cornerRadius="8dp"
-                    android:textColor="@color/white"
-                    android:layout_marginEnd="4dp"
-                    android:contentDescription="View and manage vehicles"/>
+                    app:icon="@android:drawable/ic_menu_view"
+                    app:iconGravity="textStart"
+                    app:iconSize="18dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewBookings"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="48dp"
-                    android:text="Bookings"
-                    android:textSize="14sp"
+                    android:text="B"
+                    android:textSize="8sp"
                     app:icon="@android:drawable/ic_menu_my_calendar"
                     app:iconGravity="textStart"
                     app:iconSize="18dp"
@@ -127,7 +127,45 @@
                     app:cornerRadius="8dp"
                     android:textColor="@color/rq_orange"
                     android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
                     android:contentDescription="View and manage bookings"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewMaintenance"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="View and manage maintenance"
+                    android:text=""
+                    android:textColor="@color/rq_orange"
+                    android:textSize="7.5sp"
+                    app:cornerRadius="8dp"
+                    app:icon="@android:drawable/ic_menu_manage"
+                    app:iconGravity="textStart"
+                    app:iconSize="18dp"
+                    app:strokeColor="@color/rq_orange"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewInspections"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="I"
+                    android:textSize="7.5sp"
+                    app:icon="@android:drawable/ic_menu_search"
+                    app:iconGravity="textStart"
+                    app:iconSize="18dp"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    app:strokeColor="@color/rq_orange"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="8dp"
+                    android:textColor="@color/rq_orange"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="View and manage inspections"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
