@@ -34,9 +34,12 @@ public class PaymentActivity extends AppCompatActivity {
 
         Log.d(TAG, "=== PaymentActivity Started ===");
 
-        // getter of all data from BookingActivity
+        // Get ALL data from BookingActivity
         int vid = getIntent().getIntExtra("VID", -1);
         double dailyRate = getIntent().getDoubleExtra("DAILY_RATE", 0.0);
+        double baseCost = getIntent().getDoubleExtra("BASE_COST", 0.0);
+        String insuranceType = getIntent().getStringExtra("INSURANCE_TYPE");
+        double insuranceFee = getIntent().getDoubleExtra("INSURANCE_FEE", 0.0);
         totalCost = getIntent().getDoubleExtra("TOTAL_COST", 0.0);
         String carName = getIntent().getStringExtra("NAME");
 
@@ -50,18 +53,21 @@ public class PaymentActivity extends AppCompatActivity {
 
         int lateHours = getIntent().getIntExtra("LATE_HOURS", 0);
         double lateFee = getIntent().getDoubleExtra("LATE_FEE", 0.0);
+        int rentalDays = getIntent().getIntExtra("RENTAL_DAYS", 1);
 
         int uid = getSharedPreferences("UserSession", MODE_PRIVATE).getInt("UID", 1);
 
-        // calculates 30% downpayment for the rent
+        // Calculate 30% downpayment
         downpaymentAmount = totalCost * 0.30;
         double remainingBalance = totalCost - downpaymentAmount;
 
+        Log.d(TAG, "Base Cost: $" + baseCost);
+        Log.d(TAG, "Insurance: " + insuranceType + " - $" + insuranceFee);
         Log.d(TAG, "Total Cost: $" + totalCost);
         Log.d(TAG, "Downpayment (30%): $" + downpaymentAmount);
         Log.d(TAG, "Remaining Balance: $" + remainingBalance);
 
-        // validates required data
+        // Validate required data
         if(vid == -1 || pickupDate == null || returnDate == null ||
                 pickupAddress == null || returnAddress == null) {
             Toast.makeText(this, "Error: Missing booking information", Toast.LENGTH_SHORT).show();
@@ -69,7 +75,7 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        // UI Elements
+        // Bind UI Elements
         TextView tvTitle = findViewById(R.id.tvTitle);
         TextView tvCarName = findViewById(R.id.tvCarName);
         TextView tvDates = findViewById(R.id.tvDates);
@@ -82,6 +88,7 @@ public class PaymentActivity extends AppCompatActivity {
         Button btnUploadReceipt = findViewById(R.id.btnUploadReceipt);
         Button btnConfirm = findViewById(R.id.btnConfirm);
 
+        // Set UI Data
         if(tvTitle != null) tvTitle.setText("Payment Summary");
         if(tvCarName != null) tvCarName.setText(carName != null ? carName : "Unknown Vehicle");
         if(tvDates != null) tvDates.setText(pickupDate + " " + pickupTime + " → " + returnDate + " " + returnTime);
@@ -90,7 +97,7 @@ public class PaymentActivity extends AppCompatActivity {
         if(tvDownpayment != null) tvDownpayment.setText("Downpayment (30%): $" + String.format("%.2f", downpaymentAmount));
         if(tvBalance != null) tvBalance.setText("Balance (pay at pickup): $" + String.format("%.2f", remainingBalance));
 
-        // shows late fee warning if applicable
+        // Show late fee warning if applicable
         if(tvLateFeeWarning != null) {
             if(lateFee > 0) {
                 tvLateFeeWarning.setVisibility(View.VISIBLE);
@@ -100,12 +107,13 @@ public class PaymentActivity extends AppCompatActivity {
             }
         }
 
-        // QR Code
+        // Load QR Code (you provided this image)
         if(ivQRCode != null) {
+            // The QR code image should be in drawable as "qr_code_payment"
             ivQRCode.setImageResource(R.drawable.qr_code_payment);
         }
 
-        // gallery launcher for receipt upload
+        // Initialize gallery launcher for receipt upload
         galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -117,6 +125,7 @@ public class PaymentActivity extends AppCompatActivity {
                                 ivReceipt.setImageBitmap(bitmap);
                                 ivReceipt.setVisibility(View.VISIBLE);
 
+                                // Convert to Base64
                                 receiptImageBase64 = bitmapToBase64(bitmap);
                                 Toast.makeText(this, "✓ Receipt uploaded successfully!", Toast.LENGTH_SHORT).show();
                             } catch (IOException e) {
@@ -128,14 +137,14 @@ public class PaymentActivity extends AppCompatActivity {
                 }
         );
 
-        // uploads receipt Button
+        // Upload Receipt Button
         btnUploadReceipt.setOnClickListener(v -> openGallery());
 
-        // confirms Payment Button
+        // Confirm Payment Button
         btnConfirm.setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
-            // validate receipt upload
+            // Validate receipt upload
             if(receiptImageBase64 == null || receiptImageBase64.isEmpty()) {
                 Toast.makeText(this, "⚠️ Please upload your payment receipt", Toast.LENGTH_LONG).show();
                 return;
@@ -150,7 +159,7 @@ public class PaymentActivity extends AppCompatActivity {
                     pickupTime, returnTime,
                     pickupAddress, returnAddress,
                     totalCost, "QR Code Payment",
-                    receiptImageBase64,  // stores receipt as payment ID
+                    receiptImageBase64,  // Store receipt as payment ID
                     0, 0
             );
 
@@ -171,7 +180,7 @@ public class PaymentActivity extends AppCompatActivity {
 
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
-                // return to main activity
+                // Return to main activity
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -183,7 +192,7 @@ public class PaymentActivity extends AppCompatActivity {
             }
         });
 
-        // back Button
+        // Back Button
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 

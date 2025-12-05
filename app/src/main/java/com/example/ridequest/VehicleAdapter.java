@@ -28,7 +28,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         void onEdit(CarRentalData.VehicleItem vehicle);
     }
 
-    // Constructor for admin view (with edit and delete)
+    // admin view (with edit and delete)
     public VehicleAdapter(Context ctx, List<CarRentalData.VehicleItem> list, boolean admin,
                           OnDeleteListener delListener, OnEditListener editListener) {
         this.context = ctx;

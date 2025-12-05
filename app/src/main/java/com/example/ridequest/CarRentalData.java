@@ -24,7 +24,7 @@ public class CarRentalData {
 
     // ===================== Security & Account Rules =====================
 
-     //vValidates password meets minimum security standards (8+ characters)
+    //vValidates password meets minimum security standards (8+ characters)
 
     public static boolean isPasswordValid(String password) {
         if (password == null || password.length() < 8) {
@@ -40,7 +40,7 @@ public class CarRentalData {
     }
 
 
-     // validates customer is at least 18 years old
+    // validates customer is at least 18 years old
 
     public static boolean isAgeValid(String dateOfBirth) {
         try {
@@ -102,7 +102,7 @@ public class CarRentalData {
         return id;
     }
 
-      // hard coded admin credentials
+    // hard coded admin credentials
     public boolean checkAdmin(String email, String password) {
         return email.equals("admin") && password.equals("admin123");
     }
@@ -775,6 +775,49 @@ public class CarRentalData {
         return booking;
     }
 
+
+    public List<CustomerBookingItem> getCustomerBookings(int customerId) {
+        List<CustomerBookingItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT r.booking_id, r.booking_reference, " +
+                "mk.make_name || ' ' || vm.model_name as car_name, " +
+                "v.image_res_name, " +
+                "r.pickup_date, r.return_date, " +
+                "r.status, r.total_cost, r.cancellation_fee " +
+                "FROM Reservation r " +
+                "JOIN Vehicle v ON r.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "WHERE r.customer_num = ? " +
+                "ORDER BY r.booking_id DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{String.valueOf(customerId)});
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new CustomerBookingItem(
+                            c.getInt(0),      // booking_id
+                            c.getString(1),   // booking_reference
+                            c.getString(2),   // car_name
+                            c.getString(3),   // car_image
+                            c.getString(4),   // pickup_date
+                            c.getString(5),   // return_date
+                            c.getString(6),   // status
+                            c.getDouble(7),   // total_cost
+                            c.isNull(8) ? 0 : c.getDouble(8)  // cancellation_fee
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching customer bookings: " + e.getMessage(), e);
+        }
+        db.close();
+        return list;
+    }
+
+
     // ===================== Inner Classes =====================
 
     public static class VehicleItem {
@@ -795,6 +838,29 @@ public class CarRentalData {
             this.seats = seats > 0 ? seats : 5;
         }
     }
+
+
+    public static class CustomerBookingItem {
+        public int id;
+        public String bookingReference, carName, carImage;
+        public String pickupDate, returnDate, status;
+        public double totalCost, cancellationFee;
+
+        public CustomerBookingItem(int id, String ref, String car, String img,
+                                   String pDate, String rDate, String status,
+                                   double cost, double cancelFee) {
+            this.id = id;
+            this.bookingReference = ref;
+            this.carName = car;
+            this.carImage = img;
+            this.pickupDate = pDate;
+            this.returnDate = rDate;
+            this.status = status;
+            this.totalCost = cost;
+            this.cancellationFee = cancelFee;
+        }
+    }
+
 
     public static class LocationItem {
         public int id;

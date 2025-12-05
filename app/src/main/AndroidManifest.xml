@@ -42,6 +42,12 @@
         <activity android:name=".ProfileActivity" />
         <activity android:name=".EditProfileActivity" />
 
+        <!-- Bookings -->
+        <activity
+            android:name=".MyBookingsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Admin -->
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".AddVehicleActivity" />
