@@ -382,6 +382,7 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
+                                android:contentDescription="TODO"
                                 android:src="@android:drawable/ic_dialog_info"
                                 app:tint="@color/rq_orange" />
 

@@ -145,8 +145,9 @@
                 android:textColor="#555"
                 tools:ignore="UseCompatTextViewDrawableXml" />
 
-            <!-- Item 2 -->
+            <!-- Item 2 - My Bookings -->
             <TextView
+                android:id="@+id/btnMyBookings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@android:drawable/ic_menu_recent_history"
@@ -155,7 +156,7 @@
                 android:drawableTint="#555"
                 android:gravity="center_vertical"
                 android:paddingVertical="12dp"
-                android:text="@string/previous_rent"
+                android:text="My Bookings"
                 android:textColor="#555"
                 tools:ignore="UseCompatTextViewDrawableXml" />
         </LinearLayout>
