@@ -71,4 +71,12 @@
     <string name="search_icon">Search icon</string>
     <string name="filter_icon">Filter icon</string>
 
+    <string-array name="fuel_levels_array">
+        <item>Empty</item>
+        <item>1/4 Tank</item>
+        <item>1/2 Tank</item>
+        <item>3/4 Tank</item>
+        <item>Full Tank</item>
+    </string-array>
+
 </resources>

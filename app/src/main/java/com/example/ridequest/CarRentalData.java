@@ -387,25 +387,17 @@ public class CarRentalData {
                                         String pickupDate, String returnDate,
                                         String pickupTime, String returnTime,
                                         String pickupAddress, String returnAddress,
-                                        // Cost Breakdown Details
                                         int rentalDays, double baseCost,
                                         String insuranceType, double insuranceFee,
                                         int lateHours, double lateFee,
                                         double totalCost,
-                                        // Payment Details
                                         String paymentMethod, String paymentId) {
 
-        Log.d(TAG, "=== Creating Pending Booking (Integrated) ===");
+        Log.d(TAG, "=== Creating Pending Booking with Insurance Record ===");
         Log.d(TAG, "Customer: " + customerId + " | Vehicle: " + vehicleId);
-        Log.d(TAG, "Pickup: " + pickupDate + " " + pickupTime + " @ " + pickupAddress);
-        Log.d(TAG, "Return: " + returnDate + " " + returnTime + " @ " + returnAddress);
-
-        // Log detailed costs
-        Log.d(TAG, "Days: " + rentalDays + " | Base: $" + baseCost);
         Log.d(TAG, "Insurance: " + insuranceType + " ($" + insuranceFee + ")");
-        Log.d(TAG, "Total: $" + totalCost + " | Method: " + paymentMethod);
 
-        // -VALIDATION
+        // VALIDATION
         if (paymentMethod == null || paymentMethod.isEmpty()) {
             Log.e(TAG, "Payment method required");
             return false;
@@ -418,11 +410,10 @@ public class CarRentalData {
         }
 
         if (!isCarAvailable(vehicleId, pickupDate, returnDate)) {
-            Log.e(TAG, "Car not available for selected dates");
+            Log.e(TAG, "car not available for selected dates");
             return false;
         }
 
-        // DATABASE TRANSACTION
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
@@ -430,9 +421,8 @@ public class CarRentalData {
             String bookingRef = generateBookingId();
             Log.d(TAG, "Generated Ref: " + bookingRef);
 
+            // INSERT RESERVATION
             ContentValues r = new ContentValues();
-
-            // Core Data
             r.put("customer_num", customerId);
             r.put("vehicle_id", vehicleId);
             r.put("booking_reference", bookingRef);
@@ -448,7 +438,7 @@ public class CarRentalData {
 
             // Payment Info
             r.put("payment_method", paymentMethod);
-            r.put("payment_id", paymentId); // Stores Receipt Base64 or ID
+            r.put("payment_id", paymentId);
             r.put("payment_status", "Pending");
 
             // Cost Breakdown
@@ -460,15 +450,32 @@ public class CarRentalData {
             r.put("late_fee", lateFee);
             r.put("total_cost", totalCost);
 
-            // RESERVATION
             long bookingId = db.insert("Reservation", null, r);
 
             if (bookingId == -1) {
                 throw new Exception("Failed to insert reservation record.");
             }
 
-            // UPDATE VEHICLE STATUS
-            // We set the car to 'Pending' so no one else can book for the meantime
+            // INSURANCE RECORD
+            if (insuranceType != null && !insuranceType.equals("None") && !insuranceType.equals("No Insurance (Free)")) {
+                ContentValues vInsurance = new ContentValues();
+                vInsurance.put("customer_id", customerId);
+                vInsurance.put("insurance_type", insuranceType);
+                vInsurance.put("insurance_description", getInsuranceDescription(insuranceType));
+                vInsurance.put("booking_reference", bookingRef);
+
+                long insuranceId = db.insert("Insurance", null, vInsurance);
+
+                if (insuranceId != -1) {
+                    Log.d(TAG, "Insurance record created: ID = " + insuranceId);
+                } else {
+                    Log.w(TAG, "Failed to create insurance record (non-critical)");
+                }
+            } else {
+                Log.d(TAG, "ℹNo insurance selected - skipping Insurance table insert");
+            }
+
+            // UPDATES VEHICLE STATUS TO PENDING
             ContentValues vCar = new ContentValues();
             vCar.put("status", "Pending");
             db.update("Vehicle", vCar, "vehicle_id=?", new String[]{String.valueOf(vehicleId)});
@@ -484,6 +491,178 @@ public class CarRentalData {
             return false;
         } finally {
             db.endTransaction();
+        }
+    }
+
+    // Get insurance description based on type
+    private String getInsuranceDescription(String insuranceType) {
+        if (insuranceType == null) return "No coverage";
+
+        switch (insuranceType) {
+            case "Personal Insurance":
+                return "Personal insurance coverage provided by customer";
+
+            case "Basic Insurance":
+                return "Basic Insurance Coverage:\n" +
+                        "• +20% of daily rate\n" +
+                        "• Full coverage\n" +
+                        "• Roadside assistance\n" +
+                        "• Personal injury protection";
+
+            default:
+                return "Insurance type: " + insuranceType;
+        }
+    }
+
+    public List<InsuranceItem> getCustomerInsurance(int customerId) {
+        List<InsuranceItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT insurance_id, insurance_type, insurance_description, " +
+                "booking_reference, created_at " +
+                "FROM Insurance " +
+                "WHERE customer_id = ? " +
+                "ORDER BY created_at DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{String.valueOf(customerId)});
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new InsuranceItem(
+                            c.getInt(0),      // insurance_id
+                            customerId,         //CUSTOMER ID
+                            c.getString(1),   // insurance_type
+                            c.getString(2),   // insurance_description
+                            c.getString(3),   // booking_reference
+                            c.getString(4)    // created_at
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " insurance records for customer " + customerId);
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching insurance records: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public InsuranceItem getInsuranceByBooking(String bookingReference) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        InsuranceItem insurance = null;
+
+        String query = "SELECT insurance_id, customer_id, insurance_type, " +
+                "insurance_description, booking_reference, created_at " +
+                "FROM Insurance " +
+                "WHERE booking_reference = ?";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{bookingReference});
+            if (c.moveToFirst()) {
+                insurance = new InsuranceItem(
+                        c.getInt(0),      // insurance_id
+                        c.getInt(1),      // customer_id
+                        c.getString(2),   // insurance_type
+                        c.getString(3),   // insurance_description
+                        c.getString(4),   // booking_reference
+                        c.getString(5)    // created_at
+                );
+            }
+            c.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching insurance: " + e.getMessage(), e);
+        }
+        return insurance;
+    }
+
+    public List<InsuranceItem> getAllInsurance() {
+        List<InsuranceItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT i.insurance_id, i.customer_id, " +
+                "c.first_name || ' ' || c.last_name as customer_name, " +
+                "i.insurance_type, i.insurance_description, " +
+                "i.booking_reference, i.created_at " +
+                "FROM Insurance i " +
+                "JOIN Customer c ON i.customer_id = c.customer_id " +
+                "ORDER BY i.created_at DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    InsuranceItem item = new InsuranceItem(
+                            c.getInt(0),      // insurance_id
+                            c.getInt(1),      // customer_id
+                            c.getString(3),   // insurance_type
+                            c.getString(4),   // insurance_description
+                            c.getString(5),   // booking_reference
+                            c.getString(6)    // created_at
+                    );
+                    // customer name display
+                    item.customerName = c.getString(2);
+                    list.add(item);
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " total insurance records");
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching all insurance: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public void debugListAllInsurance() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT i.insurance_id, " +
+                "c.first_name || ' ' || c.last_name as customer, " +
+                "i.insurance_type, i.booking_reference, i.created_at " +
+                "FROM Insurance i " +
+                "JOIN Customer c ON i.customer_id = c.customer_id " +
+                "ORDER BY i.insurance_id DESC";
+
+        Cursor c = db.rawQuery(query, null);
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== ALL INSURANCE RECORDS ===");
+        Log.d(TAG, "=================================");
+
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "Insurance #" + c.getInt(0));
+                Log.d(TAG, "  Customer: " + c.getString(1));
+                Log.d(TAG, "  Type: " + c.getString(2));
+                Log.d(TAG, "  Booking Ref: " + c.getString(3));
+                Log.d(TAG, "  Created: " + c.getString(4));
+                Log.d(TAG, "---------------------------------");
+            } while (c.moveToNext());
+            Log.d(TAG, "Total: " + c.getCount() + " insurance records");
+        } else {
+            Log.d(TAG, "No insurance records found");
+        }
+
+        c.close();
+        Log.d(TAG, "=================================");
+    }
+
+    // ===================== INNER CLASS: InsuranceItem =====================
+    public static class InsuranceItem {
+        public int id;
+        public int customerId;
+        public String customerName; // display
+        public String insuranceType;
+        public String insuranceDescription;
+        public String bookingReference;
+        public String createdAt;
+
+        public InsuranceItem(int id, int customerId, String type,
+                             String description, String bookingRef, String created) {
+            this.id = id;
+            this.customerId = customerId;
+            this.insuranceType = type;
+            this.insuranceDescription = description;
+            this.bookingReference = bookingRef;
+            this.createdAt = created;
         }
     }
 

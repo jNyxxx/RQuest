@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RideQuest.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 16;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -57,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(make_id) REFERENCES Make(make_id), " +
                 "FOREIGN KEY(type_id) REFERENCES Type(type_id))");
 
-        // VEHICLE TABLE
+        // Vehicle Table
         db.execSQL("CREATE TABLE Vehicle (" +
                 "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "model_id INTEGER, " +
@@ -84,7 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id))");
 
-        // RESERVATION TABLE
+        // Reservation Table
         db.execSQL("CREATE TABLE Reservation (" +
                 "booking_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "customer_num INTEGER NOT NULL, " +
@@ -114,7 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(customer_num) REFERENCES Customer(customer_id), " +
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id))");
 
-        // RENTAL TABLE
+        // Rental Table
         db.execSQL("CREATE TABLE Rental (" +
                 "rental_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "reservation_id INTEGER UNIQUE, " +
@@ -170,14 +170,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(customer_id) REFERENCES Customer(customer_id))");
 
-        // Insurance Table
+        // INSURANCE TABLE
         db.execSQL("CREATE TABLE Insurance (" +
                 "insurance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "customer_id INTEGER, " +
-                "insurance_provider TEXT, " +
-                "policy_number TEXT, " +
-                "expiry_date TEXT, " +
-                "verified INTEGER DEFAULT 0, " +
+                "customer_id INTEGER NOT NULL, " +
+                "insurance_type TEXT NOT NULL, " +
+                "insurance_description TEXT, " +
+                "booking_reference TEXT, " +
+                "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
                 "FOREIGN KEY(customer_id) REFERENCES Customer(customer_id))");
 
         // EmployeeRental Table
