@@ -17,7 +17,7 @@ public class LandingActivity extends AppCompatActivity {
 
     private OnboardingAdapter onboardingAdapter;
     private LinearLayout layoutIndicators;
-    private Button btnAction; // We keep the variable name 'btnAction' for logic, but link it to 'btnContinue'
+    private Button btnAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +26,7 @@ public class LandingActivity extends AppCompatActivity {
 
         layoutIndicators = findViewById(R.id.layoutIndicators);
 
-        // --- ERROR FIX IS HERE ---
-        // Your XML uses "btnContinue", so we must find that ID.
         btnAction = findViewById(R.id.btnContinue);
-        // -------------------------
 
         setupOnboardingItems();
 
@@ -45,7 +42,6 @@ public class LandingActivity extends AppCompatActivity {
                 super.onPageSelected(position);
                 setCurrentIndicator(position);
 
-                // Change button text on the last slide
                 if (position == onboardingAdapter.getItemCount() - 1) {
                     btnAction.setText("Get Started");
                 } else {
@@ -70,8 +66,6 @@ public class LandingActivity extends AppCompatActivity {
     private void setupOnboardingItems() {
         List<OnboardingItem> onboardingItems = new ArrayList<>();
 
-        // ITEM 1: Orange Car
-        // Ensure you have renamed your image files in res/drawable to these names!
         int img1 = getResources().getIdentifier("ob_car_orange", "drawable", getPackageName());
         if(img1 == 0) img1 = android.R.drawable.ic_menu_gallery;
 
@@ -81,7 +75,6 @@ public class LandingActivity extends AppCompatActivity {
                 "Find the perfect vehicle for every occasion!"
         );
 
-        // ITEM 2: Blue Car
         int img2 = getResources().getIdentifier("ob_car_blue", "drawable", getPackageName());
         if(img2 == 0) img2 = android.R.drawable.ic_menu_gallery;
 
@@ -91,7 +84,6 @@ public class LandingActivity extends AppCompatActivity {
                 "Rent the car you've always wanted to drive."
         );
 
-        // ITEM 3: Van
         int img3 = getResources().getIdentifier("ob_van", "drawable", getPackageName());
         if(img3 == 0) img3 = android.R.drawable.ic_menu_gallery;
 
@@ -101,7 +93,6 @@ public class LandingActivity extends AppCompatActivity {
                 "Rent large vehicle for a big family or a long journey."
         );
 
-        // ITEM 4: Money
         int img4 = getResources().getIdentifier("ob_money", "drawable", getPackageName());
         if(img4 == 0) img4 = android.R.drawable.ic_menu_gallery;
 

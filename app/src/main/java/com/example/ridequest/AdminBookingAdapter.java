@@ -47,7 +47,7 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
         holder.tvTotal.setText("$" + String.format("%.2f", booking.totalCost));
         holder.tvStatus.setText(booking.status);
 
-        // Reset visibility
+        // hides visibility
         holder.btnApprove.setVisibility(View.GONE);
         holder.btnCancel.setVisibility(View.GONE);
         holder.btnReturn.setVisibility(View.GONE);
@@ -63,8 +63,7 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
             case "Confirmed":
                 holder.tvStatus.setBackgroundResource(R.drawable.bg_status_confirmed);
                 holder.tvStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
-                // ⭐ THIS MAKES THE BUTTON VISIBLE
-                holder.btnReturn.setVisibility(View.VISIBLE);
+                holder.btnReturn.setVisibility(View.VISIBLE); // button visible after approving the booknig
                 break;
 
             case "Cancelled":
@@ -78,7 +77,6 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
                 break;
         }
 
-        // Click Listeners
         holder.btnApprove.setOnClickListener(v -> { if(listener != null) listener.onApprove(booking); });
         holder.btnCancel.setOnClickListener(v -> { if(listener != null) listener.onCancel(booking); });
         holder.btnReturn.setOnClickListener(v -> { if(listener != null) listener.onReturn(booking); });
@@ -101,7 +99,6 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
             tvTotal = view.findViewById(R.id.tvTotal);
             tvStatus = view.findViewById(R.id.tvStatus);
 
-            // BIND BUTTONS
             btnApprove = view.findViewById(R.id.btnApprove);
             btnCancel = view.findViewById(R.id.btnCancel);
             btnReturn = view.findViewById(R.id.btnReturn);

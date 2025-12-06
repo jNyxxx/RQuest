@@ -41,7 +41,7 @@ public class AddVehicleActivity extends AppCompatActivity {
 
         CarRentalData db = new CarRentalData(this);
 
-        // Initialize Layouts (TextInputLayouts)
+        // Layouts
         tilMake = findViewById(R.id.tilMake);
         tilModel = findViewById(R.id.tilModel);
         tilType = findViewById(R.id.tilType);
@@ -49,11 +49,9 @@ public class AddVehicleActivity extends AppCompatActivity {
         tilPrice = findViewById(R.id.tilPrice);
         tilPlate = findViewById(R.id.tilPlate);
         tilSeats = findViewById(R.id.tilSeats);
-        // Ensure you add TextInputLayout with id "tilColor" in your XML surrounding etColor for best effect
-        // If not, this might be null, so we'll check before using
         tilColor = findViewById(R.id.tilColor);
 
-        // Initialize Inputs
+        // Inputs
         etMake = findViewById(R.id.etMake);
         etModel = findViewById(R.id.etModel);
         etType = findViewById(R.id.etType);
@@ -61,24 +59,24 @@ public class AddVehicleActivity extends AppCompatActivity {
         etPrice = findViewById(R.id.etPrice);
         etPlate = findViewById(R.id.etPlate);
         etSeats = findViewById(R.id.etSeats);
-        etColor = findViewById(R.id.etColor); // New Color Field
+        etColor = findViewById(R.id.etColor);
 
-        // Initialize Spinners
+        // Spinners
         spTransmission = findViewById(R.id.spTransmission);
-        spCategory = findViewById(R.id.spCategory); // New Category Spinner
-        spFuel = findViewById(R.id.spFuel);         // New Fuel Spinner
+        spCategory = findViewById(R.id.spCategory);
+        spFuel = findViewById(R.id.spFuel);
 
         ivPreview = findViewById(R.id.ivPreview);
         tvImageName = findViewById(R.id.tvImageName);
         Button btnAdd = findViewById(R.id.btnAddCar);
         MaterialCardView cvImageSelector = findViewById(R.id.cvImageSelector);
 
-        // Setup Spinners
+        // Spinners
         setupSpinner(spTransmission, new String[]{"Manual", "Automatic"});
         setupSpinner(spCategory, new String[]{"Premium", "Luxury", "Economy", "Family", "Sports"});
         setupSpinner(spFuel, new String[]{"Regular Gasoline", "Premium Gasoline", "Diesel"});
 
-        // Initialize gallery launcher
+        // gallery launcher
         galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -86,14 +84,11 @@ public class AddVehicleActivity extends AppCompatActivity {
                         Uri imageUri = result.getData().getData();
                         if (imageUri != null) {
                             try {
-                                // Load image into ImageView
                                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                                 ivPreview.setImageBitmap(bitmap);
 
-                                // Convert to Base64
                                 selectedImageBase64 = bitmapToBase64(bitmap);
 
-                                // Update UI
                                 tvImageName.setText("Image selected ✓");
                                 tvImageName.setTextColor(getResources().getColor(R.color.rq_orange, null));
 
@@ -107,13 +102,13 @@ public class AddVehicleActivity extends AppCompatActivity {
                 }
         );
 
-        // Open gallery when card is clicked
+        // gallery launcehr
         cvImageSelector.setOnClickListener(v -> openGallery());
 
-        // Add vehicle button
+        // add vehicle button
         btnAdd.setOnClickListener(v -> addVehicle(db));
 
-        // Back button
+        // back button
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
@@ -128,11 +123,10 @@ public class AddVehicleActivity extends AppCompatActivity {
     }
 
     private void addVehicle(CarRentalData db) {
-        // Clear previous errors
         clearErrors();
 
         try {
-            // Get values
+            // Gets values
             String make = etMake.getText().toString().trim();
             String model = etModel.getText().toString().trim();
             String type = etType.getText().toString().trim();
@@ -146,7 +140,7 @@ public class AddVehicleActivity extends AppCompatActivity {
             String category = spCategory.getSelectedItem().toString();
             String fuel = spFuel.getSelectedItem().toString();
 
-            // Validate all fields
+            // Validates all fields
             boolean hasError = false;
 
             if (make.isEmpty()) {
@@ -238,7 +232,6 @@ public class AddVehicleActivity extends AppCompatActivity {
                 }
             }
 
-            // Validate image selection
             if (selectedImageBase64 == null || selectedImageBase64.isEmpty()) {
                 Toast.makeText(this, "Please select a vehicle image", Toast.LENGTH_SHORT).show();
                 hasError = true;
@@ -248,7 +241,6 @@ public class AddVehicleActivity extends AppCompatActivity {
                 return;
             }
 
-            // Parse validated values
             int year = Integer.parseInt(yearStr);
             double price = Double.parseDouble(priceStr);
             int seatCount = Integer.parseInt(seatsStr);
@@ -285,7 +277,6 @@ public class AddVehicleActivity extends AppCompatActivity {
     }
 
     private String bitmapToBase64(Bitmap bitmap) {
-        // Resize bitmap to reduce size (maintaining aspect ratio)
         int maxWidth = 800;
         int maxHeight = 600;
 

@@ -62,11 +62,11 @@ public class EditVehicleActivity extends AppCompatActivity {
         etType = findViewById(R.id.etType);
         etPrice = findViewById(R.id.etPrice);
         etSeats = findViewById(R.id.etSeats);
-        etColor = findViewById(R.id.etColor); // Ensure this ID exists in XML
+        etColor = findViewById(R.id.etColor);
 
         spTransmission = findViewById(R.id.spTransmission);
-        spCategory = findViewById(R.id.spCategory); // Ensure this ID exists in XML
-        spFuel = findViewById(R.id.spFuel);         // Ensure this ID exists in XML
+        spCategory = findViewById(R.id.spCategory);
+        spFuel = findViewById(R.id.spFuel);
 
         ivPreview = findViewById(R.id.ivPreview);
         Button btnUpdate = findViewById(R.id.btnUpdateCar);
@@ -80,7 +80,6 @@ public class EditVehicleActivity extends AppCompatActivity {
         etSeats.setText(String.valueOf(seats));
         if(color != null) etColor.setText(color);
 
-        // Load Image
         if (imageData != null && !imageData.isEmpty()) {
             selectedImageBase64 = imageData;
             try {
@@ -97,7 +96,7 @@ public class EditVehicleActivity extends AppCompatActivity {
             }
         }
 
-        // Setup Spinners with Selection Logic
+        // Spinners with Selection Logic
         setupSpinner(spTransmission, new String[]{"Manual", "Automatic"}, transmission);
         setupSpinner(spCategory, new String[]{"Premium", "Luxury", "Economy", "Family", "Sports"}, cat);
         setupSpinner(spFuel, new String[]{"Regular Gasoline", "Premium Gasoline", "Diesel"}, fuel);
@@ -124,7 +123,7 @@ public class EditVehicleActivity extends AppCompatActivity {
 
         btnSelectImage.setOnClickListener(v -> openGallery());
 
-        // Update Button Logic
+        // Update Logic
         btnUpdate.setOnClickListener(v -> {
             try {
                 String newMake = etMake.getText().toString().trim();
@@ -199,7 +198,7 @@ public class EditVehicleActivity extends AppCompatActivity {
     }
 
     private String bitmapToBase64(Bitmap bitmap) {
-        // Resize to prevent lag/crashes
+        // Resize to prevent crashes
         Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, 600, true);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         resized.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);

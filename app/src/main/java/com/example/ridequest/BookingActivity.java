@@ -1,8 +1,12 @@
 package com.example.ridequest;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,17 +54,16 @@ public class BookingActivity extends AppCompatActivity {
         Spinner spTimeP = findViewById(R.id.spPickupTime);
         Spinner spTimeR = findViewById(R.id.spReturnTime);
 
-        // ⭐ INSURANCE RADIO GROUP (ADD THIS TO YOUR XML)
         rgInsurance = findViewById(R.id.rgInsurance);
 
-        // Set Car Info
+        // Car Info
         if(tvName != null) tvName.setText(name);
         if(tvPrice != null) tvPrice.setText("$" + dailyRate + " per day");
 
         if(ivCar != null && imgRes != null) {
             try {
-                byte[] decodedBytes = android.util.Base64.decode(imgRes, android.util.Base64.DEFAULT);
-                android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                byte[] decodedBytes = Base64.decode(imgRes, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                 if (bitmap != null) {
                     ivCar.setImageBitmap(bitmap);
                 } else {
@@ -74,7 +77,7 @@ public class BookingActivity extends AppCompatActivity {
             }
         }
 
-        // Setup Time Spinners
+        // Time Spinners
         List<String> times = new ArrayList<>();
         for(int h = 0; h < 24; h++) {
             for(int m = 0; m < 60; m += 30) {
@@ -95,7 +98,6 @@ public class BookingActivity extends AppCompatActivity {
         etReturn.setClickable(true);
         etReturn.setOnClickListener(v -> showDatePicker(etReturn));
 
-        // Continue Button
         findViewById(R.id.btnContinue).setOnClickListener(v -> {
             String pickupDate = etPickup.getText().toString().trim();
             String returnDate = etReturn.getText().toString().trim();
@@ -105,7 +107,6 @@ public class BookingActivity extends AppCompatActivity {
             String pickupAddress = etPickupAddress.getText().toString().trim();
             String returnAddress = etReturnAddress.getText().toString().trim();
 
-            // Validate all fields
             if (pickupDate.isEmpty() || returnDate.isEmpty()) {
                 Toast.makeText(this, "Please select both dates", Toast.LENGTH_SHORT).show();
                 return;
@@ -123,7 +124,7 @@ public class BookingActivity extends AppCompatActivity {
                 return;
             }
 
-            // ⭐ GET INSURANCE SELECTION
+            // INSURANCE SELECTION
             String insuranceType = "None";
             double insuranceFee = 0.0;
 
@@ -133,21 +134,19 @@ public class BookingActivity extends AppCompatActivity {
                 insuranceType = selectedInsurance.getText().toString();
 
                 // Calculate insurance fee based on selection
-                if (insuranceType.contains("Basic")) {
-                    insuranceFee = dailyRate * 0.10; // 10% of daily rate
-                } else if (insuranceType.contains("Premium")) {
-                    insuranceFee = dailyRate * 0.20; // 20% of daily rate
+                if (insuranceType.contains("Premium")) {
+                    insuranceFee = dailyRate * 0.20;
                 }
             }
 
-            // ⭐ CALCULATE RENTAL COST WITH ALL DETAILS
+            // CALCULATE RENTAL COST WITH ALL DETAILS
             RentalCalculation calc = calculateRentalCost(pickupDate, pickupTime, returnDate, returnTime, insuranceFee);
 
             if (calc == null) {
                 return; // Error already shown
             }
 
-            // ⭐ PASS ALL DATA TO PAYMENT ACTIVITY
+            // PASSES ALL DATA TO PAYMENT ACTIVITY
             Intent i = new Intent(this, PaymentActivity.class);
             i.putExtra("VID", vid);
             i.putExtra("DAILY_RATE", dailyRate);
@@ -242,7 +241,9 @@ public class BookingActivity extends AppCompatActivity {
 
             // Minimum 1 day rental
             if(fullDays == 0 && remainingHours == 0) {
-                calc.fullDays = 1;
+                Context context = null;
+                Toast.makeText(context, "Minimum rental is 1 day. Same-day bookings not allowed.", Toast.LENGTH_SHORT).show();
+                return null;
             }
 
             // Check 24-hour rule
@@ -254,13 +255,13 @@ public class BookingActivity extends AppCompatActivity {
                 Toast.makeText(this, "⚠️ LATE RETURN DETECTED! ⚠️", Toast.LENGTH_LONG).show();
             }
 
-            // ⭐ CALCULATE BASE COST (before insurance and late fees)
+            // CALCULATE BASE COST
             calc.baseCost = (fullDays > 0 ? fullDays : 1) * dailyRate;
 
-            // ⭐ TOTAL COST = base + insurance + late fee
+            // TOTAL COST = base + insurance + late fee
             calc.totalCost = calc.baseCost + insuranceFee + calc.lateFee;
 
-            // Show breakdown
+            // breakdown
             String message;
             if(calc.lateFee > 0) {
                 message = String.format(Locale.US,
