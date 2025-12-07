@@ -101,7 +101,18 @@ public class LoginActivity extends AppCompatActivity {
 
         Log.d(TAG, "Session Saved -> ID: " + employeeId + " | Role: " + role);
 
-        Intent intent = new Intent(this, AdminDashboardActivity.class);
+        Intent intent;
+
+        // Route based on role
+        if (role.equalsIgnoreCase("Mechanic Agent")) {
+            intent = new Intent(this, MaintenanceDashboardActivity.class);
+        } else if (role.equalsIgnoreCase("Inspection Agent")) {
+            intent = new Intent(this, InspectionDashboardActivity.class);
+        } else {
+            // Manager/Admin
+            intent = new Intent(this, AdminDashboardActivity.class);
+        }
+
         intent.putExtra("USER_ROLE", role);
         startActivity(intent);
         finish();

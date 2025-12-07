@@ -1,13 +1,20 @@
 package com.example.ridequest;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import java.util.List;
 
 public class MaintenanceDashboardActivity extends AppCompatActivity {
@@ -15,45 +22,22 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
     private CarRentalData db;
     private RecyclerView recyclerView;
     private TextView tvSectionTitle, tvItemCount;
-    private ExtendedFloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_dashboard);
+        setContentView(R.layout.activity_maintenance_dashboard);
 
         db = new CarRentalData(this);
 
-        // Bind Views
-        recyclerView = findViewById(R.id.rvAdmin);
+        recyclerView = findViewById(R.id.rvMaintenanceVehicles);
         tvSectionTitle = findViewById(R.id.tvSectionTitle);
         tvItemCount = findViewById(R.id.tvItemCount);
-        fab = findViewById(R.id.fabAdd);
 
-        // Hide Admin-specific elements we don't need for the Mechanic view
-        View profileCard = findViewById(R.id.cardAdminProfile);
-        if (profileCard != null) profileCard.setVisibility(View.GONE);
-
-        View statsLayout = findViewById(R.id.layoutStats);
-        if (statsLayout != null) statsLayout.setVisibility(View.GONE);
-
-        // hide the tabs using the new ID
-        View tabContainer = findViewById(R.id.cardTabContainer);
-        if (tabContainer != null) {
-            tabContainer.setVisibility(View.GONE);
-        }
-
-        // Customize UI for Mechanic
         tvSectionTitle.setText("Vehicle Maintenance");
-        fab.setText("Log Service");
-        fab.setIconResource(android.R.drawable.ic_menu_manage);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // FAB Click -> Go to Log Maintenance Screen (Generic vehicle selection)
-        fab.setOnClickListener(v -> {
-            startActivity(new Intent(MaintenanceDashboardActivity.this, MaintenanceActivity.class));
-        });
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         loadVehicles();
     }
@@ -65,57 +49,81 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
     }
 
     private void loadVehicles() {
-        List<CarRentalData.VehicleItem> vehicles = db.getAllVehicles();
+        List<CarRentalData.VehicleMaintenanceItem> vehicles =
+                db.getAllVehiclesForMaintenance();
+
         tvItemCount.setText(vehicles.size() + " vehicles");
+        recyclerView.setAdapter(new MaintenanceVehicleAdapter(vehicles));
+    }
 
-        // We use a custom adapter implementation here to change behavior
-        // Instead of "View Details", we want "Log Service"
-        recyclerView.setAdapter(new RecyclerView.Adapter<VehicleAdapter.ViewHolder>() {
+    private class MaintenanceVehicleAdapter extends
+            RecyclerView.Adapter<MaintenanceVehicleAdapter.ViewHolder> {
 
-            @Override
-            public VehicleAdapter.ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-                View view = android.view.LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.item_vehicle, parent, false);
-                return new VehicleAdapter.ViewHolder(view);
-            }
+        private List<CarRentalData.VehicleMaintenanceItem> vehicles;
 
-            @Override
-            public void onBindViewHolder(VehicleAdapter.ViewHolder holder, int position) {
-                CarRentalData.VehicleItem v = vehicles.get(position);
+        MaintenanceVehicleAdapter(List<CarRentalData.VehicleMaintenanceItem> vehicles) {
+            this.vehicles = vehicles;
+        }
 
-                holder.name.setText(v.title);
-                holder.type.setText(v.type);
-                holder.price.setText("Status: " + v.status);
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_maintenance_vehicle, parent, false);
+            return new ViewHolder(view);
+        }
 
-                holder.btnEdit.setVisibility(View.GONE);
-                holder.btnDelete.setVisibility(View.GONE);
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            CarRentalData.VehicleMaintenanceItem vehicle = vehicles.get(position);
 
-                holder.btnDetails.setVisibility(View.VISIBLE);
-                holder.btnDetails.setText("Log Service");
-                holder.btnDetails.setOnClickListener(view -> {
-                    Intent i = new Intent(MaintenanceDashboardActivity.this, MaintenanceActivity.class);
-                    i.putExtra("VEHICLE_ID", v.id);
-                    startActivity(i);
-                });
+            holder.tvCarName.setText(vehicle.carName);
+            holder.tvPlate.setText("Plate: " + vehicle.plate);
+            holder.tvStatus.setText("Status: " + vehicle.status);
+            holder.tvLastService.setText("Last Service: " + vehicle.lastService);
+            holder.tvServiceCount.setText(vehicle.maintenanceCount + " services");
 
-
-                if (v.imageRes != null && !v.imageRes.isEmpty()) {
-                    try {
-                        byte[] decodedString = android.util.Base64.decode(v.imageRes, android.util.Base64.DEFAULT);
-                        android.graphics.Bitmap decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                        holder.img.setImageBitmap(decodedByte);
-                    } catch (Exception e) {
-                        holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
-                    }
-                } else {
-                    holder.img.setImageResource(android.R.drawable.ic_menu_gallery);
+            if (vehicle.imageRes != null && !vehicle.imageRes.isEmpty()) {
+                try {
+                    byte[] decoded = Base64.decode(vehicle.imageRes, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+                    holder.imgCar.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    holder.imgCar.setImageResource(android.R.drawable.ic_menu_gallery);
                 }
+            } else {
+                holder.imgCar.setImageResource(android.R.drawable.ic_menu_gallery);
             }
 
-            @Override
-            public int getItemCount() {
-                return vehicles.size();
+            holder.btnLogService.setOnClickListener(v -> {
+                Intent intent = new Intent(MaintenanceDashboardActivity.this,
+                        MaintenanceActivity.class);
+                intent.putExtra("VEHICLE_ID", vehicle.vehicleId);
+                intent.putExtra("CAR_NAME", vehicle.carName);
+                startActivity(intent);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return vehicles.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            ImageView imgCar;
+            TextView tvCarName, tvPlate, tvStatus, tvLastService, tvServiceCount;
+            Button btnLogService;
+
+            ViewHolder(View itemView) {
+                super(itemView);
+                imgCar = itemView.findViewById(R.id.imgCar);
+                tvCarName = itemView.findViewById(R.id.tvCarName);
+                tvPlate = itemView.findViewById(R.id.tvPlate);
+                tvStatus = itemView.findViewById(R.id.tvStatus);
+                tvLastService = itemView.findViewById(R.id.tvLastService);
+                tvServiceCount = itemView.findViewById(R.id.tvServiceCount);
+                btnLogService = itemView.findViewById(R.id.btnLogService);
             }
-        });
+        }
     }
 }

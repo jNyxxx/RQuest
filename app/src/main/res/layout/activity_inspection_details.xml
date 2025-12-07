@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="#F5F5F5">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,10 +28,10 @@
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <TextView
-            android:id="@+id/tvHeaderTitle"
+            android:id="@+id/tvInspectionId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Inspection Details"
+            android:text="Inspection #4"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -39,39 +40,22 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvCarName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Car Name"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#333"/>
-
-            <TextView
-                android:id="@+id/tvDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Date"
-                android:textColor="#666"
-                android:textSize="14sp"
-                android:layout_marginBottom="16dp"/>
-
+            <!-- Vehicle Info Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
-                android:layout_marginBottom="16dp">
+                app:cardElevation="4dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -80,57 +64,76 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Customer"
-                        android:textStyle="bold"
-                        android:textColor="#888"/>
-                    <TextView
-                        android:id="@+id/tvCustomer"
+                        android:id="@+id/tvCarName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="-"
-                        android:textSize="16sp"
+                        android:text="Toyota Vios"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
                         android:textColor="#333"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="2025-12-07 03:12"
+                        android:textSize="14sp"
+                        android:textColor="#666"/>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#EEE"
-                        android:layout_marginBottom="8dp"/>
+                        android:background="#E0E0E0"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"/>
 
+                    <!-- Customer -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Customer"
+                        android:textSize="14sp"
+                        android:textColor="#999"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/tvCustomer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Junex Baran"
+                        android:textSize="16sp"
+                        android:textColor="#333"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- Inspector -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Inspector"
-                        android:textStyle="bold"
-                        android:textColor="#888"/>
+                        android:textSize="14sp"
+                        android:textColor="#999"
+                        android:layout_marginBottom="4dp"/>
+
                     <TextView
                         android:id="@+id/tvInspector"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="-"
+                        android:text="James Bond"
                         android:textSize="16sp"
+                        android:textStyle="bold"
                         android:textColor="#333"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vehicle Condition"
-                android:textStyle="bold"
-                android:textColor="#444"
-                android:layout_marginBottom="8dp"/>
-
+            <!-- Report Details Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
-                android:layout_marginBottom="16dp">
+                app:cardElevation="4dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -141,84 +144,126 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Inspection Type"
+                        android:text="Report Details"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/rq_orange"/>
+                        android:textColor="#333"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Type -->
                     <TextView
-                        android:id="@+id/tvInspectionType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Type"
+                        android:textSize="14sp"
+                        android:textColor="@color/rq_orange"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/tvType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Pickup/Return"
+                        android:text="Return"
                         android:textSize="16sp"
                         android:textColor="#333"
                         android:layout_marginBottom="12dp"/>
 
+                    <!-- Fuel Level -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Fuel Level"
-                        android:textStyle="bold"
-                        android:textColor="@color/rq_orange"/>
+                        android:textSize="14sp"
+                        android:textColor="@color/rq_orange"
+                        android:layout_marginBottom="4dp"/>
+
                     <TextView
-                        android:id="@+id/tvFuelLevel"
+                        android:id="@+id/tvFuel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="-"
+                        android:text="Full Tank"
                         android:textSize="16sp"
                         android:textColor="#333"
                         android:layout_marginBottom="12dp"/>
 
+                    <!-- Damage Report -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Damage Report"
-                        android:textStyle="bold"
-                        android:textColor="@color/rq_orange"/>
+                        android:textSize="14sp"
+                        android:textColor="@color/rq_orange"
+                        android:layout_marginBottom="4dp"/>
+
                     <TextView
-                        android:id="@+id/tvDamageReport"
+                        android:id="@+id/tvDamage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="-"
+                        android:text="None"
                         android:textSize="16sp"
                         android:textColor="#333"
                         android:layout_marginBottom="12dp"/>
 
+                    <!-- Condition Notes -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Condition Notes"
-                        android:textStyle="bold"
-                        android:textColor="@color/rq_orange"/>
+                        android:textSize="14sp"
+                        android:textColor="@color/rq_orange"
+                        android:layout_marginBottom="4dp"/>
+
                     <TextView
-                        android:id="@+id/tvConditionNotes"
+                        android:id="@+id/tvNotes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="-"
+                        android:text="GOOD Condition"
                         android:textSize="16sp"
                         android:textColor="#333"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:id="@+id/tvPhotoLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Damage Evidence"
-                android:textStyle="bold"
-                android:textColor="#444"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone"/>
-
-            <ImageView
-                android:id="@+id/ivDamagePhoto"
+            <!-- Evidence Photo Card -->
+            <LinearLayout
+                android:id="@+id/photoSection"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:scaleType="centerCrop"
-                android:background="#DDD"
-                android:visibility="gone"
-                android:layout_marginBottom="24dp"
-                android:contentDescription="Damage Photo"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Evidence Photo"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"
+                            android:layout_marginBottom="12dp"/>
+
+                        <ImageView
+                            android:id="@+id/imgEvidence"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Evidence Photo"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

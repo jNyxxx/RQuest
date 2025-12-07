@@ -984,15 +984,142 @@ public class CarRentalData {
 
     // ===================== MECHANIC  =====================
 
-    public boolean submitMaintenance(int vehicleId, int employeeId, String date, String desc, double cost) {
+    public List<MaintenanceLogItem> getAllMaintenanceLogs() {
+        List<MaintenanceLogItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT m.mntnc_id, m.mntnc_date, m.description, m.cost, " +
+                "e.first_name || ' ' || e.last_name as mechanic_name, " +  // ← FULL NAME
+                "mk.make_name || ' ' || vm.model_name as car_name " +
+                "FROM MaintenanceRecord m " +
+                "JOIN Employee e ON m.employee_id = e.employee_id " +      // ← JOINS Employee table
+                "JOIN Vehicle v ON m.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY m.mntnc_date DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    String mechanicName = c.getString(4);  // Get mechanic full name
+                    Log.d(TAG, "Maintenance Record - Mechanic: " + mechanicName); // Debug log
+
+                    list.add(new MaintenanceLogItem(
+                            c.getInt(0),      // id
+                            c.getString(1),   // date
+                            c.getString(2),   // description
+                            c.getDouble(3),   // cost
+                            mechanicName,     // mechanic FULL NAME from database
+                            c.getString(5)    // car name
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " maintenance logs with mechanic names");
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching maintenance logs", e);
+        }
+        return list;
+    }
+
+    // maintenanceLogItem
+    public static class MaintenanceLogItem {
+        public int id;
+        public String date, description, mechanic, carName;
+        public double cost;
+
+        public MaintenanceLogItem(int id, String date, String desc,
+                                  double cost, String mechanic, String car) {
+            this.id = id;
+            this.date = date;
+            this.description = desc;
+            this.cost = cost;
+            this.mechanic = mechanic;
+            this.carName = car;
+        }
+    }
+
+    public List<VehicleMaintenanceItem> getAllVehiclesForMaintenance() {
+        List<VehicleMaintenanceItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT v.vehicle_id, " +
+                "mk.make_name || ' ' || vm.model_name as car_name, " +
+                "v.plt_number, v.status, v.image_res_name, " +
+                "COALESCE(" +
+                "  (SELECT COUNT(*) FROM MaintenanceRecord WHERE vehicle_id = v.vehicle_id), " +
+                "  0) as maintenance_count, " +
+                "COALESCE(" +
+                "  (SELECT MAX(mntnc_date) FROM MaintenanceRecord WHERE vehicle_id = v.vehicle_id), " +
+                "  'Never') as last_service " +
+                "FROM Vehicle v " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY v.vehicle_id DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new VehicleMaintenanceItem(
+                            c.getInt(0),        // vehicle_id
+                            c.getString(1),     // car_name
+                            c.getString(2),     // plate
+                            c.getString(3),     // status
+                            c.getString(4),     // image
+                            c.getInt(5),        // maintenance_count
+                            c.getString(6)      // last_service
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " vehicles for maintenance");
+        } catch (Exception e) {
+            Log.e(TAG, "Error: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    // class for Vehicle Maintenance
+    public static class VehicleMaintenanceItem {
+        public int vehicleId;
+        public String carName, plate, status, imageRes, lastService;
+        public int maintenanceCount;
+
+        public VehicleMaintenanceItem(int id, String name, String plate,
+                                      String status, String img, int count, String lastSvc) {
+            this.vehicleId = id;
+            this.carName = name;
+            this.plate = plate;
+            this.status = status;
+            this.imageRes = img;
+            this.maintenanceCount = count;
+            this.lastService = lastSvc;
+        }
+    }
+
+    public boolean submitMaintenance(int vehicleId, int employeeId, String description, double cost) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues v = new ContentValues();
+
         v.put("vehicle_id", vehicleId);
-        v.put("employee_id", employeeId);
-        v.put("mntnc_date", date);
-        v.put("description", desc);
+        v.put("employee_id", employeeId);  // ← This stores the mechanic's employee_id
+        v.put("mntnc_date", new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date()));
+        v.put("description", description);
         v.put("cost", cost);
-        return db.insert("MaintenanceRecord", null, v) != -1;
+
+        long res = db.insert("MaintenanceRecord", null, v);
+
+        if (res != -1) {
+            Log.d(TAG, "✓ Maintenance record created: ID=" + res +
+                    ", Employee=" + employeeId +
+                    ", Vehicle=" + vehicleId);
+        } else {
+            Log.e(TAG, "✗ Failed to create maintenance record");
+        }
+
+        return res != -1;
     }
 
     // simple employee class
@@ -1647,6 +1774,45 @@ public class CarRentalData {
 
     // ===================== DEBUG METHODS =====================
 
+    public void debugMaintenanceRecords() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT m.mntnc_id, " +
+                "mk.make_name || ' ' || vm.model_name as car, " +
+                "e.first_name || ' ' || e.last_name as mechanic, " +
+                "m.mntnc_date, m.cost, m.description " +
+                "FROM MaintenanceRecord m " +
+                "JOIN Employee e ON m.employee_id = e.employee_id " +
+                "JOIN Vehicle v ON m.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY m.mntnc_id DESC";
+
+        Cursor c = db.rawQuery(query, null);
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== MAINTENANCE RECORDS DEBUG ===");
+        Log.d(TAG, "=================================");
+
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "Record #" + c.getInt(0));
+                Log.d(TAG, "  Car: " + c.getString(1));
+                Log.d(TAG, "  Mechanic: " + c.getString(2));  // ← Should show full name
+                Log.d(TAG, "  Date: " + c.getString(3));
+                Log.d(TAG, "  Cost: ₱" + c.getDouble(4));
+                Log.d(TAG, "  Description: " + c.getString(5));
+                Log.d(TAG, "---------------------------------");
+            } while (c.moveToNext());
+            Log.d(TAG, "Total: " + c.getCount() + " maintenance records");
+        } else {
+            Log.d(TAG, "No maintenance records found");
+        }
+
+        c.close();
+        Log.d(TAG, "=================================");
+    }
+
     public void debugListAllReservations() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -1757,6 +1923,29 @@ public class CarRentalData {
             c.close();
         }
         Log.d(TAG, "============================");
+    }
+
+    public void debugListAllEmployees() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT employee_id, first_name, last_name, email, role FROM Employee", null);
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== ALL EMPLOYEES IN DATABASE ===");
+        Log.d(TAG, "=================================");
+
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "ID: " + c.getInt(0) +
+                        " | Name: " + c.getString(1) + " " + c.getString(2) +
+                        " | Email: " + c.getString(3) +
+                        " | Role: " + c.getString(4));
+            } while (c.moveToNext());
+            Log.d(TAG, "Total: " + c.getCount() + " employees");
+        } else {
+            Log.d(TAG, "No employees found - DATABASE MAY NEED TO BE RECREATED");
+        }
+        c.close();
+        Log.d(TAG, "=================================");
     }
 
 

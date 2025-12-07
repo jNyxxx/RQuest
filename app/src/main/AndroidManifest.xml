@@ -48,6 +48,10 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".MaintenanceDetailsActivity"
+            android:exported="false"/>
+
         <!-- Admin -->
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".AddVehicleActivity" />
@@ -57,5 +61,6 @@
         <activity android:name=".MaintenanceActivity" />
         <activity android:name=".InspectionDashboardActivity" />
         <activity android:name=".InspectionActivity" />
+        <activity android:name=".InspectionDetailsActivity" />
     </application>
 </manifest>
