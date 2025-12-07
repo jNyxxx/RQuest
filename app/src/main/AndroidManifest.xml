@@ -53,6 +53,9 @@
         <activity android:name=".AddVehicleActivity" />
         <activity android:name=".EditVehicleActivity" />
         <activity android:name=".BookingDetailsActivity" />
-
+        <activity android:name=".MaintenanceDashboardActivity" />
+        <activity android:name=".MaintenanceActivity" />
+        <activity android:name=".InspectionDashboardActivity" />
+        <activity android:name=".InspectionActivity" />
     </application>
 </manifest>

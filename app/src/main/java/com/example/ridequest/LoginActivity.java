@@ -1,6 +1,8 @@
 package com.example.ridequest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -19,80 +21,89 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         db = new CarRentalData(this);
-
-        // List all customers on app start
-        Log.d(TAG, "=== LoginActivity Started ===");
-        db.debugListAllCustomers();
-
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPass = findViewById(R.id.etPassword);
         TextView tvTitle = findViewById(R.id.tvTitle);
         TextView tvSwitch = findViewById(R.id.tvAdminLogin);
 
+        // Toggle between Customer and Admin/Staff login
         tvSwitch.setOnClickListener(v -> {
             isAdmin = !isAdmin;
-            tvTitle.setText(isAdmin ? "Admin Login" : "Sign In");
-            tvSwitch.setText(isAdmin ? "Customer? Login Here" : "Are you an Admin? Login Here");
-            etEmail.setHint(isAdmin ? "admin" : "example@gmail.com");
+            tvTitle.setText(isAdmin ? "Staff Login" : "Sign In");
+            tvSwitch.setText(isAdmin ? "Customer? Login Here" : "Are you an Admin/Agent? Login Here");
+            etEmail.setHint(isAdmin ? "admin or agent email" : "example@gmail.com");
         });
 
         findViewById(R.id.btnLogin).setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPass.getText().toString();
 
-            // Validate input
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Log.d(TAG, "Login attempt - Email: " + email + " | Admin mode: " + isAdmin);
-
             if (isAdmin) {
-                // Admin login
+                // ============================================================
+                //  ADMIN/STAFF LOGIN
+                // ============================================================
+
+                // Check if it is the Master Admin (Manager)
                 if (db.checkAdmin(email, password)) {
                     Log.d(TAG, "✓ Admin login successful");
-                    Toast.makeText(this, "Welcome Admin!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, AdminDashboardActivity.class));
-                    finish();
-                } else {
-                    Log.e(TAG, "✗ Admin login failed");
-                    Toast.makeText(this, "Invalid admin credentials", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Welcome Manager!", Toast.LENGTH_SHORT).show();
+
+                    // Launch dashboard as Employee ID 1 (Manager)
+                    launchStaffDashboard("Manager", 1);
+                    return;
                 }
+
+                // Check if it is a Regular Employee (Agent/Mechanic)
+                // We keep this so your agents can also log in and track their work
+                CarRentalData.Employee emp = db.loginEmployee(email, password);
+                if (emp != null) {
+                    Log.d(TAG, "✓ Employee login successful: " + emp.role);
+                    Toast.makeText(this, "Welcome " + emp.role + "!", Toast.LENGTH_SHORT).show();
+
+                    // Launch dashboard with their specific Employee ID
+                    launchStaffDashboard(emp.role, emp.id);
+                    return;
+                }
+
+                // Login Failed
+                Log.e(TAG, "✗ Staff login failed");
+                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+
             } else {
-                // Customer login
+                // ============================================================
+                //  CUSTOMER LOGIN
+                // ============================================================
                 int uid = db.loginCustomer(email, password);
-
                 if (uid != -1) {
-                    Log.d(TAG, "✓ Customer login successful - UID: " + uid);
-
-                    // Save session
-                    getSharedPreferences("UserSession", MODE_PRIVATE)
-                            .edit()
+                    // Save Customer Session
+                    getSharedPreferences("UserSession", MODE_PRIVATE).edit()
                             .putInt("UID", uid)
                             .apply();
 
-                    Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
                 } else {
-                    Log.e(TAG, "✗ Customer login failed for: " + email);
-                    Toast.makeText(this, "Login Failed\n\nPlease check your email and password", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        findViewById(R.id.tvSignUp).setOnClickListener(v -> {
-            Log.d(TAG, "Navigate to signup");
-            startActivity(new Intent(this, SignupActivity.class));
-        });
+        findViewById(R.id.tvSignUp).setOnClickListener(v -> startActivity(new Intent(this, SignupActivity.class)));
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Refresh customer list when returning from signup
-        Log.d(TAG, "=== Returned to LoginActivity ===");
-        db.debugListAllCustomers();
+    private void launchStaffDashboard(String role, int employeeId) {
+        SharedPreferences prefs = getSharedPreferences("EmployeeSession", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putInt("EMPLOYEE_ID", employeeId);
+        editor.putString("ROLE", role);
+        editor.apply();
+
+        Log.d(TAG, "Session Saved -> ID: " + employeeId + " | Role: " + role);
+
+        Intent intent = new Intent(this, AdminDashboardActivity.class);
+        intent.putExtra("USER_ROLE", role);
+        startActivity(intent);
+        finish();
     }
 }
