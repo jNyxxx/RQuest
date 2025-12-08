@@ -13,6 +13,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 public class CarRentalData {
     private static final String TAG = "CarRentalData";
@@ -379,6 +384,152 @@ public class CarRentalData {
 
     // ===================== Booking and Reservation =====================
 
+
+    public List<EmployeeReservationItem> getAllEmployeeReservations() {
+        List<EmployeeReservationItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT er.resv_id, er.employee_id, " +
+                "e.first_name || ' ' || e.last_name as employee_name, e.role, " +
+                "er.booking_id, r.booking_reference, er.asgn_date " +
+                "FROM EmployeeReservation er " +
+                "JOIN Employee e ON er.employee_id = e.employee_id " +
+                "JOIN Reservation r ON er.booking_id = r.booking_id " +
+                "ORDER BY er.asgn_date DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new EmployeeReservationItem(
+                            c.getInt(0),      // resv_id
+                            c.getInt(1),      // employee_id
+                            c.getString(2),   // employee_name
+                            c.getString(3),   // role
+                            c.getInt(4),      // booking_id
+                            c.getString(5),   // booking_reference
+                            c.getString(6)    // asgn_date
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " employee-reservation records");
+        } catch (Exception e) {
+            Log.e(TAG, "Error: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public List<EmployeeRentalItem> getAllEmployeeRentals() {
+        List<EmployeeRentalItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT er.er_id, er.employee_id, " +
+                "e.first_name || ' ' || e.last_name as employee_name, " +
+                "er.rental_id, r.reservation_id, er.role " +
+                "FROM EmployeeRental er " +
+                "JOIN Employee e ON er.employee_id = e.employee_id " +
+                "JOIN Rental r ON er.rental_id = r.rental_id " +
+                "ORDER BY er.er_id DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new EmployeeRentalItem(
+                            c.getInt(0),      // er_id
+                            c.getInt(1),      // employee_id
+                            c.getString(2),   // employee_name
+                            c.getInt(3),      // rental_id
+                            c.getInt(4),      // reservation_id
+                            c.getString(5)    // role
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " employee-rental records");
+        } catch (Exception e) {
+            Log.e(TAG, "Error: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public EmployeeReservationItem getEmployeeForBooking(int bookingId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        EmployeeReservationItem item = null;
+
+        String query = "SELECT er.resv_id, er.employee_id, " +
+                "e.first_name || ' ' || e.last_name as employee_name, e.role, " +
+                "er.booking_id, r.booking_reference, er.asgn_date " +
+                "FROM EmployeeReservation er " +
+                "JOIN Employee e ON er.employee_id = e.employee_id " +
+                "JOIN Reservation r ON er.booking_id = r.booking_id " +
+                "WHERE er.booking_id = ?";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{String.valueOf(bookingId)});
+            if (c.moveToFirst()) {
+                item = new EmployeeReservationItem(
+                        c.getInt(0), c.getInt(1), c.getString(2),
+                        c.getString(3), c.getInt(4), c.getString(5), c.getString(6)
+                );
+            }
+            c.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error: " + e.getMessage(), e);
+        }
+        return item;
+    }
+
+    public void debugListEmployeeTracking() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== EMPLOYEE TRACKING RECORDS ===");
+        Log.d(TAG, "=================================");
+
+        // EmployeeReservation
+        Cursor cRes = db.rawQuery(
+                "SELECT er.resv_id, e.first_name || ' ' || e.last_name, " +
+                        "r.booking_reference, er.asgn_date " +
+                        "FROM EmployeeReservation er " +
+                        "JOIN Employee e ON er.employee_id = e.employee_id " +
+                        "JOIN Reservation r ON er.booking_id = r.booking_id", null);
+
+        Log.d(TAG, "--- EmployeeReservation ---");
+        if (cRes.moveToFirst()) {
+            do {
+                Log.d(TAG, "ID: " + cRes.getInt(0) + " | Employee: " + cRes.getString(1) +
+                        " | Booking: " + cRes.getString(2) + " | Date: " + cRes.getString(3));
+            } while (cRes.moveToNext());
+            Log.d(TAG, "Total: " + cRes.getCount() + " records");
+        } else {
+            Log.d(TAG, "No records");
+        }
+        cRes.close();
+
+        // EmployeeRental
+        Cursor cRent = db.rawQuery(
+                "SELECT er.er_id, e.first_name || ' ' || e.last_name, " +
+                        "er.rental_id, er.role " +
+                        "FROM EmployeeRental er " +
+                        "JOIN Employee e ON er.employee_id = e.employee_id", null);
+
+        Log.d(TAG, "--- EmployeeRental ---");
+        if (cRent.moveToFirst()) {
+            do {
+                Log.d(TAG, "ID: " + cRent.getInt(0) + " | Employee: " + cRent.getString(1) +
+                        " | Rental: " + cRent.getInt(2) + " | Role: " + cRent.getString(3));
+            } while (cRent.moveToNext());
+            Log.d(TAG, "Total: " + cRent.getCount() + " records");
+        } else {
+            Log.d(TAG, "No records");
+        }
+        cRent.close();
+
+        Log.d(TAG, "=================================");
+    }
+
     private String generateBookingId() {
         return "RQ" + System.currentTimeMillis();
     }
@@ -387,25 +538,17 @@ public class CarRentalData {
                                         String pickupDate, String returnDate,
                                         String pickupTime, String returnTime,
                                         String pickupAddress, String returnAddress,
-                                        // Cost Breakdown Details
                                         int rentalDays, double baseCost,
                                         String insuranceType, double insuranceFee,
                                         int lateHours, double lateFee,
                                         double totalCost,
-                                        // Payment Details
                                         String paymentMethod, String paymentId) {
 
-        Log.d(TAG, "=== Creating Pending Booking (Integrated) ===");
+        Log.d(TAG, "=== Creating Pending Booking with Insurance Record ===");
         Log.d(TAG, "Customer: " + customerId + " | Vehicle: " + vehicleId);
-        Log.d(TAG, "Pickup: " + pickupDate + " " + pickupTime + " @ " + pickupAddress);
-        Log.d(TAG, "Return: " + returnDate + " " + returnTime + " @ " + returnAddress);
-
-        // Log detailed costs
-        Log.d(TAG, "Days: " + rentalDays + " | Base: $" + baseCost);
         Log.d(TAG, "Insurance: " + insuranceType + " ($" + insuranceFee + ")");
-        Log.d(TAG, "Total: $" + totalCost + " | Method: " + paymentMethod);
 
-        // -VALIDATION
+        // VALIDATION
         if (paymentMethod == null || paymentMethod.isEmpty()) {
             Log.e(TAG, "Payment method required");
             return false;
@@ -418,11 +561,10 @@ public class CarRentalData {
         }
 
         if (!isCarAvailable(vehicleId, pickupDate, returnDate)) {
-            Log.e(TAG, "Car not available for selected dates");
+            Log.e(TAG, "car not available for selected dates");
             return false;
         }
 
-        // DATABASE TRANSACTION
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
@@ -430,9 +572,8 @@ public class CarRentalData {
             String bookingRef = generateBookingId();
             Log.d(TAG, "Generated Ref: " + bookingRef);
 
+            // INSERT RESERVATION
             ContentValues r = new ContentValues();
-
-            // Core Data
             r.put("customer_num", customerId);
             r.put("vehicle_id", vehicleId);
             r.put("booking_reference", bookingRef);
@@ -448,7 +589,7 @@ public class CarRentalData {
 
             // Payment Info
             r.put("payment_method", paymentMethod);
-            r.put("payment_id", paymentId); // Stores Receipt Base64 or ID
+            r.put("payment_id", paymentId);
             r.put("payment_status", "Pending");
 
             // Cost Breakdown
@@ -460,15 +601,32 @@ public class CarRentalData {
             r.put("late_fee", lateFee);
             r.put("total_cost", totalCost);
 
-            // RESERVATION
             long bookingId = db.insert("Reservation", null, r);
 
             if (bookingId == -1) {
                 throw new Exception("Failed to insert reservation record.");
             }
 
-            // UPDATE VEHICLE STATUS
-            // We set the car to 'Pending' so no one else can book for the meantime
+            // INSURANCE RECORD
+            if (insuranceType != null && !insuranceType.equals("None") && !insuranceType.equals("No Insurance (Free)")) {
+                ContentValues vInsurance = new ContentValues();
+                vInsurance.put("customer_id", customerId);
+                vInsurance.put("insurance_type", insuranceType);
+                vInsurance.put("insurance_description", getInsuranceDescription(insuranceType));
+                vInsurance.put("booking_reference", bookingRef);
+
+                long insuranceId = db.insert("Insurance", null, vInsurance);
+
+                if (insuranceId != -1) {
+                    Log.d(TAG, "Insurance record created: ID = " + insuranceId);
+                } else {
+                    Log.w(TAG, "Failed to create insurance record (non-critical)");
+                }
+            } else {
+                Log.d(TAG, "ℹNo insurance selected - skipping Insurance table insert");
+            }
+
+            // UPDATES VEHICLE STATUS TO PENDING
             ContentValues vCar = new ContentValues();
             vCar.put("status", "Pending");
             db.update("Vehicle", vCar, "vehicle_id=?", new String[]{String.valueOf(vehicleId)});
@@ -484,6 +642,515 @@ public class CarRentalData {
             return false;
         } finally {
             db.endTransaction();
+        }
+    }
+
+    // Get insurance description based on type
+    private String getInsuranceDescription(String insuranceType) {
+        if (insuranceType == null) return "No coverage";
+
+        switch (insuranceType) {
+            case "Personal Insurance":
+                return "Personal insurance coverage provided by customer";
+
+            case "Basic Insurance":
+                return "Basic Insurance Coverage:\n" +
+                        "• +20% of daily rate\n" +
+                        "• Full coverage\n" +
+                        "• Roadside assistance\n" +
+                        "• Personal injury protection";
+
+            default:
+                return "Insurance type: " + insuranceType;
+        }
+    }
+
+    public List<InsuranceItem> getCustomerInsurance(int customerId) {
+        List<InsuranceItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT insurance_id, insurance_type, insurance_description, " +
+                "booking_reference, created_at " +
+                "FROM Insurance " +
+                "WHERE customer_id = ? " +
+                "ORDER BY created_at DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{String.valueOf(customerId)});
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new InsuranceItem(
+                            c.getInt(0),      // insurance_id
+                            customerId,         //CUSTOMER ID
+                            c.getString(1),   // insurance_type
+                            c.getString(2),   // insurance_description
+                            c.getString(3),   // booking_reference
+                            c.getString(4)    // created_at
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " insurance records for customer " + customerId);
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching insurance records: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public InsuranceItem getInsuranceByBooking(String bookingReference) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        InsuranceItem insurance = null;
+
+        String query = "SELECT insurance_id, customer_id, insurance_type, " +
+                "insurance_description, booking_reference, created_at " +
+                "FROM Insurance " +
+                "WHERE booking_reference = ?";
+
+        try {
+            Cursor c = db.rawQuery(query, new String[]{bookingReference});
+            if (c.moveToFirst()) {
+                insurance = new InsuranceItem(
+                        c.getInt(0),      // insurance_id
+                        c.getInt(1),      // customer_id
+                        c.getString(2),   // insurance_type
+                        c.getString(3),   // insurance_description
+                        c.getString(4),   // booking_reference
+                        c.getString(5)    // created_at
+                );
+            }
+            c.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching insurance: " + e.getMessage(), e);
+        }
+        return insurance;
+    }
+
+    public List<InsuranceItem> getAllInsurance() {
+        List<InsuranceItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT i.insurance_id, i.customer_id, " +
+                "c.first_name || ' ' || c.last_name as customer_name, " +
+                "i.insurance_type, i.insurance_description, " +
+                "i.booking_reference, i.created_at " +
+                "FROM Insurance i " +
+                "JOIN Customer c ON i.customer_id = c.customer_id " +
+                "ORDER BY i.created_at DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    InsuranceItem item = new InsuranceItem(
+                            c.getInt(0),      // insurance_id
+                            c.getInt(1),      // customer_id
+                            c.getString(3),   // insurance_type
+                            c.getString(4),   // insurance_description
+                            c.getString(5),   // booking_reference
+                            c.getString(6)    // created_at
+                    );
+                    // customer name display
+                    item.customerName = c.getString(2);
+                    list.add(item);
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " total insurance records");
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching all insurance: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public void debugListAllInsurance() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT i.insurance_id, " +
+                "c.first_name || ' ' || c.last_name as customer, " +
+                "i.insurance_type, i.booking_reference, i.created_at " +
+                "FROM Insurance i " +
+                "JOIN Customer c ON i.customer_id = c.customer_id " +
+                "ORDER BY i.insurance_id DESC";
+
+        Cursor c = db.rawQuery(query, null);
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== ALL INSURANCE RECORDS ===");
+        Log.d(TAG, "=================================");
+
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "Insurance #" + c.getInt(0));
+                Log.d(TAG, "  Customer: " + c.getString(1));
+                Log.d(TAG, "  Type: " + c.getString(2));
+                Log.d(TAG, "  Booking Ref: " + c.getString(3));
+                Log.d(TAG, "  Created: " + c.getString(4));
+                Log.d(TAG, "---------------------------------");
+            } while (c.moveToNext());
+            Log.d(TAG, "Total: " + c.getCount() + " insurance records");
+        } else {
+            Log.d(TAG, "No insurance records found");
+        }
+
+        c.close();
+        Log.d(TAG, "=================================");
+    }
+
+    // ===================== EMPLOYEE AUTHENTICATION =====================
+
+    // employee login
+    public Employee loginEmployee(String email, String password) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT employee_id, first_name, last_name, role FROM Employee WHERE email=? AND password=?",
+                new String[]{email, password});
+
+        Employee emp = null;
+        if (c.moveToFirst()) {
+            emp = new Employee(c.getInt(0), c.getString(1), c.getString(2), c.getString(3));
+        }
+        c.close();
+        return emp;
+    }
+
+    // ===================== INSPECTION AGENT LOGIC =====================
+
+    // Get bookings that need Return Inspection
+    public List<AdminBookingItem> getBookingsForInspection() {
+        List<AdminBookingItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // UPDATED QUERY: Fetches both 'Confirmed' (for Pickup) and 'Rented' (for Return)
+        String query = "SELECT r.booking_id, r.booking_reference, " +
+                "c.first_name || ' ' || c.last_name, c.email, c.phone, " +
+                "mk.make_name || ' ' || vm.model_name, " +
+                "r.pickup_date, r.pickup_time, r.pickup_address, " +
+                "r.return_date, r.return_time, r.return_address, " +
+                "r.status, r.payment_method, r.total_cost " +
+                "FROM Reservation r " +
+                "JOIN Customer c ON r.customer_num = c.customer_id " +
+                "JOIN Vehicle v ON r.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "WHERE r.status IN ('Confirmed', 'Rented') " +  // <--- KEY CHANGE
+                "ORDER BY r.pickup_date ASC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if(c.moveToFirst()) {
+                do {
+                    list.add(new AdminBookingItem(c.getInt(0), c.getString(1), c.getString(2),
+                            c.getString(3), c.getString(4), c.getString(5), c.getString(6),
+                            c.getString(7), c.getString(8), c.getString(9), c.getString(10),
+                            c.getString(11), c.getString(12), c.getString(13), c.getDouble(14)));
+                } while(c.moveToNext());
+            }
+            c.close();
+        } catch(Exception e) { Log.e(TAG, "Error fetching inspection list", e); }
+        return list;
+    }
+
+    public boolean submitInspection(int bookingId, int employeeId, String inspectionType, String fuel, String notes, String damage, String photoPath) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            Cursor c = db.rawQuery("SELECT vehicle_id, return_date FROM Reservation WHERE booking_id=?", new String[]{String.valueOf(bookingId)});
+            if(!c.moveToFirst()) { c.close(); return false; }
+            int vehicleId = c.getInt(0);
+            String returnDate = c.getString(1);
+            c.close();
+
+            // Insert into Inspection Table
+            ContentValues vInsp = new ContentValues();
+            vInsp.put("rental_id", bookingId);
+            vInsp.put("vehicle_id", vehicleId);
+            vInsp.put("inspection_type", inspectionType);
+            vInsp.put("inspection_date", new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date())); // Added Date
+            vInsp.put("fuel_level", fuel);
+            vInsp.put("condition_notes", notes);
+            vInsp.put("damage_report", damage);
+            vInsp.put("inspector_id", employeeId);
+            vInsp.put("photos", photoPath); // <--- SAVING PHOTO
+            db.insert("Inspection", null, vInsp);
+
+            // Log Employee Activity
+            ContentValues vEmpRes = new ContentValues();
+            vEmpRes.put("employee_id", employeeId);
+            vEmpRes.put("booking_id", bookingId);
+            vEmpRes.put("asgn_date", returnDate);
+            db.insert("EmployeeReservation", null, vEmpRes);
+
+            // UPDATE RENTAL TABLE
+            ContentValues vRentalUpdate = new ContentValues();
+            if (inspectionType.equalsIgnoreCase("Pickup")) {
+                vRentalUpdate.put("pickup_fuel_level", fuel);
+            } else {
+                vRentalUpdate.put("return_fuel_level", fuel);
+            }
+            // Ensure your Rental table has a column that links to booking_id (e.g. reservation_id)
+            db.update("Rental", vRentalUpdate, "reservation_id=?", new String[]{String.valueOf(bookingId)});
+
+            // UPDATE RESERVATION STATUS
+            ContentValues vRes = new ContentValues();
+            if (inspectionType.equalsIgnoreCase("Pickup")) {
+                vRes.put("status", "Rented");
+            } else {
+                vRes.put("status", "Inspected");
+            }
+            db.update("Reservation", vRes, "booking_id=?", new String[]{String.valueOf(bookingId)});
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error submitting inspection: " + e.getMessage());
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    // ================== INSPECTION HISTORY ==================
+
+    public List<InspectionLogItem> getInspectionHistory() {
+        List<InspectionLogItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Fetches all details to the database
+        String query = "SELECT " +
+                "i.inspection_id, " +       // 0
+                "i.inspection_type, " +     // 1
+                "i.inspection_date, " +     // 2
+                "i.fuel_level, " +          // 3
+                "i.condition_notes, " +     // 4
+                "i.damage_report, " +       // 5
+                "mk.make_name || ' ' || vm.model_name AS car_name, " + // 6
+                "c.first_name || ' ' || c.last_name AS customer_name, " + // 7
+                "e.first_name || ' ' || e.last_name AS inspector_name, " + // 8
+                "i.photos " +               // 9
+                "FROM Inspection i " +
+                "JOIN Vehicle v ON i.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "JOIN Reservation r ON i.rental_id = r.booking_id " +
+                "JOIN Customer c ON r.customer_num = c.customer_id " +
+                "LEFT JOIN Employee e ON i.inspector_id = e.employee_id " +
+                "ORDER BY i.inspection_id DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new InspectionLogItem(
+                            c.getInt(0),      // id
+                            c.getString(1),   // type
+                            c.getString(2),   // date
+                            c.getString(3),   // fuel
+                            c.getString(4),   // notes
+                            c.getString(5),   // damage
+                            c.getString(6),   // carName
+                            c.getString(7),   // customerName
+                            c.getString(8),   // inspectorName
+                            c.getString(9)    // photos
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading history: " + e.getMessage());
+        }
+        return list;
+    }
+
+    // Inspection Logs
+    public static class InspectionLogItem {
+        public int inspectionId;
+        public String type, date, fuel, notes, damage, photos;
+        public String carName, customerName, inspectorName;
+
+        public InspectionLogItem(int id, String type, String date, String fuel,
+                                 String notes, String damage, String car,
+                                 String cust, String insp, String photoPath) {
+            this.inspectionId = id;
+            this.type = type;
+            this.date = date;
+            this.fuel = fuel;
+            this.notes = notes;
+            this.damage = damage;
+            this.carName = car;
+            this.customerName = cust;
+            this.inspectorName = insp;
+            this.photos = photoPath;
+        }
+    }
+
+    // ===================== MECHANIC  =====================
+
+    public List<MaintenanceLogItem> getAllMaintenanceLogs() {
+        List<MaintenanceLogItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT m.mntnc_id, m.mntnc_date, m.description, m.cost, " +
+                "e.first_name || ' ' || e.last_name as mechanic_name, " +  // ← FULL NAME
+                "mk.make_name || ' ' || vm.model_name as car_name " +
+                "FROM MaintenanceRecord m " +
+                "JOIN Employee e ON m.employee_id = e.employee_id " +      // ← JOINS Employee table
+                "JOIN Vehicle v ON m.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY m.mntnc_date DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    String mechanicName = c.getString(4);  // Get mechanic full name
+                    Log.d(TAG, "Maintenance Record - Mechanic: " + mechanicName); // Debug log
+
+                    list.add(new MaintenanceLogItem(
+                            c.getInt(0),      // id
+                            c.getString(1),   // date
+                            c.getString(2),   // description
+                            c.getDouble(3),   // cost
+                            mechanicName,     // mechanic FULL NAME from database
+                            c.getString(5)    // car name
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " maintenance logs with mechanic names");
+        } catch (Exception e) {
+            Log.e(TAG, "Error fetching maintenance logs", e);
+        }
+        return list;
+    }
+
+    // maintenanceLogItem
+    public static class MaintenanceLogItem {
+        public int id;
+        public String date, description, mechanic, carName;
+        public double cost;
+
+        public MaintenanceLogItem(int id, String date, String desc,
+                                  double cost, String mechanic, String car) {
+            this.id = id;
+            this.date = date;
+            this.description = desc;
+            this.cost = cost;
+            this.mechanic = mechanic;
+            this.carName = car;
+        }
+    }
+
+    public List<VehicleMaintenanceItem> getAllVehiclesForMaintenance() {
+        List<VehicleMaintenanceItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT v.vehicle_id, " +
+                "mk.make_name || ' ' || vm.model_name as car_name, " +
+                "v.plt_number, v.status, v.image_res_name, " +
+                "COALESCE(" +
+                "  (SELECT COUNT(*) FROM MaintenanceRecord WHERE vehicle_id = v.vehicle_id), " +
+                "  0) as maintenance_count, " +
+                "COALESCE(" +
+                "  (SELECT MAX(mntnc_date) FROM MaintenanceRecord WHERE vehicle_id = v.vehicle_id), " +
+                "  'Never') as last_service " +
+                "FROM Vehicle v " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY v.vehicle_id DESC";
+
+        try {
+            Cursor c = db.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                do {
+                    list.add(new VehicleMaintenanceItem(
+                            c.getInt(0),        // vehicle_id
+                            c.getString(1),     // car_name
+                            c.getString(2),     // plate
+                            c.getString(3),     // status
+                            c.getString(4),     // image
+                            c.getInt(5),        // maintenance_count
+                            c.getString(6)      // last_service
+                    ));
+                } while (c.moveToNext());
+            }
+            c.close();
+            Log.d(TAG, "Loaded " + list.size() + " vehicles for maintenance");
+        } catch (Exception e) {
+            Log.e(TAG, "Error: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    // class for Vehicle Maintenance
+    public static class VehicleMaintenanceItem {
+        public int vehicleId;
+        public String carName, plate, status, imageRes, lastService;
+        public int maintenanceCount;
+
+        public VehicleMaintenanceItem(int id, String name, String plate,
+                                      String status, String img, int count, String lastSvc) {
+            this.vehicleId = id;
+            this.carName = name;
+            this.plate = plate;
+            this.status = status;
+            this.imageRes = img;
+            this.maintenanceCount = count;
+            this.lastService = lastSvc;
+        }
+    }
+
+    public boolean submitMaintenance(int vehicleId, int employeeId, String description, double cost) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues v = new ContentValues();
+
+        v.put("vehicle_id", vehicleId);
+        v.put("employee_id", employeeId);  // ← This stores the mechanic's employee_id
+        v.put("mntnc_date", new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date()));
+        v.put("description", description);
+        v.put("cost", cost);
+
+        long res = db.insert("MaintenanceRecord", null, v);
+
+        if (res != -1) {
+            Log.d(TAG, "✓ Maintenance record created: ID=" + res +
+                    ", Employee=" + employeeId +
+                    ", Vehicle=" + vehicleId);
+        } else {
+            Log.e(TAG, "✗ Failed to create maintenance record");
+        }
+
+        return res != -1;
+    }
+
+    // simple employee class
+    public static class Employee {
+        public int id;
+        public String firstName, lastName, role;
+        public Employee(int id, String f, String l, String r) {
+            this.id = id; firstName = f; lastName = l; role = r;
+        }
+    }
+
+
+
+    // ===================== INNER CLASS InsuranceItem =====================
+    public static class InsuranceItem {
+        public int id;
+        public int customerId;
+        public String customerName; // display
+        public String insuranceType;
+        public String insuranceDescription;
+        public String bookingReference;
+        public String createdAt;
+
+        public InsuranceItem(int id, int customerId, String type,
+                             String description, String bookingRef, String created) {
+            this.id = id;
+            this.customerId = customerId;
+            this.insuranceType = type;
+            this.insuranceDescription = description;
+            this.bookingReference = bookingRef;
+            this.createdAt = created;
         }
     }
 
@@ -566,20 +1233,19 @@ public class CarRentalData {
     }
 
     // ===================== Admin Approval =====================
-
-    public boolean approveBooking(int bookingId) {
+    public boolean approveBooking(int bookingId, int employeeId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
         try {
-            // Gets reservation details including addresses
+            // GET RESERVATION DETAILS
             Cursor c = db.rawQuery("SELECT vehicle_id, total_cost, pickup_address, return_address " +
                             "FROM Reservation WHERE booking_id=?",
                     new String[]{String.valueOf(bookingId)});
 
             if (!c.moveToFirst()) {
                 c.close();
-                Log.e(TAG, "Booking #" + bookingId + " not found");
+                Log.e("CarRentalData", "Booking #" + bookingId + " not found");
                 return false;
             }
 
@@ -589,19 +1255,22 @@ public class CarRentalData {
             String returnAddress = c.getString(3);
             c.close();
 
-            // UPDATES RESERVATION STATUS TO CONFIRMED
+            Log.d("CarRentalData", "=== Approving Booking #" + bookingId + " ===");
+
+            // UPDATE RESERVATION STATUS
             ContentValues vReservation = new ContentValues();
             vReservation.put("status", "Confirmed");
             vReservation.put("payment_status", "Paid");
             db.update("Reservation", vReservation, "booking_id=?",
                     new String[]{String.valueOf(bookingId)});
 
-            // UPDATES VEHICLE STATUS TO RENTED
+            // UPDATE VEHICLE STATUS
             ContentValues vCar = new ContentValues();
             vCar.put("status", "Rented");
             db.update("Vehicle", vCar, "vehicle_id=?",
                     new String[]{String.valueOf(vehicleId)});
 
+            // CREATE RENTAL RECORD
             ContentValues vRental = new ContentValues();
             vRental.put("reservation_id", bookingId);
             vRental.put("actual_pickup_address", pickupAddress);
@@ -611,11 +1280,24 @@ public class CarRentalData {
 
             long rentalId = db.insert("Rental", null, vRental);
 
-            if (rentalId == -1) {
-                throw new Exception("Failed to create rental record");
-            }
+            if (rentalId == -1) throw new Exception("Failed to create rental record");
 
-            // records 30% downpayment
+            // CREATE EMPLOYEE-RESERVATION LINK
+            ContentValues vEmpRes = new ContentValues();
+            vEmpRes.put("employee_id", employeeId);
+            vEmpRes.put("booking_id", bookingId);
+            vEmpRes.put("asgn_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()));
+
+            db.insert("EmployeeReservation", null, vEmpRes);
+
+            // CREATE EMPLOYEE-RENTAL LINK
+            ContentValues vEmpRental = new ContentValues();
+            vEmpRental.put("employee_id", employeeId);
+            vEmpRental.put("rental_id", rentalId);
+            vEmpRental.put("role", "Booking Manager");
+
+            db.insert("EmployeeRental", null, vEmpRental);
+
             ContentValues vPayment = new ContentValues();
             vPayment.put("rental_id", rentalId);
             vPayment.put("amount", totalCost * 0.30);
@@ -625,20 +1307,23 @@ public class CarRentalData {
             long paymentId = db.insert("Payment", null, vPayment);
 
             db.setTransactionSuccessful();
-
-            Log.d(TAG, "Booking approved successfully!");
-            Log.d(TAG, "Rental ID: " + rentalId);
-            Log.d(TAG, "Pickup Address: " + pickupAddress);
-            Log.d(TAG, "Return Address: " + returnAddress);
-
+            Log.d("CarRentalData", "Approved successfully. Rental ID: " + rentalId);
             return true;
 
         } catch (Exception e) {
-            Log.e(TAG, "Error approving booking: " + e.getMessage(), e);
+            Log.e("CarRentalData", "Error approving booking: " + e.getMessage(), e);
             return false;
         } finally {
             db.endTransaction();
         }
+    }
+
+    // ==========================================
+    //  HELPER METHOD
+    // ==========================================
+    public int getCurrentEmployeeId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("EmployeeSession", Context.MODE_PRIVATE);
+        return prefs.getInt("EMPLOYEE_ID", 1);
     }
 
     // ===================== Return Inspection =====================
@@ -1089,6 +1774,45 @@ public class CarRentalData {
 
     // ===================== DEBUG METHODS =====================
 
+    public void debugMaintenanceRecords() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT m.mntnc_id, " +
+                "mk.make_name || ' ' || vm.model_name as car, " +
+                "e.first_name || ' ' || e.last_name as mechanic, " +
+                "m.mntnc_date, m.cost, m.description " +
+                "FROM MaintenanceRecord m " +
+                "JOIN Employee e ON m.employee_id = e.employee_id " +
+                "JOIN Vehicle v ON m.vehicle_id = v.vehicle_id " +
+                "JOIN VehicleModel vm ON v.model_id = vm.model_id " +
+                "JOIN Make mk ON vm.make_id = mk.make_id " +
+                "ORDER BY m.mntnc_id DESC";
+
+        Cursor c = db.rawQuery(query, null);
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== MAINTENANCE RECORDS DEBUG ===");
+        Log.d(TAG, "=================================");
+
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "Record #" + c.getInt(0));
+                Log.d(TAG, "  Car: " + c.getString(1));
+                Log.d(TAG, "  Mechanic: " + c.getString(2));  // ← Should show full name
+                Log.d(TAG, "  Date: " + c.getString(3));
+                Log.d(TAG, "  Cost: ₱" + c.getDouble(4));
+                Log.d(TAG, "  Description: " + c.getString(5));
+                Log.d(TAG, "---------------------------------");
+            } while (c.moveToNext());
+            Log.d(TAG, "Total: " + c.getCount() + " maintenance records");
+        } else {
+            Log.d(TAG, "No maintenance records found");
+        }
+
+        c.close();
+        Log.d(TAG, "=================================");
+    }
+
     public void debugListAllReservations() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -1201,8 +1925,63 @@ public class CarRentalData {
         Log.d(TAG, "============================");
     }
 
+    public void debugListAllEmployees() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT employee_id, first_name, last_name, email, role FROM Employee", null);
+
+        Log.d(TAG, "=================================");
+        Log.d(TAG, "=== ALL EMPLOYEES IN DATABASE ===");
+        Log.d(TAG, "=================================");
+
+        if (c.moveToFirst()) {
+            do {
+                Log.d(TAG, "ID: " + c.getInt(0) +
+                        " | Name: " + c.getString(1) + " " + c.getString(2) +
+                        " | Email: " + c.getString(3) +
+                        " | Role: " + c.getString(4));
+            } while (c.moveToNext());
+            Log.d(TAG, "Total: " + c.getCount() + " employees");
+        } else {
+            Log.d(TAG, "No employees found - DATABASE MAY NEED TO BE RECREATED");
+        }
+        c.close();
+        Log.d(TAG, "=================================");
+    }
+
 
     // ===================== Inner Classes =====================
+
+    public static class EmployeeReservationItem {
+        public int resvId, employeeId, bookingId;
+        public String employeeName, role, bookingReference, asgnDate;
+
+        public EmployeeReservationItem(int resvId, int empId, String empName,
+                                       String role, int bookingId,
+                                       String bookingRef, String date) {
+            this.resvId = resvId;
+            this.employeeId = empId;
+            this.employeeName = empName;
+            this.role = role;
+            this.bookingId = bookingId;
+            this.bookingReference = bookingRef;
+            this.asgnDate = date;
+        }
+    }
+
+    public static class EmployeeRentalItem {
+        public int erId, employeeId, rentalId, reservationId;
+        public String employeeName, role;
+
+        public EmployeeRentalItem(int erId, int empId, String empName,
+                                  int rentalId, int reservationId, String role) {
+            this.erId = erId;
+            this.employeeId = empId;
+            this.employeeName = empName;
+            this.rentalId = rentalId;
+            this.reservationId = reservationId;
+            this.role = role;
+        }
+    }
 
     public static class VehicleItem {
         public int id;

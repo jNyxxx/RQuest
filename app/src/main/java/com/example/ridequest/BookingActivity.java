@@ -1,12 +1,9 @@
 package com.example.ridequest;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Base64;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,6 +23,7 @@ import java.util.Locale;
 
 public class BookingActivity extends AppCompatActivity {
 
+    private static final String TAG = "BookingActivity";
     private double dailyRate;
     private RadioGroup rgInsurance;
 
@@ -39,6 +37,8 @@ public class BookingActivity extends AppCompatActivity {
         dailyRate = getIntent().getDoubleExtra("PRICE", 0.0);
         String name = getIntent().getStringExtra("NAME");
         String imgRes = getIntent().getStringExtra("IMG_RES");
+
+        Log.d(TAG, "Booking started - Vehicle ID: " + vid + ", Daily Rate: $" + dailyRate);
 
         // UI Elements
         TextView tvName = findViewById(R.id.tvBookingCarName);
@@ -54,16 +54,17 @@ public class BookingActivity extends AppCompatActivity {
         Spinner spTimeP = findViewById(R.id.spPickupTime);
         Spinner spTimeR = findViewById(R.id.spReturnTime);
 
+        // INSURANCE
         rgInsurance = findViewById(R.id.rgInsurance);
 
-        // Car Info
+        // Set Car Info
         if(tvName != null) tvName.setText(name);
         if(tvPrice != null) tvPrice.setText("$" + dailyRate + " per day");
 
         if(ivCar != null && imgRes != null) {
             try {
-                byte[] decodedBytes = Base64.decode(imgRes, Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                byte[] decodedBytes = android.util.Base64.decode(imgRes, android.util.Base64.DEFAULT);
+                android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                 if (bitmap != null) {
                     ivCar.setImageBitmap(bitmap);
                 } else {
@@ -77,7 +78,7 @@ public class BookingActivity extends AppCompatActivity {
             }
         }
 
-        // Time Spinners
+        // Setup Time Spinners
         List<String> times = new ArrayList<>();
         for(int h = 0; h < 24; h++) {
             for(int m = 0; m < 60; m += 30) {
@@ -98,6 +99,7 @@ public class BookingActivity extends AppCompatActivity {
         etReturn.setClickable(true);
         etReturn.setOnClickListener(v -> showDatePicker(etReturn));
 
+        // Continue Button
         findViewById(R.id.btnContinue).setOnClickListener(v -> {
             String pickupDate = etPickup.getText().toString().trim();
             String returnDate = etReturn.getText().toString().trim();
@@ -107,6 +109,7 @@ public class BookingActivity extends AppCompatActivity {
             String pickupAddress = etPickupAddress.getText().toString().trim();
             String returnAddress = etReturnAddress.getText().toString().trim();
 
+            // Validate
             if (pickupDate.isEmpty() || returnDate.isEmpty()) {
                 Toast.makeText(this, "Please select both dates", Toast.LENGTH_SHORT).show();
                 return;
@@ -124,35 +127,54 @@ public class BookingActivity extends AppCompatActivity {
                 return;
             }
 
-            // INSURANCE SELECTION
+            // GET INSURANCE SELECTION
             String insuranceType = "None";
             double insuranceFee = 0.0;
 
             int selectedInsuranceId = rgInsurance.getCheckedRadioButtonId();
             if (selectedInsuranceId != -1) {
                 RadioButton selectedInsurance = findViewById(selectedInsuranceId);
-                insuranceType = selectedInsurance.getText().toString();
+                String insuranceText = selectedInsurance.getText().toString();
 
-                // Calculate insurance fee based on selection
-                if (insuranceType.contains("Premium")) {
-                    insuranceFee = dailyRate * 0.20;
+                Log.d(TAG, "Selected insurance: " + insuranceText);
+
+                // insurance type
+                if (insuranceText.contains("No Insurance")) {
+                    insuranceType = "No Insurance (Free)";
+                    insuranceFee = 0.0;
+                } else if (insuranceText.contains("Personal Insurance")) {
+                    insuranceType = "Personal Insurance";
+                    insuranceFee = 0.0; // Customer provides own insurance
+                } else if (insuranceText.contains("Basic Insurance")) {
+                    insuranceType = "Basic Insurance";
+                    insuranceFee = dailyRate * 0.20; // 20% of DAILY RATE (not total)
                 }
+
+                Log.d(TAG, "Insurance Type: " + insuranceType);
+                Log.d(TAG, "Insurance Fee: $" + insuranceFee);
             }
 
-            // CALCULATE RENTAL COST WITH ALL DETAILS
+            // CALCULATE RENTAL COST
             RentalCalculation calc = calculateRentalCost(pickupDate, pickupTime, returnDate, returnTime, insuranceFee);
 
             if (calc == null) {
-                return; // Error already shown
+                return;
             }
 
-            // PASSES ALL DATA TO PAYMENT ACTIVITY
+            Log.d(TAG, "=== Cost Breakdown ===");
+            Log.d(TAG, "Days: " + calc.fullDays);
+            Log.d(TAG, "Base Cost: $" + calc.baseCost);
+            Log.d(TAG, "Insurance: $" + insuranceFee + " x " + calc.fullDays + " days = $" + (insuranceFee * calc.fullDays));
+            Log.d(TAG, "Late Fee: $" + calc.lateFee);
+            Log.d(TAG, "TOTAL: $" + calc.totalCost);
+
+            // PASS ALL DATA TO PAYMENT
             Intent i = new Intent(this, PaymentActivity.class);
             i.putExtra("VID", vid);
             i.putExtra("DAILY_RATE", dailyRate);
             i.putExtra("BASE_COST", calc.baseCost);
             i.putExtra("INSURANCE_TYPE", insuranceType);
-            i.putExtra("INSURANCE_FEE", insuranceFee);
+            i.putExtra("INSURANCE_FEE", insuranceFee * calc.fullDays); // ⭐ TOTAL INSURANCE FOR ALL DAYS
             i.putExtra("TOTAL_COST", calc.totalCost);
             i.putExtra("NAME", name);
             i.putExtra("PICKUP_DATE", pickupDate);
@@ -196,9 +218,10 @@ public class BookingActivity extends AppCompatActivity {
         int fullDays;
     }
 
+    // Insurance fee calculation
     private RentalCalculation calculateRentalCost(String pickupDateStr, String pickupTimeStr,
                                                   String returnDateStr, String returnTimeStr,
-                                                  double insuranceFee) {
+                                                  double insuranceFeePerDay) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy HH:mm", Locale.US);
             String pickupDateTime = pickupDateStr + " " + pickupTimeStr;
@@ -221,7 +244,6 @@ public class BookingActivity extends AppCompatActivity {
             long totalHours = diffInMillis / (1000 * 60 * 60);
 
             int fullDays = (int) (totalHours / 24);
-            int remainingHours = (int) (totalHours % 24);
 
             String[] pickupTimeParts = pickupTimeStr.split(":");
             String[] returnTimeParts = returnTimeStr.split(":");
@@ -239,11 +261,9 @@ public class BookingActivity extends AppCompatActivity {
             calc.lateHours = 0;
             calc.lateFee = 0;
 
-            // Minimum 1 day rental
-            if(fullDays == 0 && remainingHours == 0) {
-                Context context = null;
-                Toast.makeText(context, "Minimum rental is 1 day. Same-day bookings not allowed.", Toast.LENGTH_SHORT).show();
-                return null;
+            // Minimum 1 day
+            if(fullDays == 0) {
+                calc.fullDays = 1;
             }
 
             // Check 24-hour rule
@@ -252,25 +272,26 @@ public class BookingActivity extends AppCompatActivity {
                 double hourlyRate = dailyRate / 4.0;
                 calc.lateFee = calc.lateHours * hourlyRate;
 
-                Toast.makeText(this, "⚠️ LATE RETURN DETECTED! ⚠️", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "LATE RETURN DETECTED! ⚠️", Toast.LENGTH_LONG).show();
             }
 
-            // CALCULATE BASE COST
-            calc.baseCost = (fullDays > 0 ? fullDays : 1) * dailyRate;
+            // CALCULATE COSTS
+            calc.baseCost = calc.fullDays * dailyRate;
 
-            // TOTAL COST = base + insurance + late fee
-            calc.totalCost = calc.baseCost + insuranceFee + calc.lateFee;
+            // TOTAL = base + (insurance per day * days) + late fee
+            double totalInsurance = insuranceFeePerDay * calc.fullDays;
+            calc.totalCost = calc.baseCost + totalInsurance + calc.lateFee;
 
-            // breakdown
+            // Show breakdown
             String message;
             if(calc.lateFee > 0) {
                 message = String.format(Locale.US,
                         "Base: $%.2f\nInsurance: $%.2f\nLate: $%.2f\nTotal: $%.2f",
-                        calc.baseCost, insuranceFee, calc.lateFee, calc.totalCost);
+                        calc.baseCost, totalInsurance, calc.lateFee, calc.totalCost);
             } else {
                 message = String.format(Locale.US,
                         "Base: $%.2f\nInsurance: $%.2f\nTotal: $%.2f ✓",
-                        calc.baseCost, insuranceFee, calc.totalCost);
+                        calc.baseCost, totalInsurance, calc.totalCost);
             }
 
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
