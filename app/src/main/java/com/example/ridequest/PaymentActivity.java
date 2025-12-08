@@ -157,8 +157,12 @@ public class PaymentActivity extends AppCompatActivity {
                 return;
             }
 
+            // 1. GENERATE A RANDOM ID (This is the missing 19th item)
+            String generatedPaymentId = "PAY-" + System.currentTimeMillis();
+
             CarRentalData db = new CarRentalData(this);
 
+            // 2. CALL THE METHOD WITH ALL 19 ARGUMENTS
             boolean success = db.createPendingBooking(
                     uid, vid, carName,
                     pickupDate, returnDate,
@@ -166,42 +170,23 @@ public class PaymentActivity extends AppCompatActivity {
                     pickupAddress, returnAddress,
                     rentalDays, baseCost, insuranceType, insuranceFee,
                     lateHours, lateFee, totalCost,
-                    "QR Code Payment", receiptImageBase64
+                    "QR Code/GCash",      // 17. Payment Method
+                    generatedPaymentId,    // 18. Payment ID (New!)
+                    receiptImageBase64     // 19. Receipt Image (New!)
             );
 
             if(success) {
-                Log.d(TAG, "Booking created with all details!");
-
-                String message = "Booking Submitted Successfully!\n\n" +
-                        "Your booking is pending admin verification.\n\n" +
-                        "Cost Breakdown:\n" +
-                        "Base Cost: $" + String.format("%.2f", baseCost) + "\n" +
-                        (insuranceFee > 0 ? "Insurance: $" + String.format("%.2f", insuranceFee) + "\n" : "") +
-                        (lateFee > 0 ? "Late Fee: $" + String.format("%.2f", lateFee) + "\n" : "") +
-                        "Total: $" + String.format("%.2f", totalCost) + "\n\n" +
-                        "Downpayment Paid: $" + String.format("%.2f", downpaymentAmount) + "\n" +
-                        "Balance Due at Pickup: $" + String.format("%.2f", remainingBalance) + "\n\n" +
-                        "Pickup: " + pickupAddress + "\n" +
-                        "Return: " + returnAddress + "\n\n" +
-                        "IMPORTANT - Bring to Pickup:\n" +
-                        "• Valid driver's license\n" +
-                        "• Government-issued ID\n" +
-                        "• Cash for remaining balance\n" +
-                        "• Proof of insurance (if applicable)";
-
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Booking created successfully!");
+                Toast.makeText(this, "Booking Submitted!", Toast.LENGTH_LONG).show();
 
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
-
             } else {
-                Log.e(TAG, "Booking failed!");
-                Toast.makeText(this, "Booking Failed\n\nPlease try again.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Booking Failed. Please try again.", Toast.LENGTH_LONG).show();
             }
         });
-
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 

@@ -199,8 +199,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     public void onApprove(CarRentalData.AdminBookingItem b) {
                         int empId = db.getCurrentEmployeeId(AdminDashboardActivity.this);
                         if(db.approveBooking(b.id, empId)) {
-                            Toast.makeText(AdminDashboardActivity.this,
-                                    "Booking Approved!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AdminDashboardActivity.this, "Booking Approved!", Toast.LENGTH_SHORT).show();
                             loadBookings();
                         }
                     }
@@ -208,8 +207,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     @Override
                     public void onCancel(CarRentalData.AdminBookingItem b) {
                         if(db.cancelBooking(b.id, true)) {
-                            Toast.makeText(AdminDashboardActivity.this,
-                                    "Booking Cancelled", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AdminDashboardActivity.this, "Booking Cancelled", Toast.LENGTH_SHORT).show();
                             loadBookings();
                         }
                     }
@@ -217,19 +215,18 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     @Override
                     public void onReturn(CarRentalData.AdminBookingItem b) {
                         if(db.markBookingAsReturned(b.id)) {
-                            Toast.makeText(AdminDashboardActivity.this,
-                                    "Vehicle Returned!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AdminDashboardActivity.this, "Vehicle Returned!", Toast.LENGTH_SHORT).show();
                             loadBookings();
                         } else {
-                            Toast.makeText(AdminDashboardActivity.this,
-                                    "Error returning vehicle", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AdminDashboardActivity.this, "Error returning vehicle", Toast.LENGTH_SHORT).show();
                         }
                     }
 
+                    // --- FIX HERE: Added 'String inspectionType' ---
                     @Override
-                    public void onViewDetails(CarRentalData.AdminBookingItem b) {
-                        Intent i = new Intent(AdminDashboardActivity.this,
-                                BookingDetailsActivity.class);
+                    public void onViewDetails(CarRentalData.AdminBookingItem b, String inspectionType) {
+                        // Manager just views details, ignores inspection type
+                        Intent i = new Intent(AdminDashboardActivity.this, BookingDetailsActivity.class);
                         i.putExtra("BOOKING_ID", b.id);
                         startActivity(i);
                     }
@@ -363,18 +360,20 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 @Override public void onCancel(CarRentalData.AdminBookingItem b) {}
                 @Override public void onReturn(CarRentalData.AdminBookingItem b) {}
 
+                // Added 'String inspectionType' ---
                 @Override
-                public void onViewDetails(CarRentalData.AdminBookingItem b) {
-                    Intent intent = new Intent(AdminDashboardActivity.this,
-                            InspectionActivity.class);
+                public void onViewDetails(CarRentalData.AdminBookingItem b, String inspectionType) {
+                    Intent intent = new Intent(AdminDashboardActivity.this, InspectionActivity.class);
                     intent.putExtra("BOOKING_ID", b.id);
+                    // Now we pass the correct type (Pickup or Return) to the activity
+                    intent.putExtra("INSPECTION_TYPE", inspectionType);
                     startActivity(intent);
                 }
             });
             recyclerView.setAdapter(adapter);
 
         } else {
-            // MANAGER VIEW: Inspection History
+            // Inspection History
             tvSectionTitle.setText("Inspection Logs");
 
             List<CarRentalData.InspectionLogItem> history = db.getInspectionHistory();
@@ -414,7 +413,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
 
         if(bookings != null) {
-            // Count only active bookings (Pending, Confirmed, Rented)
+            // Count only active bookings Pending, Confirmed, Rented
             int activeCount = 0;
             for(CarRentalData.AdminBookingItem booking : bookings) {
                 if(booking.status.equals("Pending") ||
