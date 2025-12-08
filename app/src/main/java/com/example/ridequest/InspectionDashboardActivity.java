@@ -58,12 +58,11 @@ public class InspectionDashboardActivity extends AppCompatActivity {
             @Override
             public void onReturn(CarRentalData.AdminBookingItem booking) {}
 
-            // UPDATED METHOD: Receives inspectionType from Adapter
             @Override
             public void onViewDetails(CarRentalData.AdminBookingItem booking, String inspectionType) {
                 Intent i = new Intent(InspectionDashboardActivity.this, InspectionActivity.class);
                 i.putExtra("BOOKING_ID", booking.id);
-                i.putExtra("INSPECTION_TYPE", inspectionType); // "Pickup" or "Return"
+                i.putExtra("INSPECTION_TYPE", inspectionType); // Pickup or Return
                 startActivity(i);
             }
         });

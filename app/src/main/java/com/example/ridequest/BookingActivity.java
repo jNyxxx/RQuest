@@ -57,7 +57,7 @@ public class BookingActivity extends AppCompatActivity {
         // INSURANCE
         rgInsurance = findViewById(R.id.rgInsurance);
 
-        // Set Car Info
+        // Car Info
         if(tvName != null) tvName.setText(name);
         if(tvPrice != null) tvPrice.setText("$" + dailyRate + " per day");
 
@@ -78,7 +78,7 @@ public class BookingActivity extends AppCompatActivity {
             }
         }
 
-        // Setup Time Spinners
+        // Time Spinners
         List<String> times = new ArrayList<>();
         for(int h = 0; h < 24; h++) {
             for(int m = 0; m < 60; m += 30) {

@@ -131,8 +131,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume - Reloading vehicles and user name");
-        loadUserName(); // Refresh welcome message
-        loadVehicles(); // Refresh vehicle list
+        loadUserName();
+        loadVehicles();
     }
 
     private void loadUserName() {
@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (userId == -1) {
-            // User not logged in
             tvWelcome.setText("Welcome, Guest!");
             Log.d(TAG, "No user logged in - showing Guest");
             return;

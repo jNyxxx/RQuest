@@ -21,7 +21,6 @@ public class CarDetailActivity extends AppCompatActivity {
     private int vehicleId;
     private int userId;
 
-    // UI Components
     private ImageView ivCar, btnFavorite;
     private TextView tvName, tvPrice, tvCategory, tvColor;
     private TextView tvTransmission, tvSeats, tvFuel, tvType;
@@ -34,13 +33,12 @@ public class CarDetailActivity extends AppCompatActivity {
 
         db = new CarRentalData(this);
 
-        // 1. Get Vehicle ID safely
+        // Gets Vehicle ID
         vehicleId = getIntent().getIntExtra("VEHICLE_ID", -1);
         if (vehicleId == -1) {
             vehicleId = getIntent().getIntExtra("VID", -1);
         }
 
-        // DEBUG: Log what we received
         Log.d(TAG, "=== CarDetailActivity Started ===");
         Log.d(TAG, "Received VEHICLE_ID: " + vehicleId);
         Log.d(TAG, "All Intent Extras:");
@@ -50,7 +48,7 @@ public class CarDetailActivity extends AppCompatActivity {
             }
         }
 
-        // 2. Get User Session
+        // User Session
         SharedPreferences prefs = getSharedPreferences("UserSession", MODE_PRIVATE);
         userId = prefs.getInt("UID", -1);
 
@@ -61,7 +59,7 @@ public class CarDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // 3. Initialize Views - FIXED TO MATCH XML IDs
+        //  Initialize Viewsw
         ivCar = findViewById(R.id.ivDetailCar);
         tvName = findViewById(R.id.tvDetailTitle);
         tvPrice = findViewById(R.id.tvDetailPrice);
@@ -80,10 +78,10 @@ public class CarDetailActivity extends AppCompatActivity {
             findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         }
 
-        // 4. Load Data Fresh from Database
+        // loads data from db
         loadVehicleData();
 
-        // 5. Handle Favorite Logic
+        // Favorite Logic
         if (userId != -1 && btnFavorite != null) {
             boolean isFav = db.isVehicleFavorite(userId, vehicleId);
             updateFavoriteIcon(isFav);
@@ -112,7 +110,6 @@ public class CarDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // DEBUG: Log what we got from database
         Log.d(TAG, "=== Vehicle Data Loaded ===");
         Log.d(TAG, "Title: " + vehicle.title);
         Log.d(TAG, "Price: $" + vehicle.price);
@@ -124,7 +121,7 @@ public class CarDetailActivity extends AppCompatActivity {
         Log.d(TAG, "Color: " + vehicle.color);
         Log.d(TAG, "Status: " + vehicle.status);
 
-        // Set all the data
+        // setsall the data
         if (tvName != null) {
             tvName.setText(vehicle.title);
             Log.d(TAG, "✓ Set vehicle name");
@@ -165,19 +162,16 @@ public class CarDetailActivity extends AppCompatActivity {
             Log.d(TAG, "✓ Set vehicle type");
         }
 
-        // Image Loading
         if (ivCar != null) {
             String imageRes = vehicle.imageRes;
             if (imageRes != null && !imageRes.isEmpty()) {
                 try {
                     if (imageRes.length() > 20) {
-                        // Base64 encoded image
                         byte[] decodedBytes = Base64.decode(imageRes, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                         ivCar.setImageBitmap(bitmap);
                         Log.d(TAG, "✓ Loaded Base64 image");
                     } else {
-                        // Drawable resource name
                         int resId = getResources().getIdentifier(imageRes, "drawable", getPackageName());
                         ivCar.setImageResource(resId != 0 ? resId : R.drawable.ic_launcher_background);
                         Log.d(TAG, "✓ Loaded drawable image");

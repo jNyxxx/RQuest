@@ -25,26 +25,25 @@ public class FavoritesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
-        // 1. Initialize DB and Views
+        // DB and Views
         carRentalData = new CarRentalData(this);
         rvFavorites = findViewById(R.id.rvFavorites);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
         btnBack = findViewById(R.id.btnBack);
 
-        // 2. Get User ID
+        //User ID
         currentUserId = getSessionUserId();
 
-        // 3. Setup RecyclerView
+        // recyclerView
         if (rvFavorites != null) {
             rvFavorites.setLayoutManager(new LinearLayoutManager(this));
         }
 
-        // 4. Back Button Action
+        // Back Button
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
         }
 
-        // 5. Load Data
         loadFavorites();
     }
 
@@ -61,7 +60,7 @@ public class FavoritesActivity extends AppCompatActivity {
         List<CarRentalData.VehicleItem> favoriteCars = carRentalData.getCustomerFavorites(currentUserId);
 
         if (favoriteCars == null || favoriteCars.isEmpty()) {
-            // Show Empty State
+            // Show Empty
             if (rvFavorites != null) rvFavorites.setVisibility(View.GONE);
             if (layoutEmptyState != null) layoutEmptyState.setVisibility(View.VISIBLE);
         } else {
@@ -69,7 +68,7 @@ public class FavoritesActivity extends AppCompatActivity {
             if (rvFavorites != null) rvFavorites.setVisibility(View.VISIBLE);
             if (layoutEmptyState != null) layoutEmptyState.setVisibility(View.GONE);
 
-            // Use VehicleAdapter (isAdmin = false, Listener = null)
+            // VehicleAdapter
             VehicleAdapter adapter = new VehicleAdapter(this, favoriteCars, false, null);
             if (rvFavorites != null) rvFavorites.setAdapter(adapter);
         }
@@ -77,7 +76,6 @@ public class FavoritesActivity extends AppCompatActivity {
 
     private int getSessionUserId() {
         SharedPreferences prefs = getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-        // FIX: Changed "CUSTOMER_ID" to "UID" to match your Login/Profile logic
         return prefs.getInt("UID", -1);
     }
 }

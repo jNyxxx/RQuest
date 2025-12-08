@@ -37,7 +37,7 @@ public class EditVehicleActivity extends AppCompatActivity {
 
         CarRentalData db = new CarRentalData(this);
 
-        // Get vehicle data from intent (Ensure VehicleAdapter passes these!)
+        // Get vehicle data
         vehicleId = getIntent().getIntExtra("VEHICLE_ID", -1);
         String makeModel = getIntent().getStringExtra("MAKE_MODEL");
         String type = getIntent().getStringExtra("TYPE");
@@ -51,12 +51,12 @@ public class EditVehicleActivity extends AppCompatActivity {
         String cat = getIntent().getStringExtra("CATEGORY");
         String fuel = getIntent().getStringExtra("FUEL");
 
-        // Split Make and Model
+        // make and Model
         String[] parts = makeModel != null ? makeModel.split(" ", 2) : new String[]{"", ""};
         String make = parts.length > 0 ? parts[0] : "";
         String model = parts.length > 1 ? parts[1] : "";
 
-        // Initialize UI Elements
+        // Initialize UI
         etMake = findViewById(R.id.etMake);
         etModel = findViewById(R.id.etModel);
         etType = findViewById(R.id.etType);
@@ -72,7 +72,6 @@ public class EditVehicleActivity extends AppCompatActivity {
         Button btnUpdate = findViewById(R.id.btnUpdateCar);
         Button btnSelectImage = findViewById(R.id.btnSelectImage);
 
-        // Populate fields
         etMake.setText(make);
         etModel.setText(model);
         etType.setText(type);
@@ -96,12 +95,11 @@ public class EditVehicleActivity extends AppCompatActivity {
             }
         }
 
-        // Spinners with Selection Logic
+        // Spinners selection
         setupSpinner(spTransmission, new String[]{"Manual", "Automatic"}, transmission);
         setupSpinner(spCategory, new String[]{"Premium", "Luxury", "Economy", "Family", "Sports"}, cat);
         setupSpinner(spFuel, new String[]{"Regular Gasoline", "Premium Gasoline", "Diesel"}, fuel);
 
-        // Gallery Launcher
         galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -123,7 +121,7 @@ public class EditVehicleActivity extends AppCompatActivity {
 
         btnSelectImage.setOnClickListener(v -> openGallery());
 
-        // Update Logic
+        // Update
         btnUpdate.setOnClickListener(v -> {
             try {
                 String newMake = etMake.getText().toString().trim();
@@ -156,7 +154,7 @@ public class EditVehicleActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Call Updated DB Method
+                // Call Updated db
                 if (db.updateVehicle(vehicleId, newMake, newModel, newType, newPrice,
                         selectedImageBase64, newTrans, seatCount,
                         newColor, newCat, newFuel)) {
@@ -198,7 +196,6 @@ public class EditVehicleActivity extends AppCompatActivity {
     }
 
     private String bitmapToBase64(Bitmap bitmap) {
-        // Resize to prevent crashes
         Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, 600, true);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         resized.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);

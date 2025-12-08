@@ -76,7 +76,7 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        // Bind UI Elements
+        // UI Elements
         TextView tvTitle = findViewById(R.id.tvTitle);
         TextView tvCarName = findViewById(R.id.tvCarName);
         TextView tvDates = findViewById(R.id.tvDates);
@@ -91,7 +91,7 @@ public class PaymentActivity extends AppCompatActivity {
         Button btnUploadReceipt = findViewById(R.id.btnUploadReceipt);
         Button btnConfirm = findViewById(R.id.btnConfirm);
 
-        // Set UI Data
+        // UI
         if(tvTitle != null) tvTitle.setText("Payment Summary");
         if(tvCarName != null) tvCarName.setText(carName != null ? carName : "Unknown Vehicle");
         if(tvDates != null) tvDates.setText(pickupDate + " " + pickupTime + " → " + returnDate + " " + returnTime);
@@ -111,7 +111,7 @@ public class PaymentActivity extends AppCompatActivity {
         if(tvDownpayment != null) tvDownpayment.setText("Downpayment (30%): $" + String.format("%.2f", downpaymentAmount));
         if(tvBalance != null) tvBalance.setText("Balance (pay at pickup): $" + String.format("%.2f", remainingBalance));
 
-        // Show late fee warning
+        // late fee warning
         if(tvLateFeeWarning != null) {
             if(lateFee > 0) {
                 tvLateFeeWarning.setVisibility(View.VISIBLE);
@@ -149,9 +149,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         btnUploadReceipt.setOnClickListener(v -> openGallery());
 
-        // ==========================================
-        //  CONFIRM PAYMENT LOGIC (FIXED)
-        // ==========================================
+        //confirm payment method
         btnConfirm.setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
@@ -161,10 +159,9 @@ public class PaymentActivity extends AppCompatActivity {
                 return;
             }
 
-            // 2. Generate the Payment ID
+            // Generate the Payment ID
             String generatedPaymentId = "PAY-" + System.currentTimeMillis();
 
-            // 3. Now it is safe to log (because variable exists)
             Log.d("DEBUG_CHECK", "Payment ID being sent: " + generatedPaymentId);
             if (receiptImageBase64.length() > 50) {
                 Log.d("DEBUG_CHECK", "Receipt Image being sent (First 50 chars): " + receiptImageBase64.substring(0, 50));
@@ -172,7 +169,7 @@ public class PaymentActivity extends AppCompatActivity {
 
             CarRentalData db = new CarRentalData(this);
 
-            // 4. Call Database Method
+            // Call Database Method
             boolean success = db.createPendingBooking(
                     uid, vid, carName,
                     pickupDate, returnDate,

@@ -348,7 +348,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         highlightTab(btnInspections);
 
         if (currentUserRole.equalsIgnoreCase("Inspection Agent")) {
-            // AGENT VIEW: Inspection Tasks
             tvSectionTitle.setText("Inspection Tasks");
 
             List<CarRentalData.AdminBookingItem> list = db.getBookingsForInspection();
@@ -360,12 +359,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 @Override public void onCancel(CarRentalData.AdminBookingItem b) {}
                 @Override public void onReturn(CarRentalData.AdminBookingItem b) {}
 
-                // Added 'String inspectionType' ---
                 @Override
                 public void onViewDetails(CarRentalData.AdminBookingItem b, String inspectionType) {
                     Intent intent = new Intent(AdminDashboardActivity.this, InspectionActivity.class);
                     intent.putExtra("BOOKING_ID", b.id);
-                    // Now we pass the correct type (Pickup or Return) to the activity
                     intent.putExtra("INSPECTION_TYPE", inspectionType);
                     startActivity(intent);
                 }
@@ -413,7 +410,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
 
         if(bookings != null) {
-            // Count only active bookings Pending, Confirmed, Rented
+            // Counts active bookings Pending, Confirmed, Rented
             int activeCount = 0;
             for(CarRentalData.AdminBookingItem booking : bookings) {
                 if(booking.status.equals("Pending") ||

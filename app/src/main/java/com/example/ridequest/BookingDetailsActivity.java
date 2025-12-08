@@ -61,10 +61,8 @@ public class BookingDetailsActivity extends AppCompatActivity {
         TextView tvBalance = findViewById(R.id.tvBalance);
         TextView tvPaymentMethod = findViewById(R.id.tvPaymentMethod);
 
-        // Correct ID from XML
         ImageView ivReceipt = findViewById(R.id.ivReceipt);
 
-        // Set Texts
         if (tvBookingRef != null) tvBookingRef.setText(booking.bookingReference);
 
         if (tvStatus != null) {
@@ -94,16 +92,12 @@ public class BookingDetailsActivity extends AppCompatActivity {
         if (tvBalance != null) tvBalance.setText("$" + String.format("%.2f", balance));
         if (tvPaymentMethod != null) tvPaymentMethod.setText(booking.paymentMethod);
 
-        // ==========================================
-        // ROBUST IMAGE LOADING (Handles Base64 & URI)
-        // ==========================================
-
-        // 1. Load Car Image
+        // Car Image
         if (ivCarImage != null) {
             loadSmartImage(ivCarImage, booking.carImage, "CarImage");
         }
 
-        // 2. Load Receipt Image
+        // Receipt Image
         if (ivReceipt != null) {
             loadSmartImage(ivReceipt, booking.paymentReceipt, "PaymentReceipt");
         }
@@ -115,7 +109,6 @@ public class BookingDetailsActivity extends AppCompatActivity {
         }
     }
 
-    // --- SMART IMAGE LOADER HELPER ---
     private void loadSmartImage(ImageView imageView, String imageData, String tag) {
         if (imageData == null || imageData.isEmpty()) {
             Log.e(TAG, tag + ": Data is NULL or EMPTY");
@@ -123,12 +116,10 @@ public class BookingDetailsActivity extends AppCompatActivity {
             return;
         }
 
-        // Log the length to verify data exists
         Log.d(TAG, tag + ": Data Length = " + imageData.length());
 
         try {
-            // OPTION A: Try Base64 Decoding
-            if (imageData.length() > 100) { // Base64 is usually long
+            if (imageData.length() > 100) {
                 byte[] decodedBytes = Base64.decode(imageData, Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                 if (bitmap != null) {
@@ -143,8 +134,6 @@ public class BookingDetailsActivity extends AppCompatActivity {
         }
 
         try {
-            // OPTION B: Try as File Path / URI (Fallback)
-            // This catches cases where you saved "content://..." instead of the image data
             imageView.setImageURI(Uri.parse(imageData));
             imageView.setVisibility(View.VISIBLE);
             Log.d(TAG, tag + ": Loaded as URI");

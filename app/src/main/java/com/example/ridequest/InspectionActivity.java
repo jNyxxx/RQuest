@@ -44,7 +44,7 @@ public class InspectionActivity extends AppCompatActivity {
 
         db = new CarRentalData(this);
 
-        // 1. GET LOGGED IN AGENT ID
+        // GET LOGGED IN AGENT ID
         SharedPreferences prefs = getSharedPreferences("EmployeeSession", MODE_PRIVATE);
         inspectorId = prefs.getInt("EMPLOYEE_ID", -1); // Defaults to -1 if not found
 
@@ -67,14 +67,13 @@ public class InspectionActivity extends AppCompatActivity {
         Button btnUpload = findViewById(R.id.btnUploadPhoto);
         Button btnSubmit = findViewById(R.id.btnSubmitInspection);
 
-        // Setup UI
+        // UI
         tvHeaderTitle.setText(inspectionType + " Inspection");
         btnSubmit.setText("Submit " + inspectionType);
 
-        // Listeners
         btnBack.setOnClickListener(v -> finish());
 
-        // 2. CAMERA PERMISSION & LAUNCH
+        // CAMERA
         btnUpload.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CODE);
@@ -104,14 +103,13 @@ public class InspectionActivity extends AppCompatActivity {
             ivInspectionPhoto.setVisibility(android.view.View.VISIBLE);
             ivInspectionPhoto.setImageBitmap(evidencePhoto);
 
-            // CONVERT TO STRING FOR DB
             photoBase64 = convertBitmapToString(evidencePhoto);
         }
     }
 
     private String convertBitmapToString(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos); // Compress to 50% quality
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
         byte[] b = baos.toByteArray();
         return Base64.encodeToString(b, Base64.DEFAULT);
     }
@@ -121,7 +119,7 @@ public class InspectionActivity extends AppCompatActivity {
         String damage = etDamage.getText().toString();
         String notes = etNotes.getText().toString();
 
-        // 3. PASS ALL DATA TO DATABASE
+        // PASS ALL DATA TO DATABASE
         boolean success = db.addInspection(bookingId, inspectionType, fuel, damage, notes, inspectorId, photoBase64);
 
         if (success) {

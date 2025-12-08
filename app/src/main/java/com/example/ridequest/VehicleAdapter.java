@@ -87,7 +87,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             }
         }
 
-        // --- IMAGE LOADING ---
         if (holder.img != null) {
             if(v.imageRes != null && !v.imageRes.isEmpty()) {
                 try {
@@ -108,13 +107,12 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             }
         }
 
-        // --- FAVORITE LOGIC ---
+        // FAVORITE
         int currentUserId = getUserId();
 
         if (!isAdmin && currentUserId != -1) {
             holder.btnFavorite.setVisibility(View.VISIBLE);
 
-            // FIX: Changed method name to match your CarRentalData code (isVehicleFavorite)
             boolean isFav = dbHelper.isVehicleFavorite(currentUserId, v.id);
             updateFavoriteIcon(holder.btnFavorite, isFav);
 
@@ -129,7 +127,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             holder.btnFavorite.setVisibility(View.GONE);
         }
 
-        // --- CLICK LISTENERS ---
         View.OnClickListener openDetails = view -> {
             if (!isAdmin && v.status != null) {
                 if (v.status.equalsIgnoreCase("Rented")) {
@@ -147,7 +144,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                 i.putExtra("PRICE", v.price);
                 i.putExtra("NAME", v.title);
                 i.putExtra("IMAGE", v.imageRes);
-                // Add any other fields you need for details
                 context.startActivity(i);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -189,13 +185,17 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     }
 
     private void updateFavoriteIcon(ImageView view, boolean isFavorite) {
-        // Switch between your custom outline/filled icons
         if (isFavorite) {
             view.setImageResource(R.drawable.ic_star_filled);
         } else {
             view.setImageResource(R.drawable.ic_star_outline);
         }
         view.clearColorFilter();
+    }
+
+    private int getUserId() {
+        SharedPreferences prefs = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        return prefs.getInt("UID", -1);
     }
 
     private int getUserId() {
@@ -216,7 +216,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             status = v.findViewById(R.id.tvStatus);
             img = v.findViewById(R.id.ivCar);
 
-            btnFavorite = v.findViewById(R.id.btnFavorite); // Ensure this ID is in XML
+            btnFavorite = v.findViewById(R.id.btnFavorite);
 
             btnDelete = v.findViewById(R.id.btnDelete);
             btnDetails = v.findViewById(R.id.btnDetails);

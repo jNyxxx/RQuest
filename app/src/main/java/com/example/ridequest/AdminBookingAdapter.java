@@ -18,12 +18,11 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
     private BookingActionListener listener;
     private String userRole;
 
-    // UPDATED INTERFACE: Now accepts 'inspectionType'
     public interface BookingActionListener {
         void onApprove(CarRentalData.AdminBookingItem booking);
         void onCancel(CarRentalData.AdminBookingItem booking);
         void onReturn(CarRentalData.AdminBookingItem booking);
-        void onViewDetails(CarRentalData.AdminBookingItem booking, String inspectionType); // Changed this line
+        void onViewDetails(CarRentalData.AdminBookingItem booking, String inspectionType);
     }
 
     public AdminBookingAdapter(Context context, List<CarRentalData.AdminBookingItem> bookings, String userRole, BookingActionListener listener) {
@@ -67,14 +66,13 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
                 }
                 break;
 
-            case "Confirmed": // THIS IS READY FOR PICKUP
+            case "Confirmed": // ready for pickup from inspector agent
                 holder.tvStatus.setText("Ready for Pickup");
                 holder.tvStatus.setTextColor(Color.parseColor("#008000"));
 
                 if (userRole.equals("Inspection Agent")) {
                     holder.btnApprove.setText("Start Pickup");
                     holder.btnApprove.setVisibility(View.VISIBLE);
-                    // Pass "Pickup" as the type
                     holder.btnApprove.setOnClickListener(v -> listener.onViewDetails(booking, "Pickup"));
                 }
                 break;
@@ -86,7 +84,6 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
                 if (userRole.equals("Inspection Agent")) {
                     holder.btnApprove.setText("Start Return");
                     holder.btnApprove.setVisibility(View.VISIBLE);
-                    // Pass "Return" as the type
                     holder.btnApprove.setOnClickListener(v -> listener.onViewDetails(booking, "Return"));
                 } else {
                     holder.tvStatus.setText("On Rental");

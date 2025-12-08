@@ -34,7 +34,7 @@ public class InspectionDetailsActivity extends AppCompatActivity {
         imgEvidence = findViewById(R.id.imgEvidence);
         photoSection = findViewById(R.id.photoSection);
 
-        // Get Data from Intent
+        // Get Data
         int id = getIntent().getIntExtra("ID", -1);
         String type = getIntent().getStringExtra("TYPE");
         String date = getIntent().getStringExtra("DATE");
@@ -52,7 +52,6 @@ public class InspectionDetailsActivity extends AppCompatActivity {
         tvDate.setText(date != null ? date : "N/A");
         tvCustomer.setText(customer != null ? customer : "N/A");
 
-        // FIXED: Show inspector name if available
         if (inspector != null && !inspector.isEmpty() && !inspector.equals("null")) {
             tvInspector.setText(inspector);
         } else {
@@ -64,7 +63,6 @@ public class InspectionDetailsActivity extends AppCompatActivity {
         tvDamage.setText(damage != null && !damage.isEmpty() ? damage : "None");
         tvNotes.setText(notes != null && !notes.isEmpty() ? notes : "No additional notes");
 
-        // Load Photo if available
         if (photo != null && !photo.isEmpty() && !photo.equals("null")) {
             try {
                 byte[] decodedBytes = Base64.decode(photo, Base64.DEFAULT);

@@ -23,13 +23,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         load();
 
-        // Edit Profile Click
+        // Edit Profile
         LinearLayout btnEdit = findViewById(R.id.btnEditProfile);
         if (btnEdit != null) {
             btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
         }
 
-        // Logout Click
+        // Logout
         TextView btnLogout = findViewById(R.id.btnLogout);
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
-        // My Bookings Click
+        // My Bookings
         TextView btnMyBookings = findViewById(R.id.btnMyBookings);
         if (btnMyBookings != null) {
             btnMyBookings.setOnClickListener(v -> {
@@ -62,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
-        // Back Button
+        // Back
         ImageView btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());

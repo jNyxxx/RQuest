@@ -52,11 +52,8 @@ public class CustomerBookingAdapter extends RecyclerView.Adapter<CustomerBooking
         holder.tvDates.setText(booking.pickupDate + " → " + booking.returnDate);
         holder.tvTotalCost.setText(String.format(Locale.US, "$%.2f", booking.totalCost));
 
-        // --- FIX STARTS HERE ---
-        // Decode Base64 string to Bitmap instead of looking up resource ID
         if (booking.carImage != null && !booking.carImage.isEmpty()) {
             try {
-                // Check if it's a long Base64 string
                 if (booking.carImage.length() > 20) {
                     byte[] decodedBytes = Base64.decode(booking.carImage, Base64.DEFAULT);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
@@ -66,7 +63,6 @@ public class CustomerBookingAdapter extends RecyclerView.Adapter<CustomerBooking
                         holder.ivCarImage.setImageResource(R.drawable.ic_car_placeholder);
                     }
                 } else {
-                    // Fallback for old resource names (e.g., "tesla_model_s")
                     int resId = context.getResources().getIdentifier(booking.carImage, "drawable", context.getPackageName());
                     if (resId != 0) holder.ivCarImage.setImageResource(resId);
                     else holder.ivCarImage.setImageResource(R.drawable.ic_car_placeholder);
@@ -77,7 +73,6 @@ public class CustomerBookingAdapter extends RecyclerView.Adapter<CustomerBooking
         } else {
             holder.ivCarImage.setImageResource(R.drawable.ic_car_placeholder);
         }
-        // --- FIX ENDS HERE ---
 
         holder.tvStatus.setText(booking.status);
         setStatusStyle(holder.tvStatus, booking.status);
@@ -137,7 +132,6 @@ public class CustomerBookingAdapter extends RecyclerView.Adapter<CustomerBooking
     }
 
     private void setStatusStyle(TextView tvStatus, String status) {
-        // (Keep your existing setStatusStyle method)
         switch (status) {
             case "Pending":
                 tvStatus.setBackgroundResource(R.drawable.bg_status_pending);

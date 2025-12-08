@@ -244,7 +244,7 @@ public class AddVehicleActivity extends AppCompatActivity {
             double price = Double.parseDouble(priceStr);
             int seatCount = Integer.parseInt(seatsStr);
 
-            // Add to database
+            // Adds to database
             if (db.addNewCarComplete(make, model, type, year, price, plate, selectedImageBase64,
                     transmission, seatCount, color, category, fuel)) {
                 Toast.makeText(this, "Vehicle added successfully! ✓", Toast.LENGTH_LONG).show();

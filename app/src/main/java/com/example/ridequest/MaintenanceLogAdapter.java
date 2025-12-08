@@ -19,7 +19,6 @@ public class MaintenanceLogAdapter extends RecyclerView.Adapter<MaintenanceLogAd
         this.logs = logs;
     }
 
-    // Constructor with Context for Intent navigation
     public MaintenanceLogAdapter(Context context, List<CarRentalData.MaintenanceLogItem> logs) {
         this.context = context;
         this.logs = logs;
