@@ -60,6 +60,7 @@ public class PaymentActivity extends AppCompatActivity {
         downpaymentAmount = totalCost * 0.30;
         double remainingBalance = totalCost - downpaymentAmount;
 
+        // Log Data for Debugging
         Log.d(TAG, "Base Cost: $" + baseCost);
         Log.d(TAG, "Insurance: " + insuranceType + " - $" + insuranceFee);
         Log.d(TAG, "Late Fee: $" + lateFee);
@@ -148,21 +149,30 @@ public class PaymentActivity extends AppCompatActivity {
 
         btnUploadReceipt.setOnClickListener(v -> openGallery());
 
-        // CONFIRM PAYMENT
+        // ==========================================
+        //  CONFIRM PAYMENT LOGIC (FIXED)
+        // ==========================================
         btnConfirm.setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
+            // 1. Check if image exists FIRST
             if(receiptImageBase64 == null || receiptImageBase64.isEmpty()) {
                 Toast.makeText(this, "⚠️ Please upload your payment receipt", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            // 1. GENERATE A RANDOM ID (This is the missing 19th item)
+            // 2. Generate the Payment ID
             String generatedPaymentId = "PAY-" + System.currentTimeMillis();
+
+            // 3. Now it is safe to log (because variable exists)
+            Log.d("DEBUG_CHECK", "Payment ID being sent: " + generatedPaymentId);
+            if (receiptImageBase64.length() > 50) {
+                Log.d("DEBUG_CHECK", "Receipt Image being sent (First 50 chars): " + receiptImageBase64.substring(0, 50));
+            }
 
             CarRentalData db = new CarRentalData(this);
 
-            // 2. CALL THE METHOD WITH ALL 19 ARGUMENTS
+            // 4. Call Database Method
             boolean success = db.createPendingBooking(
                     uid, vid, carName,
                     pickupDate, returnDate,
@@ -171,8 +181,8 @@ public class PaymentActivity extends AppCompatActivity {
                     rentalDays, baseCost, insuranceType, insuranceFee,
                     lateHours, lateFee, totalCost,
                     "QR Code/GCash",      // 17. Payment Method
-                    generatedPaymentId,    // 18. Payment ID (New!)
-                    receiptImageBase64     // 19. Receipt Image (New!)
+                    generatedPaymentId,    // 18. Payment ID
+                    receiptImageBase64     // 19. Receipt Image (Base64 String)
             );
 
             if(success) {
@@ -187,6 +197,7 @@ public class PaymentActivity extends AppCompatActivity {
                 Toast.makeText(this, "Booking Failed. Please try again.", Toast.LENGTH_LONG).show();
             }
         });
+
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 

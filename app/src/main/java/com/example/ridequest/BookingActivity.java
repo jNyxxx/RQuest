@@ -144,7 +144,7 @@ public class BookingActivity extends AppCompatActivity {
                     insuranceFee = 0.0;
                 } else if (insuranceText.contains("Personal Insurance")) {
                     insuranceType = "Personal Insurance";
-                    insuranceFee = 0.0; // Customer provides own insurance
+                    insuranceFee = 0.0;
                 } else if (insuranceText.contains("Basic Insurance")) {
                     insuranceType = "Basic Insurance";
                     insuranceFee = dailyRate * 0.20; // 20% of DAILY RATE (not total)
@@ -174,7 +174,7 @@ public class BookingActivity extends AppCompatActivity {
             i.putExtra("DAILY_RATE", dailyRate);
             i.putExtra("BASE_COST", calc.baseCost);
             i.putExtra("INSURANCE_TYPE", insuranceType);
-            i.putExtra("INSURANCE_FEE", insuranceFee * calc.fullDays); // ⭐ TOTAL INSURANCE FOR ALL DAYS
+            i.putExtra("INSURANCE_FEE", insuranceFee * calc.fullDays);
             i.putExtra("TOTAL_COST", calc.totalCost);
             i.putExtra("NAME", name);
             i.putExtra("PICKUP_DATE", pickupDate);
@@ -272,7 +272,7 @@ public class BookingActivity extends AppCompatActivity {
                 double hourlyRate = dailyRate / 4.0;
                 calc.lateFee = calc.lateHours * hourlyRate;
 
-                Toast.makeText(this, "LATE RETURN DETECTED! ⚠️", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "LATE RETURN DETECTED! ", Toast.LENGTH_LONG).show();
             }
 
             // CALCULATE COSTS

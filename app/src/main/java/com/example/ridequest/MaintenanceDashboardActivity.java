@@ -1,6 +1,7 @@
 package com.example.ridequest;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +23,7 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
 
     private CarRentalData db;
     private RecyclerView recyclerView;
-    private TextView tvSectionTitle, tvItemCount;
+    private TextView tvItemCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +32,49 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
 
         db = new CarRentalData(this);
 
-        recyclerView = findViewById(R.id.rvMaintenanceVehicles);
-        tvSectionTitle = findViewById(R.id.tvSectionTitle);
-        tvItemCount = findViewById(R.id.tvItemCount);
+        // 1. MATCHING IDs FROM YOUR XML
+        recyclerView = findViewById(R.id.rvMaintenanceVehicles); // Matches XML
+        tvItemCount = findViewById(R.id.tvItemCount);           // Matches XML
 
-        tvSectionTitle.setText("Vehicle Maintenance");
+        // This is the button in the top right. Your XML calls it "btnLogout"
+        View btnSettings = findViewById(R.id.btnLogout);
+
+        // 2. Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // 3. Back Button Logic
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
+        // 4. SETTINGS / LOGOUT MENU LOGIC
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(MaintenanceDashboardActivity.this, v);
+                popup.getMenu().add("Log Out"); // Add the menu option
+
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().equals("Log Out")) {
+                        logout();
+                        return true;
+                    }
+                    return false;
+                });
+
+                popup.show();
+            });
+        }
+
+        // 5. Load Data
         loadVehicles();
+    }
+
+    private void logout() {
+        SharedPreferences prefs = getSharedPreferences("EmployeeSession", MODE_PRIVATE);
+        prefs.edit().clear().apply();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -49,15 +84,20 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
     }
 
     private void loadVehicles() {
-        List<CarRentalData.VehicleMaintenanceItem> vehicles =
-                db.getAllVehiclesForMaintenance();
+        List<CarRentalData.VehicleMaintenanceItem> vehicles = db.getAllVehiclesForMaintenance();
 
-        tvItemCount.setText(vehicles.size() + " vehicles");
-        recyclerView.setAdapter(new MaintenanceVehicleAdapter(vehicles));
+        if (vehicles != null) {
+            tvItemCount.setText(vehicles.size() + " vehicles"); // Updates "Loading..." text
+            recyclerView.setAdapter(new MaintenanceVehicleAdapter(vehicles));
+        } else {
+            tvItemCount.setText("0 vehicles");
+        }
     }
 
-    private class MaintenanceVehicleAdapter extends
-            RecyclerView.Adapter<MaintenanceVehicleAdapter.ViewHolder> {
+    // ============================================================
+    //  ADAPTER CLASS
+    // ============================================================
+    private class MaintenanceVehicleAdapter extends RecyclerView.Adapter<MaintenanceVehicleAdapter.ViewHolder> {
 
         private List<CarRentalData.VehicleMaintenanceItem> vehicles;
 
@@ -68,8 +108,8 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_maintenance_vehicle, parent, false);
+            // Ensure this layout file exists: item_maintenance_vehicle.xml or item_vehicle.xml
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_maintenance_vehicle, parent, false);
             return new ViewHolder(view);
         }
 
@@ -83,6 +123,7 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
             holder.tvLastService.setText("Last Service: " + vehicle.lastService);
             holder.tvServiceCount.setText(vehicle.maintenanceCount + " services");
 
+            // Image Loading
             if (vehicle.imageRes != null && !vehicle.imageRes.isEmpty()) {
                 try {
                     byte[] decoded = Base64.decode(vehicle.imageRes, Base64.DEFAULT);
@@ -95,9 +136,9 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
                 holder.imgCar.setImageResource(android.R.drawable.ic_menu_gallery);
             }
 
+            // Log Service Button Click
             holder.btnLogService.setOnClickListener(v -> {
-                Intent intent = new Intent(MaintenanceDashboardActivity.this,
-                        MaintenanceActivity.class);
+                Intent intent = new Intent(MaintenanceDashboardActivity.this, MaintenanceActivity.class);
                 intent.putExtra("VEHICLE_ID", vehicle.vehicleId);
                 intent.putExtra("CAR_NAME", vehicle.carName);
                 startActivity(intent);
@@ -116,6 +157,7 @@ public class MaintenanceDashboardActivity extends AppCompatActivity {
 
             ViewHolder(View itemView) {
                 super(itemView);
+                // Make sure these IDs exist in your item layout xml
                 imgCar = itemView.findViewById(R.id.imgCar);
                 tvCarName = itemView.findViewById(R.id.tvCarName);
                 tvPlate = itemView.findViewById(R.id.tvPlate);

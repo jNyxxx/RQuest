@@ -3,6 +3,7 @@ package com.example.ridequest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,44 +25,63 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Edit Profile Click
         LinearLayout btnEdit = findViewById(R.id.btnEditProfile);
-        btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+        if (btnEdit != null) {
+            btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+        }
 
         // Logout Click
         TextView btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(v -> {
-            SharedPreferences.Editor editor = getSharedPreferences("UserSession", MODE_PRIVATE).edit();
-            editor.clear();
-            editor.apply();
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                SharedPreferences.Editor editor = getSharedPreferences("UserSession", MODE_PRIVATE).edit();
+                editor.clear();
+                editor.apply();
 
-            // Go directly to LoginActivity
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
+        }
 
+        // My Bookings Click
         TextView btnMyBookings = findViewById(R.id.btnMyBookings);
-        btnMyBookings.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MyBookingsActivity.class);
-            startActivity(intent);
-        });
+        if (btnMyBookings != null) {
+            btnMyBookings.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MyBookingsActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        TextView btnFavorites = findViewById(R.id.btnFavoriteCars);
+
+        if (btnFavorites != null) {
+            btnFavorites.setOnClickListener(v -> {
+                Intent intent = new Intent(this, FavoritesActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // Back Button
         ImageView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        load(); // Refresh in case edit changed name
+        load();
     }
 
     private void load() {
         CarRentalData.Customer c = db.getCustomer(uid);
         if(c != null) {
-            ((TextView)findViewById(R.id.tvName)).setText(c.firstName + " " + c.lastName);
-            ((TextView)findViewById(R.id.tvEmail)).setText(c.email);
+            TextView tvName = findViewById(R.id.tvName);
+            TextView tvEmail = findViewById(R.id.tvEmail);
+            if(tvName != null) tvName.setText(c.firstName + " " + c.lastName);
+            if(tvEmail != null) tvEmail.setText(c.email);
         }
     }
 }

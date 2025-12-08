@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="40dp">
 
-        <!-- ORANGE HEADER BACKGROUND -->
         <View
             android:id="@+id/viewHeader"
             android:layout_width="match_parent"
@@ -19,7 +18,6 @@
             android:background="@color/rq_orange"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Back Button -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -33,7 +31,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
-        <!-- Profile Avatar -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardAvatar"
             android:layout_width="70dp"
@@ -56,14 +53,13 @@
                 android:src="@drawable/ic_launcher_foreground" />
         </androidx.cardview.widget.CardView>
 
-        <!-- Name & Email -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="@string/sample_name"
+            android:text="User Name"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -75,13 +71,12 @@
             android:id="@+id/tvEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/sample_email"
+            android:text="user@email.com"
             android:textColor="#E0E0E0"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@id/tvName"
             app:layout_constraintTop_toBottomOf="@id/tvName" />
 
-        <!-- Edit Profile Button (Top Right) -->
         <LinearLayout
             android:id="@+id/btnEditProfile"
             android:layout_width="wrap_content"
@@ -89,6 +84,8 @@
             android:layout_marginEnd="20dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="@id/cardAvatar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/cardAvatar">
@@ -104,19 +101,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="@string/edit_profile"
+                android:text="Edit Profile"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- GENERAL SECTION -->
         <TextView
             android:id="@+id/lblGeneral"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp"
-            android:text="@string/general"
+            android:text="General"
             android:textColor="#333"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -131,8 +127,8 @@
             android:paddingHorizontal="24dp"
             app:layout_constraintTop_toBottomOf="@id/lblGeneral">
 
-            <!-- Item 1 -->
             <TextView
+                android:id="@+id/btnFavoriteCars"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@android:drawable/btn_star_big_off"
@@ -141,11 +137,13 @@
                 android:drawableTint="#555"
                 android:gravity="center_vertical"
                 android:paddingVertical="12dp"
-                android:text="@string/favorite_cars"
+                android:text="Favorite Cars"
                 android:textColor="#555"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
                 tools:ignore="UseCompatTextViewDrawableXml" />
 
-            <!-- Item 2 - My Bookings -->
             <TextView
                 android:id="@+id/btnMyBookings"
                 android:layout_width="match_parent"
@@ -158,17 +156,19 @@
                 android:paddingVertical="12dp"
                 android:text="My Bookings"
                 android:textColor="#555"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
                 tools:ignore="UseCompatTextViewDrawableXml" />
         </LinearLayout>
 
-        <!-- SUPPORT SECTION -->
         <TextView
             android:id="@+id/lblSupport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp"
-            android:text="@string/support"
+            android:text="Support"
             android:textColor="#333"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -182,7 +182,6 @@
             android:paddingHorizontal="24dp"
             app:layout_constraintTop_toBottomOf="@id/lblSupport">
 
-            <!-- Item 1 -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -192,11 +191,10 @@
                 android:drawableTint="#555"
                 android:gravity="center_vertical"
                 android:paddingVertical="12dp"
-                android:text="@string/settings"
+                android:text="Settings"
                 android:textColor="#555"
                 tools:ignore="UseCompatTextViewDrawableXml" />
 
-            <!-- Item 2 -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -206,11 +204,10 @@
                 android:drawableTint="#555"
                 android:gravity="center_vertical"
                 android:paddingVertical="12dp"
-                android:text="@string/help_support"
+                android:text="Help &amp; Support"
                 android:textColor="#555"
                 tools:ignore="UseCompatTextViewDrawableXml" />
 
-            <!-- LOGOUT -->
             <TextView
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
@@ -221,8 +218,11 @@
                 android:drawableTint="#555"
                 android:gravity="center_vertical"
                 android:paddingVertical="12dp"
-                android:text="@string/log_out"
+                android:text="Log Out"
                 android:textColor="#555"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
                 tools:ignore="UseCompatTextViewDrawableXml" />
         </LinearLayout>
 

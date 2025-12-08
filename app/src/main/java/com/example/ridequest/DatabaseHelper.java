@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "RideQuest.db";
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 19;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -153,23 +153,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
                 "FOREIGN KEY(inspector_id) REFERENCES Employee(employee_id))");
 
-        // AccidentReport Table
-        db.execSQL("CREATE TABLE AccidentReport (" +
-                "report_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "rental_id INTEGER, " +
-                "vehicle_id INTEGER, " +
-                "customer_id INTEGER, " +
-                "accident_date TEXT, " +
-                "description TEXT, " +
-                "police_report_num TEXT, " +
-                "photos TEXT, " +
-                "damage_cost REAL, " +
-                "status TEXT DEFAULT 'Under Review', " +
-                "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                "FOREIGN KEY(rental_id) REFERENCES Rental(rental_id), " +
-                "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
-                "FOREIGN KEY(customer_id) REFERENCES Customer(customer_id))");
-
         // Insurance Table
         db.execSQL("CREATE TABLE Insurance (" +
                 "insurance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -198,6 +181,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(employee_id) REFERENCES Employee(employee_id), " +
                 "FOREIGN KEY(booking_id) REFERENCES Reservation(booking_id))");
 
+        // Favorites Table
+        db.execSQL("CREATE TABLE Favorites (" +
+                "fav_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "customer_id INTEGER NOT NULL, " +
+                "vehicle_id INTEGER NOT NULL, " +
+                "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                "FOREIGN KEY(customer_id) REFERENCES Customer(customer_id), " +
+                "FOREIGN KEY(vehicle_id) REFERENCES Vehicle(vehicle_id), " +
+                "UNIQUE(customer_id, vehicle_id))");
+
         // Employees
         db.execSQL("INSERT INTO Employee (first_name, last_name, email, password, role) VALUES " +
                 "('Keith', 'Justin', 'admin', 'admin123', 'Manager')");
@@ -211,7 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String[] tables = {"AccidentReport", "Insurance", "Inspection",
+        String[] tables = {"Favorites" ,"Insurance", "Inspection",
                 "EmployeeReservation", "EmployeeRental", "Payment",
                 "Rental", "Reservation", "MaintenanceRecord",
                 "Vehicle", "VehicleModel", "Employee", "Customer",
