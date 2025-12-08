@@ -198,10 +198,6 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         return prefs.getInt("UID", -1);
     }
 
-    private int getUserId() {
-        SharedPreferences prefs = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-        return prefs.getInt("UID", -1);
-    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, type, price, status;
