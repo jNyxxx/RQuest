@@ -42,14 +42,13 @@ public class InspectionHistoryAdapter extends RecyclerView.Adapter<InspectionHis
         holder.tvCustomer.setText(item.type + " Inspection");
         holder.tvDates.setText("Date: " + item.date);
 
-        // Hide unused buttons
+        // Hides unused buttons
         holder.btnApprove.setVisibility(View.GONE);
         holder.btnCancel.setVisibility(View.GONE);
         holder.btnReturn.setVisibility(View.GONE);
 
-        // Style the "Status" to look like a link/button
         holder.tvStatus.setText("View Report >");
-        holder.tvStatus.setTextColor(Color.parseColor("#E65100")); // RQ Orange
+        holder.tvStatus.setTextColor(Color.parseColor("#E65100"));
         holder.tvStatus.setBackground(null);
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(item));

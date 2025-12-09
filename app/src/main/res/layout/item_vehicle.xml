@@ -1,53 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Car Image -->
-        <ImageView
-            android:id="@+id/ivCar"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_car_placeholder"
-            android:contentDescription="Vehicle Image"
-            tools:ignore="HardcodedText" />
+            android:layout_height="180dp">
 
-        <!-- Car Details -->
+            <ImageView
+                android:id="@+id/ivCar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background"
+                android:contentDescription="Car Image"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <ImageView
+                    android:id="@+id/btnFavorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_star_outline"
+                    android:padding="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:contentDescription="Add to Favorites"/>
+            </androidx.cardview.widget.CardView>
+        </RelativeLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="12dp">
 
-            <!-- Title and Status Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="4dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvCarName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Toyota Wigo"
+                    android:text="Car Name"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#333"
-                    tools:ignore="HardcodedText" />
+                    android:textColor="#333"/>
 
                 <TextView
                     android:id="@+id/tvStatus"
@@ -55,85 +76,62 @@
                     android:layout_height="wrap_content"
                     android:text="Available"
                     android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    tools:ignore="HardcodedText" />
+                    android:textColor="#666"/>
             </LinearLayout>
 
-            <!-- Type -->
             <TextView
                 android:id="@+id/tvType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sedan"
                 android:textSize="14sp"
-                android:textColor="#666"
-                android:layout_marginBottom="8dp"
-                tools:ignore="HardcodedText" />
+                android:textColor="#999"
+                android:layout_marginTop="4dp"/>
 
-            <!-- Price -->
             <TextView
                 android:id="@+id/tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$850.00/day"
-                android:textSize="18sp"
+                android:text="$500.00/day"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/rq_orange"
-                android:layout_marginBottom="12dp"
-                tools:ignore="HardcodedText" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"/>
 
-            <!-- Admin Action Buttons and Customer Details Button -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end">
+                android:orientation="horizontal">
 
-                <!-- Customer: View Details Button -->
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDetails"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
                     android:layout_weight="1"
+                    android:layout_height="48dp"
                     android:text="View Details"
-                    android:textColor="@color/white"
-                    android:background="@drawable/bg_button_orange"
-                    android:textAllCaps="false"
-                    android:visibility="visible"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="24dp"
+                    app:backgroundTint="@color/rq_orange"/>
 
-                <!-- Admin: Edit Button -->
                 <Button
                     android:id="@+id/btnEdit"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
+                    android:layout_height="wrap_content"
                     android:text="Edit"
-                    android:textColor="@color/white"
-                    android:background="@drawable/bg_button_blue"
-                    android:textAllCaps="false"
-                    android:paddingHorizontal="16dp"
-                    android:layout_marginEnd="8dp"
                     android:visibility="gone"
-                    tools:ignore="HardcodedText" />
+                    android:layout_marginEnd="4dp"/>
 
-                <!-- Admin: Delete Button -->
                 <Button
                     android:id="@+id/btnDelete"
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
+                    android:layout_height="wrap_content"
                     android:text="Delete"
-                    android:textColor="@color/white"
-                    android:background="@drawable/bg_button_cancel"
-                    android:textAllCaps="false"
-                    android:paddingHorizontal="16dp"
+                    android:backgroundTint="#F44336"
                     android:visibility="gone"
-                    tools:ignore="HardcodedText" />
+                    android:layout_marginStart="4dp"/>
             </LinearLayout>
-
         </LinearLayout>
-
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

@@ -29,7 +29,6 @@ public class AddVehicleActivity extends AppCompatActivity {
     private String selectedImageBase64 = null;
     private ActivityResultLauncher<Intent> galleryLauncher;
 
-    // Added tilColor for consistency if you add it to XML, otherwise we handle error on EditText
     private TextInputLayout tilMake, tilModel, tilType, tilYear, tilPrice, tilPlate, tilSeats, tilColor;
     private TextInputEditText etMake, etModel, etType, etYear, etPrice, etPlate, etSeats, etColor;
     private Spinner spTransmission, spCategory, spFuel;
@@ -245,7 +244,7 @@ public class AddVehicleActivity extends AppCompatActivity {
             double price = Double.parseDouble(priceStr);
             int seatCount = Integer.parseInt(seatsStr);
 
-            // Add to database
+            // Adds to database
             if (db.addNewCarComplete(make, model, type, year, price, plate, selectedImageBase64,
                     transmission, seatCount, color, category, fuel)) {
                 Toast.makeText(this, "Vehicle added successfully! ✓", Toast.LENGTH_LONG).show();

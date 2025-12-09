@@ -24,7 +24,6 @@ public class EditProfileActivity extends AppCompatActivity {
         EditText etPhone = findViewById(R.id.etPhone);
         TextView tvName = findViewById(R.id.tvEditNameDisplay);
 
-        // Load existing data
         CarRentalData.Customer c = db.getCustomer(uid);
         if(c != null) {
             etFirst.setText(c.firstName);
@@ -34,7 +33,7 @@ public class EditProfileActivity extends AppCompatActivity {
             tvName.setText(c.firstName + " " + c.lastName);
         }
 
-        // Save Button
+        // Save
         Button btnSave = findViewById(R.id.btnSave);
         btnSave.setOnClickListener(v -> {
             String f = etFirst.getText().toString();
@@ -44,7 +43,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             if (db.updateCustomer(uid, f, l, e, p)) {
                 Toast.makeText(this, "Profile Updated!", Toast.LENGTH_SHORT).show();
-                finish(); // Go back to Profile Screen
+                finish();
             } else {
                 Toast.makeText(this, "Update Failed", Toast.LENGTH_SHORT).show();
             }

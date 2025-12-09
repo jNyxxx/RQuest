@@ -1,6 +1,7 @@
 package com.example.ridequest;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private CarRentalData db;
     private RecyclerView recyclerView;
     private VehicleAdapter adapter;
+    private TextView tvWelcome;
+    private int userId;
 
     private List<CarRentalData.VehicleItem> allVehicles;
     private List<CarRentalData.VehicleItem> filteredVehicles;
@@ -37,8 +40,16 @@ public class MainActivity extends AppCompatActivity {
 
         db = new CarRentalData(this);
         recyclerView = findViewById(R.id.recyclerView);
+        tvWelcome = findViewById(R.id.tvWelcome);
         ImageView ivProfile = findViewById(R.id.ivProfile);
         EditText etSearch = findViewById(R.id.etSearch);
+
+        // Get user session
+        SharedPreferences prefs = getSharedPreferences("UserSession", MODE_PRIVATE);
+        userId = prefs.getInt("UID", -1);
+
+        // Load and display user's name
+        loadUserName();
 
         // recyclerview
         if(recyclerView != null) {
@@ -119,8 +130,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume - Reloading vehicles");
-        loadVehicles(); // IMPORTANT!! this method will refresh the vehicle list when returning to this activity
+        Log.d(TAG, "onResume - Reloading vehicles and user name");
+        loadUserName();
+        loadVehicles();
+    }
+
+    private void loadUserName() {
+        if (tvWelcome == null) {
+            Log.e(TAG, "tvWelcome is null!");
+            return;
+        }
+
+        if (userId == -1) {
+            tvWelcome.setText("Welcome, Guest!");
+            Log.d(TAG, "No user logged in - showing Guest");
+            return;
+        }
+
+        try {
+            // Fetch user from database
+            CarRentalData.Customer customer = db.getCustomer(userId);
+
+            if (customer != null && customer.firstName != null && !customer.firstName.isEmpty()) {
+                String welcomeText = "Welcome, " + customer.firstName + "!";
+                tvWelcome.setText(welcomeText);
+                Log.d(TAG, "✓ Welcome message set for: " + customer.firstName + " (ID: " + userId + ")");
+            } else {
+                tvWelcome.setText("Welcome, User!");
+                Log.e(TAG, "Could not load customer name for ID: " + userId);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading user name: " + e.getMessage(), e);
+            tvWelcome.setText("Welcome, User!");
+        }
     }
 
     private void loadVehicles() {

@@ -16,20 +16,19 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
     private Context context;
     private List<CarRentalData.AdminBookingItem> bookings;
     private BookingActionListener listener;
-    private String userRole; // ADDED: To distinguish between Manager and Agent views
+    private String userRole;
 
     public interface BookingActionListener {
         void onApprove(CarRentalData.AdminBookingItem booking);
         void onCancel(CarRentalData.AdminBookingItem booking);
-        void onReturn(CarRentalData.AdminBookingItem booking); // Manager Action
-        void onViewDetails(CarRentalData.AdminBookingItem booking); // Agent Action (Inspect)
+        void onReturn(CarRentalData.AdminBookingItem booking);
+        void onViewDetails(CarRentalData.AdminBookingItem booking, String inspectionType);
     }
 
-    // UPDATED CONSTRUCTOR
     public AdminBookingAdapter(Context context, List<CarRentalData.AdminBookingItem> bookings, String userRole, BookingActionListener listener) {
         this.context = context;
         this.bookings = bookings;
-        this.userRole = userRole; // Store the role
+        this.userRole = userRole;
         this.listener = listener;
     }
 
@@ -50,88 +49,64 @@ public class AdminBookingAdapter extends RecyclerView.Adapter<AdminBookingAdapte
         holder.tvDates.setText(booking.pickupDate + " → " + booking.returnDate);
         holder.tvTotal.setText("$" + String.format("%.2f", booking.totalCost));
 
-        // 1. RESET BUTTONS (Default to GONE)
         holder.btnApprove.setVisibility(View.GONE);
         holder.btnCancel.setVisibility(View.GONE);
         holder.btnReturn.setVisibility(View.GONE);
-        holder.tvStatus.setOnClickListener(null); // Reset click listeners on status
+        holder.tvStatus.setOnClickListener(null);
 
-        // 2. LOGIC BASED ON STATUS
         switch (booking.status) {
             case "Pending":
                 holder.tvStatus.setText("Pending Approval");
                 holder.tvStatus.setTextColor(context.getResources().getColor(R.color.rq_orange));
-                // Only Manager can approve/cancel
                 if (userRole.equals("Manager")) {
-                    holder.btnApprove.setVisibility(View.VISIBLE); // "Approve"
-                    holder.btnCancel.setVisibility(View.VISIBLE);
-                }
-                break;
-
-            case "Confirmed": // Ready for Pickup
-                holder.tvStatus.setText("Ready for Pickup");
-                holder.tvStatus.setTextColor(Color.parseColor("#008000")); // Green
-
-                // If Agent, this is where they start the Pickup Inspection
-                if (userRole.equals("Inspection Agent")) {
-                    holder.btnApprove.setText("Start Pickup"); // Repurpose button
                     holder.btnApprove.setVisibility(View.VISIBLE);
-                    holder.btnApprove.setOnClickListener(v -> listener.onViewDetails(booking));
+                    holder.btnCancel.setVisibility(View.VISIBLE);
+                    holder.btnApprove.setText("Approve");
+                    holder.btnApprove.setOnClickListener(v -> listener.onApprove(booking));
                 }
                 break;
 
-            case "Rented": // Car is out with client
-                holder.tvStatus.setText("On Rental");
+            case "Confirmed": // ready for pickup from inspector agent
+                holder.tvStatus.setText("Ready for Pickup");
+                holder.tvStatus.setTextColor(Color.parseColor("#008000"));
+
+                if (userRole.equals("Inspection Agent")) {
+                    holder.btnApprove.setText("Start Pickup");
+                    holder.btnApprove.setVisibility(View.VISIBLE);
+                    holder.btnApprove.setOnClickListener(v -> listener.onViewDetails(booking, "Pickup"));
+                }
+                break;
+
+            case "Rented": // THIS IS READY FOR RETURN
+                holder.tvStatus.setText("Ready for Return");
                 holder.tvStatus.setTextColor(Color.BLUE);
 
                 if (userRole.equals("Inspection Agent")) {
-                    // AGENT VIEW: Needs to Inspect Return
-                    holder.btnApprove.setText("Inspect Return"); // Repurpose button
+                    holder.btnApprove.setText("Start Return");
                     holder.btnApprove.setVisibility(View.VISIBLE);
-                    holder.btnApprove.setOnClickListener(v -> listener.onViewDetails(booking));
+                    holder.btnApprove.setOnClickListener(v -> listener.onViewDetails(booking, "Return"));
                 } else {
-                    // MANAGER VIEW: Shows nothing. Must wait for inspection.
-                    holder.tvStatus.setText("Waiting for Inspection");
+                    holder.tvStatus.setText("On Rental");
                 }
                 break;
 
-            case "Inspected": // Agent is done.
+            case "Inspected":
                 holder.tvStatus.setText("Inspection Complete");
-                holder.tvStatus.setTextColor(Color.parseColor("#800080")); // Purple
-
+                holder.tvStatus.setTextColor(Color.parseColor("#800080"));
                 if (userRole.equals("Manager")) {
-                    // MANAGER VIEW: NOW they see the Return button
                     holder.btnReturn.setVisibility(View.VISIBLE);
                     holder.btnReturn.setText("Finalize Return");
-                } else {
-                    // AGENT VIEW: They are done.
-                    holder.tvStatus.setText("Sent to Manager");
+                    holder.btnReturn.setOnClickListener(v -> listener.onReturn(booking));
                 }
                 break;
 
-            case "Completed":
-                holder.tvStatus.setText("Returned");
+            default:
+                holder.tvStatus.setText(booking.status);
                 holder.tvStatus.setTextColor(Color.GRAY);
                 break;
-
-            case "Cancelled":
-                holder.tvStatus.setText("Cancelled");
-                holder.tvStatus.setTextColor(Color.RED);
-                break;
-        }
-
-        // Standard Button Listeners
-        // We set specific listeners inside the switch for "Approve" repurposing,
-        // but these are the defaults for Manager actions.
-        if (holder.btnApprove.getVisibility() == View.VISIBLE && holder.btnApprove.getText().toString().equals("Approve")) {
-            holder.btnApprove.setOnClickListener(v -> listener.onApprove(booking));
         }
 
         holder.btnCancel.setOnClickListener(v -> listener.onCancel(booking));
-        holder.btnReturn.setOnClickListener(v -> listener.onReturn(booking));
-
-        // Whole row click always views details/starts inspection
-        holder.itemView.setOnClickListener(v -> listener.onViewDetails(booking));
     }
 
     @Override

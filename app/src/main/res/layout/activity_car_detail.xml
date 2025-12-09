@@ -34,20 +34,20 @@
                     android:padding="8dp"
                     android:rotation="180"
                     android:src="@android:drawable/ic_menu_revert"
-                    android:contentDescription="@string/back_button"
+                    android:contentDescription="Back"
                     app:tint="@color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="@string/car_details"
+                    android:text="Vehicle Details"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/btnMore"
+                    android:id="@+id/btnFavorite"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_alignParentEnd="true"
@@ -56,8 +56,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:padding="8dp"
-                    android:src="@android:drawable/ic_menu_more"
-                    android:contentDescription="@string/more_options"
+                    android:src="@android:drawable/star_big_off"
+                    android:contentDescription="Favorite"
                     app:tint="@color/white" />
             </RelativeLayout>
         </com.google.android.material.appbar.MaterialToolbar>
@@ -74,6 +74,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="24dp">
 
+            <!-- Car Image Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardCarImage"
                 android:layout_width="0dp"
@@ -92,10 +93,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="240dp"
                     android:scaleType="centerCrop"
-                    android:contentDescription="@string/car_image"
+                    android:contentDescription="Car Image"
                     android:src="@drawable/ic_launcher_foreground" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Car Info Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardCarInfo"
                 android:layout_width="0dp"
@@ -115,6 +117,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- Title and Price Row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -122,6 +125,7 @@
                         android:gravity="center_vertical"
                         android:layout_marginBottom="12dp">
 
+                        <!-- Vehicle Name and Category -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
@@ -132,7 +136,7 @@
                                 android:id="@+id/tvDetailTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Tesla Model S"
+                                tools:text="Tesla Model S"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="#333" />
@@ -141,12 +145,13 @@
                                 android:id="@+id/tvCategory"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Premium Car"
+                                tools:text="Premium Car"
                                 android:textColor="#999"
                                 android:textSize="13sp"
                                 android:layout_marginTop="4dp" />
                         </LinearLayout>
 
+                        <!-- Price -->
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -157,7 +162,7 @@
                                 android:id="@+id/tvDetailPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="$18,000"
+                                tools:text="$18,000"
                                 android:textColor="@color/rq_orange"
                                 android:textSize="22sp"
                                 android:textStyle="bold" />
@@ -165,13 +170,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/per_day"
+                                android:text="per day"
                                 android:textColor="#999"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
                     </LinearLayout>
 
+                    <!-- Payment Info Banner -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -190,7 +196,7 @@
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:src="@android:drawable/ic_dialog_info"
-                                android:contentDescription="Info icon"
+                                android:contentDescription="Info"
                                 app:tint="@color/rq_orange" />
 
                             <TextView
@@ -206,6 +212,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Car Features Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardFeatures"
                 android:layout_width="0dp"
@@ -228,18 +235,20 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/car_features"
+                        android:text="Car Features"
                         android:textStyle="bold"
                         android:textColor="#333"
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp" />
 
+                    <!-- Feature Boxes -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:weightSum="3">
 
+                        <!-- Capacity -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
@@ -247,19 +256,19 @@
                             android:orientation="vertical"
                             android:background="@drawable/bg_input_field"
                             android:padding="12dp"
-                            android:layout_marginEnd="8dp">
+                            android:layout_marginEnd="8dp"
+                            android:gravity="center_horizontal">
 
                             <ImageView
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:src="@android:drawable/ic_menu_myplaces"
-                                android:contentDescription="@string/capacity_icon"
                                 app:tint="#777" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/capacity"
+                                android:text="Capacity"
                                 android:textSize="11sp"
                                 android:layout_marginTop="12dp"
                                 android:textColor="#999" />
@@ -268,13 +277,14 @@
                                 android:id="@+id/tvSeats"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="5 Seats"
+                                tools:text="5 Seats"
                                 android:textStyle="bold"
                                 android:textColor="#333"
                                 android:textSize="14sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
 
+                        <!-- Transmission -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
@@ -282,13 +292,13 @@
                             android:orientation="vertical"
                             android:background="@drawable/bg_input_field"
                             android:padding="12dp"
-                            android:layout_marginEnd="8dp">
+                            android:layout_marginEnd="8dp"
+                            android:gravity="center_horizontal">
 
                             <ImageView
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:src="@android:drawable/ic_lock_idle_charging"
-                                android:contentDescription="Transmission icon"
                                 app:tint="#777" />
 
                             <TextView
@@ -303,26 +313,27 @@
                                 android:id="@+id/tvTransmission"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Manual"
+                                tools:text="Manual"
                                 android:textStyle="bold"
                                 android:textColor="#333"
                                 android:textSize="14sp"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
 
+                        <!-- Type -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:background="@drawable/bg_input_field"
-                            android:padding="12dp">
+                            android:padding="12dp"
+                            android:gravity="center_horizontal">
 
                             <ImageView
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:src="@android:drawable/ic_menu_compass"
-                                android:contentDescription="Type icon"
                                 app:tint="#777" />
 
                             <TextView
@@ -337,7 +348,7 @@
                                 android:id="@+id/tvType"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Sedan"
+                                tools:text="Sedan"
                                 android:textStyle="bold"
                                 android:textColor="#333"
                                 android:textSize="14sp"
@@ -347,6 +358,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Specifications Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardSpecifications"
                 android:layout_width="0dp"
@@ -375,6 +387,7 @@
                         android:textSize="16sp"
                         android:layout_marginBottom="16dp" />
 
+                    <!-- Fuel Type -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -394,13 +407,14 @@
                             android:id="@+id/tvFuelType"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Gasoline"
+                            tools:text="Gasoline"
                             android:textColor="#333"
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
 
+                    <!-- Color -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -420,13 +434,14 @@
                             android:id="@+id/tvColor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pearl White"
+                            tools:text="Pearl White"
                             android:textColor="#333"
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
 
+                    <!-- Hidden Plate Number (for internal use) -->
                     <TextView
                         android:id="@+id/tvPlate"
                         android:layout_width="wrap_content"
@@ -436,11 +451,12 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Book Now Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBookNow"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
-                android:text="@string/book_now"
+                android:text="Book Now"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"

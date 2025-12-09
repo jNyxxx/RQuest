@@ -21,11 +21,11 @@ public class MaintenanceActivity extends AppCompatActivity {
 
         db = new CarRentalData(this);
 
-        // 1. Get Vehicle ID from Dashboard Intent
+        // gets Vehicle ID
         vehicleId = getIntent().getIntExtra("VEHICLE_ID", -1);
         String carName = getIntent().getStringExtra("CAR_NAME");
 
-        // 2. Get Mechanic ID from Session (Important!)
+        // Get Mechanic ID
         SharedPreferences prefs = getSharedPreferences("EmployeeSession", MODE_PRIVATE);
         mechanicId = prefs.getInt("EMPLOYEE_ID", -1);
 
@@ -44,7 +44,7 @@ public class MaintenanceActivity extends AppCompatActivity {
         // Display Car Name
         tvCarName.setText(carName != null ? carName : "Unknown Vehicle");
 
-        // 3. Submit Logic
+        // Submit
         btnSubmit.setOnClickListener(v -> {
             String desc = etDesc.getText().toString().trim();
             String costStr = etCost.getText().toString().trim();
@@ -67,8 +67,6 @@ public class MaintenanceActivity extends AppCompatActivity {
                 return;
             }
 
-            // Save to DB - FIXED: Only 4 parameters (removed currentDate)
-            // The date is automatically generated inside submitMaintenance()
             if (db.submitMaintenance(vehicleId, mechanicId, desc, cost)) {
                 Toast.makeText(this, "Maintenance Logged Successfully!", Toast.LENGTH_SHORT).show();
                 finish();

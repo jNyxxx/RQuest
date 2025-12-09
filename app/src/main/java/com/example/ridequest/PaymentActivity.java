@@ -60,6 +60,7 @@ public class PaymentActivity extends AppCompatActivity {
         downpaymentAmount = totalCost * 0.30;
         double remainingBalance = totalCost - downpaymentAmount;
 
+        // Log Data for Debugging
         Log.d(TAG, "Base Cost: $" + baseCost);
         Log.d(TAG, "Insurance: " + insuranceType + " - $" + insuranceFee);
         Log.d(TAG, "Late Fee: $" + lateFee);
@@ -75,7 +76,7 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        // Bind UI Elements
+        // UI Elements
         TextView tvTitle = findViewById(R.id.tvTitle);
         TextView tvCarName = findViewById(R.id.tvCarName);
         TextView tvDates = findViewById(R.id.tvDates);
@@ -90,7 +91,7 @@ public class PaymentActivity extends AppCompatActivity {
         Button btnUploadReceipt = findViewById(R.id.btnUploadReceipt);
         Button btnConfirm = findViewById(R.id.btnConfirm);
 
-        // Set UI Data
+        // UI
         if(tvTitle != null) tvTitle.setText("Payment Summary");
         if(tvCarName != null) tvCarName.setText(carName != null ? carName : "Unknown Vehicle");
         if(tvDates != null) tvDates.setText(pickupDate + " " + pickupTime + " → " + returnDate + " " + returnTime);
@@ -110,7 +111,7 @@ public class PaymentActivity extends AppCompatActivity {
         if(tvDownpayment != null) tvDownpayment.setText("Downpayment (30%): $" + String.format("%.2f", downpaymentAmount));
         if(tvBalance != null) tvBalance.setText("Balance (pay at pickup): $" + String.format("%.2f", remainingBalance));
 
-        // Show late fee warning
+        // late fee warning
         if(tvLateFeeWarning != null) {
             if(lateFee > 0) {
                 tvLateFeeWarning.setVisibility(View.VISIBLE);
@@ -148,17 +149,27 @@ public class PaymentActivity extends AppCompatActivity {
 
         btnUploadReceipt.setOnClickListener(v -> openGallery());
 
-        // CONFIRM PAYMENT
+        //confirm payment method
         btnConfirm.setOnClickListener(v -> {
             Log.d(TAG, ">>> Confirm Payment clicked");
 
+            // 1. Check if image exists FIRST
             if(receiptImageBase64 == null || receiptImageBase64.isEmpty()) {
                 Toast.makeText(this, "⚠️ Please upload your payment receipt", Toast.LENGTH_LONG).show();
                 return;
             }
 
+            // Generate the Payment ID
+            String generatedPaymentId = "PAY-" + System.currentTimeMillis();
+
+            Log.d("DEBUG_CHECK", "Payment ID being sent: " + generatedPaymentId);
+            if (receiptImageBase64.length() > 50) {
+                Log.d("DEBUG_CHECK", "Receipt Image being sent (First 50 chars): " + receiptImageBase64.substring(0, 50));
+            }
+
             CarRentalData db = new CarRentalData(this);
 
+            // Call Database Method
             boolean success = db.createPendingBooking(
                     uid, vid, carName,
                     pickupDate, returnDate,
@@ -166,39 +177,21 @@ public class PaymentActivity extends AppCompatActivity {
                     pickupAddress, returnAddress,
                     rentalDays, baseCost, insuranceType, insuranceFee,
                     lateHours, lateFee, totalCost,
-                    "QR Code Payment", receiptImageBase64
+                    "QR Code/GCash",      // 17. Payment Method
+                    generatedPaymentId,    // 18. Payment ID
+                    receiptImageBase64     // 19. Receipt Image (Base64 String)
             );
 
             if(success) {
-                Log.d(TAG, "Booking created with all details!");
-
-                String message = "Booking Submitted Successfully!\n\n" +
-                        "Your booking is pending admin verification.\n\n" +
-                        "Cost Breakdown:\n" +
-                        "Base Cost: $" + String.format("%.2f", baseCost) + "\n" +
-                        (insuranceFee > 0 ? "Insurance: $" + String.format("%.2f", insuranceFee) + "\n" : "") +
-                        (lateFee > 0 ? "Late Fee: $" + String.format("%.2f", lateFee) + "\n" : "") +
-                        "Total: $" + String.format("%.2f", totalCost) + "\n\n" +
-                        "Downpayment Paid: $" + String.format("%.2f", downpaymentAmount) + "\n" +
-                        "Balance Due at Pickup: $" + String.format("%.2f", remainingBalance) + "\n\n" +
-                        "Pickup: " + pickupAddress + "\n" +
-                        "Return: " + returnAddress + "\n\n" +
-                        "IMPORTANT - Bring to Pickup:\n" +
-                        "• Valid driver's license\n" +
-                        "• Government-issued ID\n" +
-                        "• Cash for remaining balance\n" +
-                        "• Proof of insurance (if applicable)";
-
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Booking created successfully!");
+                Toast.makeText(this, "Booking Submitted!", Toast.LENGTH_LONG).show();
 
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
-
             } else {
-                Log.e(TAG, "Booking failed!");
-                Toast.makeText(this, "Booking Failed\n\nPlease try again.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Booking Failed. Please try again.", Toast.LENGTH_LONG).show();
             }
         });
 
