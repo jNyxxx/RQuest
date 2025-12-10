@@ -3,49 +3,93 @@ package com.example.ridequest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 public class ProfileActivity extends AppCompatActivity {
+    private static final String TAG = "ProfileActivity";
+    private static final String PREF_NAME = "UserSession";
+    private static final String KEY_UID = "UID";
+
     private CarRentalData db;
+    private SharedPreferences prefs;
     private int uid;
+
+    // UI Elements
+    private TextView tvName;
+    private TextView tvEmail;
+    private TextView tvFavCount;
+    private TextView tvBookingCount;
+    private ImageView ivProfileAvatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Initialize SharedPreferences and Database
+        prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         db = new CarRentalData(this);
-        uid = getSharedPreferences("UserSession", MODE_PRIVATE).getInt("UID", 1);
+        uid = prefs.getInt(KEY_UID, -1);
 
-        load();
-
-        // Edit Profile
-        LinearLayout btnEdit = findViewById(R.id.btnEditProfile);
-        if (btnEdit != null) {
-            btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+        // Validate user session
+        if (uid == -1) {
+            redirectToLogin();
+            return;
         }
 
-        // Logout
-        TextView btnLogout = findViewById(R.id.btnLogout);
-        if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> {
-                SharedPreferences.Editor editor = getSharedPreferences("UserSession", MODE_PRIVATE).edit();
-                editor.clear();
-                editor.apply();
+        // Initialize UI elements
+        initializeViews();
 
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        // Load profile data
+        loadProfileData();
+
+        // Setup click listeners
+        setupClickListeners();
+    }
+
+    private void initializeViews() {
+        tvName = findViewById(R.id.tvName);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvFavCount = findViewById(R.id.tvFavCount);
+        tvBookingCount = findViewById(R.id.tvBookingCount);
+        ivProfileAvatar = findViewById(R.id.ivProfileAvatar);
+    }
+
+    private void setupClickListeners() {
+        // Back button
+        ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
+
+        // Edit Profile
+        MaterialCardView cardEditProfile = findViewById(R.id.cardEditProfile);
+        if (cardEditProfile != null) {
+            cardEditProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(this, EditProfileActivity.class);
                 startActivity(intent);
-                finish();
+            });
+        }
+
+        // Favorite Cars
+        LinearLayout btnFavoriteCars = findViewById(R.id.btnFavoriteCars);
+        if (btnFavoriteCars != null) {
+            btnFavoriteCars.setOnClickListener(v -> {
+                Intent intent = new Intent(this, FavoritesActivity.class);
+                startActivity(intent);
             });
         }
 
         // My Bookings
-        TextView btnMyBookings = findViewById(R.id.btnMyBookings);
+        LinearLayout btnMyBookings = findViewById(R.id.btnMyBookings);
         if (btnMyBookings != null) {
             btnMyBookings.setOnClickListener(v -> {
                 Intent intent = new Intent(this, MyBookingsActivity.class);
@@ -53,35 +97,114 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
-        TextView btnFavorites = findViewById(R.id.btnFavoriteCars);
-
-        if (btnFavorites != null) {
-            btnFavorites.setOnClickListener(v -> {
-                Intent intent = new Intent(this, FavoritesActivity.class);
-                startActivity(intent);
+        // Settings
+        LinearLayout btnSettings = findViewById(R.id.btnSettings);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                // TODO: Create SettingsActivity
+                Toast.makeText(this, "Settings coming soon", Toast.LENGTH_SHORT).show();
             });
         }
 
-        // Back
-        ImageView btnBack = findViewById(R.id.btnBack);
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
+        // Help & Support
+        LinearLayout btnHelp = findViewById(R.id.btnHelp);
+        if (btnHelp != null) {
+            btnHelp.setOnClickListener(v -> {
+                // TODO: Create HelpActivity
+                Toast.makeText(this, "Help & Support coming soon", Toast.LENGTH_SHORT).show();
+            });
         }
+
+        // About
+        LinearLayout btnAbout = findViewById(R.id.btnAbout);
+        if (btnAbout != null) {
+            btnAbout.setOnClickListener(v -> {
+                // TODO: Create AboutActivity
+                Toast.makeText(this, "About RideQuest v1.0.0", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        // Logout
+        MaterialButton btnLogout = findViewById(R.id.btnLogout);
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> handleLogout());
+        }
+    }
+
+    private void loadProfileData() {
+        try {
+            CarRentalData.Customer customer = db.getCustomer(uid);
+
+            if (customer != null) {
+                // Set name
+                if (tvName != null) {
+                    String fullName = customer.firstName + " " + customer.lastName;
+                    tvName.setText(fullName);
+                }
+
+                // Set email
+                if (tvEmail != null) {
+                    tvEmail.setText(customer.email);
+                }
+
+                // Set default text for favorites and bookings
+                if (tvFavCount != null) {
+                    tvFavCount.setText("View your saved vehicles");
+                }
+
+                if (tvBookingCount != null) {
+                    tvBookingCount.setText("View your rental history");
+                }
+
+                // TODO: Load profile avatar if you have image storage
+                // loadProfileAvatar(customer);
+
+            } else {
+                Log.e(TAG, "Customer not found for UID: " + uid);
+                Toast.makeText(this, "Profile data not found", Toast.LENGTH_SHORT).show();
+                redirectToLogin();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading profile data", e);
+            Toast.makeText(this, "Error loading profile", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handleLogout() {
+        try {
+            // Clear session data
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
+            editor.apply();
+
+            // Redirect to login
+            redirectToLogin();
+
+            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error during logout", e);
+            Toast.makeText(this, "Logout failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void redirectToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        load();
+        // Reload profile data when returning from other activities
+        if (uid != -1) {
+            loadProfileData();
+        }
     }
 
-    private void load() {
-        CarRentalData.Customer c = db.getCustomer(uid);
-        if(c != null) {
-            TextView tvName = findViewById(R.id.tvName);
-            TextView tvEmail = findViewById(R.id.tvEmail);
-            if(tvName != null) tvName.setText(c.firstName + " " + c.lastName);
-            if(tvEmail != null) tvEmail.setText(c.email);
-        }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

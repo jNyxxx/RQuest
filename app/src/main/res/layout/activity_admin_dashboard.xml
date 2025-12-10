@@ -6,168 +6,279 @@
     android:layout_height="match_parent"
     android:background="#F8F9FA">
 
+    <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:elevation="4dp">
+        app:elevation="0dp">
 
+        <!-- Main Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="@color/rq_orange"
-            app:contentInsetStart="16dp"
-            app:contentInsetEnd="16dp">
+            android:minHeight="?attr/actionBarSize"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp">
 
+                <!-- Header Row -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admin Dashboard"
+                            android:textColor="@color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvAdminSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:alpha="0.9"
+                            android:text="Manage your fleet"
+                            android:textColor="@color/white"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAdminProfile"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:clickable="true"
+                        android:contentDescription="Admin profile and settings"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="4dp">
+
+                        <ImageView
+                            android:id="@+id/btnAdminProfile"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Profile menu"
+                            android:padding="10dp"
+                            android:src="@android:drawable/ic_menu_manage"
+                            app:tint="@color/rq_orange" />
+                    </com.google.android.material.card.MaterialCardView>
+                </RelativeLayout>
+
+                <!-- Stats Cards -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/layoutStats"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_centerVertical="true">
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    tools:visibility="visible">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Admin Dashboard"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp">
 
-                    <TextView
-                        android:id="@+id/tvAdminSubtitle"
-                        android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@android:drawable/ic_menu_view"
+                                app:tint="@color/rq_orange" />
+
+                            <TextView
+                                android:id="@+id/tvTotalVehicles"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="0"
+                                android:textColor="@color/rq_orange"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Total Vehicles"
+                                android:textColor="#666"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Manage your fleet"
-                        android:textColor="#FFFFFF"
-                        android:alpha="0.9"
-                        android:textSize="12sp"/>
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@android:drawable/ic_menu_my_calendar"
+                                app:tint="#4CAF50" />
+
+                            <TextView
+                                android:id="@+id/tvActiveBookings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="0"
+                                android:textColor="#4CAF50"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Active Bookings"
+                                android:textColor="#666"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardAdminProfile"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:clickable="true"
-                    android:contentDescription="Admin profile and settings"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp">
-
-                    <ImageView
-                        android:id="@+id/btnAdminProfile"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="Profile menu"
-                        android:padding="8dp"
-                        android:src="@android:drawable/ic_menu_manage"
-                        app:tint="@color/rq_orange" />
-                </com.google.android.material.card.MaterialCardView>
-            </RelativeLayout>
+            </LinearLayout>
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <!-- Tab Navigation -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardTabContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="-8dp"
             android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="@color/white">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:padding="6dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewVehicles"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="56dp"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:contentDescription="View and manage vehicles"
-                    android:text="V"
+                    android:text="Vehicles"
                     android:textColor="@color/white"
-                    android:textSize="9sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
                     app:backgroundTint="@color/rq_orange"
-                    app:cornerRadius="8dp"
+                    app:cornerRadius="12dp"
                     app:icon="@android:drawable/ic_menu_view"
-                    app:iconGravity="textStart"
-                    app:iconSize="18dp" />
+                    app:iconGravity="top"
+                    app:iconPadding="4dp"
+                    app:iconSize="20dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewBookings"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="48dp"
-                    android:text="B"
-                    android:textSize="8sp"
-                    app:icon="@android:drawable/ic_menu_my_calendar"
-                    app:iconGravity="textStart"
-                    app:iconSize="18dp"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    app:strokeColor="@color/rq_orange"
-                    app:strokeWidth="2dp"
-                    app:cornerRadius="8dp"
-                    android:textColor="@color/rq_orange"
+                    android:layout_height="56dp"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
-                    android:contentDescription="View and manage bookings"/>
+                    android:layout_weight="1"
+                    android:contentDescription="View and manage bookings"
+                    android:text="Bookings"
+                    android:textColor="#666"
+                    android:textSize="11sp"
+                    app:cornerRadius="12dp"
+                    app:icon="@android:drawable/ic_menu_my_calendar"
+                    app:iconGravity="top"
+                    app:iconPadding="4dp"
+                    app:iconSize="20dp"
+                    app:iconTint="#666" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewMaintenance"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="56dp"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
                     android:contentDescription="View and manage maintenance"
-                    android:text=""
-                    android:textColor="@color/rq_orange"
-                    android:textSize="7.5sp"
-                    app:cornerRadius="8dp"
+                    android:text="Maintenance"
+                    android:textColor="#666"
+                    android:textSize="10sp"
+                    app:cornerRadius="12dp"
                     app:icon="@android:drawable/ic_menu_manage"
-                    app:iconGravity="textStart"
-                    app:iconSize="18dp"
-                    app:strokeColor="@color/rq_orange"
-                    app:strokeWidth="2dp" />
+                    app:iconGravity="top"
+                    app:iconPadding="4dp"
+                    app:iconSize="20dp"
+                    app:iconTint="#666" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewInspections"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="48dp"
-                    android:text="I"
-                    android:textSize="7.5sp"
-                    app:icon="@android:drawable/ic_menu_search"
-                    app:iconGravity="textStart"
-                    app:iconSize="18dp"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    app:strokeColor="@color/rq_orange"
-                    app:strokeWidth="2dp"
-                    app:cornerRadius="8dp"
-                    android:textColor="@color/rq_orange"
+                    android:layout_height="56dp"
                     android:layout_marginStart="4dp"
-                    android:contentDescription="View and manage inspections"/>
+                    android:layout_weight="1"
+                    android:contentDescription="View and manage inspections"
+                    android:text="Inspections"
+                    android:textColor="#666"
+                    android:textSize="10sp"
+                    app:cornerRadius="12dp"
+                    app:icon="@android:drawable/ic_menu_search"
+                    app:iconGravity="top"
+                    app:iconPadding="4dp"
+                    app:iconSize="20dp"
+                    app:iconTint="#666" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Main Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -179,197 +290,147 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <LinearLayout
-                android:id="@+id/layoutStats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-
-                        <TextView
-                            android:id="@+id/tvTotalVehicles"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="12"
-                            android:textSize="28sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/rq_orange"
-                            tools:ignore="HardcodedText"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Total Vehicles"
-                            android:textSize="12sp"
-                            android:textColor="#666"
-                            android:layout_marginTop="4dp"
-                            tools:ignore="HardcodedText"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-
-                        <TextView
-                            android:id="@+id/tvActiveBookings"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="5"
-                            android:textSize="28sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/rq_orange"
-                            tools:ignore="HardcodedText"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Active Bookings"
-                            android:textSize="12sp"
-                            android:textColor="#666"
-                            android:layout_marginTop="4dp"
-                            tools:ignore="HardcodedText"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
+            <!-- Section Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvSectionTitle"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="All Vehicles"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
                     android:textColor="#333"
-                    tools:ignore="HardcodedText"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvItemCount"
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="12 items"
-                    android:textSize="14sp"
-                    android:textColor="#999"
-                    tools:ignore="HardcodedText"/>
+                    app:cardBackgroundColor="#F0F0F0"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+
+                    <TextView
+                        android:id="@+id/tvItemCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:text="0 items"
+                        android:textColor="#666"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <!-- Content Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- RecyclerView -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvAdmin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
                         android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"/>
+                        android:nestedScrollingEnabled="false"
+                        android:padding="8dp" />
 
+                    <!-- Empty State -->
                     <LinearLayout
                         android:id="@+id/layoutEmpty"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:gravity="center"
+                        android:orientation="vertical"
                         android:padding="48dp"
                         android:visibility="gone"
                         tools:visibility="visible">
 
-                        <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:src="@android:drawable/ic_menu_view"
-                            android:alpha="0.3"
-                            app:tint="#999"
-                            android:contentDescription="Empty state icon"/>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            app:cardBackgroundColor="#FFF3E0"
+                            app:cardCornerRadius="50dp"
+                            app:cardElevation="0dp">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="Empty state icon"
+                                android:src="@android:drawable/ic_menu_view"
+                                app:tint="@color/rq_orange" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:id="@+id/tvEmptyTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
                             android:text="No vehicles yet"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:textColor="#666"
-                            android:layout_marginTop="16dp"
-                            tools:ignore="HardcodedText"/>
+                            android:textColor="#333"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvEmptyMessage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tap the + button to add your first vehicle"
-                            android:textSize="14sp"
-                            android:textColor="#999"
-                            android:textAlignment="center"
                             android:layout_marginTop="8dp"
-                            tools:ignore="HardcodedText"/>
+                            android:text="Tap the button below to add your first vehicle to the fleet"
+                            android:textAlignment="center"
+                            android:textColor="#999"
+                            android:textSize="14sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEmptyStateAdd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:paddingHorizontal="32dp"
+                            android:text="Add Vehicle"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:backgroundTint="@color/rq_orange"
+                            app:cornerRadius="12dp"
+                            app:icon="@android:drawable/ic_input_add"
+                            app:iconGravity="start" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
+        android:contentDescription="Add new vehicle to fleet"
         android:text="Add Vehicle"
         android:textColor="@color/white"
         android:textStyle="bold"
-        app:icon="@android:drawable/ic_input_add"
-        app:iconTint="@color/white"
         app:backgroundTint="@color/rq_orange"
-        app:elevation="6dp"
         app:cornerRadius="16dp"
-        android:contentDescription="Add new vehicle to fleet"/>
+        app:elevation="6dp"
+        app:icon="@android:drawable/ic_input_add"
+        app:iconTint="@color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

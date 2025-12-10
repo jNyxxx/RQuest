@@ -1,180 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="24dp">
+    android:background="#F8F9FA">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="24dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
             android:text="Edit Vehicle"
             android:textColor="@color/rq_orange"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/etMake"
-            android:hint="Make (e.g. Toyota)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etModel"
-            android:hint="Model (e.g. Vios)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etType"
-            android:hint="Type (e.g. Sedan)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etColor"
-            android:hint="Color (e.g. Red)"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/etPrice"
-            android:hint="Rate/Day"
-            android:inputType="numberDecimal"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
-
+        <!-- Make Dropdown -->
         <TextView
-            android:text="Transmission:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:text="Make"
             android:textColor="#555"
-            android:textStyle="bold"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spMake"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="12dp" />
+
+        <!-- Model -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Model"
+            android:textColor="#555"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etModel"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="e.g. Vios, Civic, F-150"
+            android:inputType="text"
+            android:paddingHorizontal="12dp" />
+
+        <!-- Type Dropdown -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Type"
+            android:textColor="#555"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spType"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="12dp" />
+
+        <!-- Color -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Color"
+            android:textColor="#555"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etColor"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="e.g. Red, Black, White"
+            android:inputType="text"
+            android:paddingHorizontal="12dp" />
+
+        <!-- Daily Rate -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Daily Rate (₱)"
+            android:textColor="#555"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPrice"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="e.g. 2500.00"
+            android:inputType="numberDecimal"
+            android:paddingHorizontal="12dp" />
+
+        <!-- Transmission -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Transmission"
+            android:textColor="#555"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/spTransmission"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field" />
 
+        <!-- Category -->
         <TextView
-            android:text="Category:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:text="Category"
             android:textColor="#555"
-            android:textStyle="bold"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/spCategory"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field" />
 
+        <!-- Fuel Type -->
         <TextView
-            android:text="Fuel Type:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:text="Fuel Type"
             android:textColor="#555"
-            android:textStyle="bold"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/spFuel"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/bg_input_field"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_field" />
 
+        <!-- Seating Capacity -->
         <TextView
-            android:text="Seating Capacity:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:text="Seating Capacity"
             android:textColor="#555"
-            android:textStyle="bold"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etSeats"
-            android:hint="Number of seats (e.g. 5)"
-            android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:hint="Number of seats (e.g. 5)"
+            android:inputType="number"
+            android:paddingHorizontal="12dp" />
 
+        <!-- Image Selection -->
         <TextView
-            android:text="Select Image Asset:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:text="Vehicle Image"
             android:textColor="#555"
-            android:textStyle="bold"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btnSelectImage"
-            android:text="Select Image from Gallery"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_button_orange"
-            android:textColor="@color/white"
-            android:layout_marginBottom="12dp"/>
-
-        <ImageView
-            android:id="@+id/ivPreview"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:background="#EEE"
-            android:layout_marginBottom="24dp"
-            android:contentDescription="Vehicle preview"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnUpdateCar"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Update Vehicle"
-            android:background="@drawable/bg_button_orange"
-            android:textColor="@color/white"
-            android:textStyle="bold"/>
-
-        <Button
-            android:id="@+id/btnBack"
-            android:text="Cancel"
-            android:textColor="#555"
-            android:background="@android:color/transparent"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/ivPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="#EEE"
+                    android:contentDescription="Vehicle preview"
+                    android:scaleType="centerCrop" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSelectImage"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Select Image from Gallery"
+                    android:textColor="@color/rq_orange"
+                    app:cornerRadius="8dp"
+                    app:icon="@android:drawable/ic_menu_gallery"
+                    app:iconGravity="start"
+                    app:strokeColor="@color/rq_orange"
+                    app:strokeWidth="2dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Update Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUpdateCar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:text="Update Vehicle"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:backgroundTint="@color/rq_orange"
+            app:cornerRadius="12dp"
+            app:icon="@android:drawable/ic_menu_save"
+            app:iconGravity="start" />
+
+        <!-- Cancel Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBack"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="#666" />
 
     </LinearLayout>
 </ScrollView>

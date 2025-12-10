@@ -261,6 +261,16 @@ public class CarRentalData {
         }
     }
 
+    public Cursor getAllMakes() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Make ORDER BY make_name ASC", null);
+    }
+
+    public Cursor getAllTypes() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Type ORDER BY type_name ASC", null);
+    }
+
 
     // ===================== VEHICLE RETURN =====================
 
@@ -2224,4 +2234,5 @@ public class CarRentalData {
             this.paymentReceipt = receipt;
         }
     }
+
 }

@@ -283,7 +283,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Date"
-                                android:focusable="false"
+                                android:focusable="true"
                                 android:clickable="true"
                                 android:inputType="none"
                                 android:contentDescription="Select pickup date" />
@@ -340,7 +340,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:clickable="true"
-                                android:focusable="false"
+                                android:focusable="true"
                                 android:hint="Date"
                                 android:inputType="none" />
                         </com.google.android.material.textfield.TextInputLayout>
