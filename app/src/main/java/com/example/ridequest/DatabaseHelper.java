@@ -282,10 +282,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Additional vehicles
         db.execSQL("INSERT INTO Vehicle (model_id, plt_number, status, fuel_level, transmission, seating_capacity, image_res_name, last_inspection_date, color, category, fuel_type) VALUES " +
-                "(1, 'VWX-1111', 'Rented', '75', 'Automatic', 5, 'car_sedan_black', '2024-11-15', 'Black', 'Sedan', 'Gasoline')");
+                "(9, 'VWX-1111', 'Rented', '75', 'Automatic', 5, 'car_gtr_orange', '2024-11-15', 'Orange', 'Sedan', 'Gasoline')");
 
         db.execSQL("INSERT INTO Vehicle (model_id, plt_number, status, fuel_level, transmission, seating_capacity, image_res_name, last_inspection_date, color, category, fuel_type) VALUES " +
-                "(2, 'YZA-2222', 'Maintenance', '60', 'Automatic', 7, 'car_suv_red', '2024-10-20', 'Red', 'SUV', 'Gasoline')");
+                "(10, 'YZA-2222', 'Maintenance', '60', 'Automatic', 7, 'car_suv_red', '2024-10-20', 'Red', 'SUV', 'Gasoline')");
     }
 
     @Override
